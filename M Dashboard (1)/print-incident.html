@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Incident report · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+  <link href="assets/css/extras.css" rel="stylesheet">
+</head>
+<body style="background:#e9ecf2;">
+
+  <div class="print-toolbar">
+    <a href="view-incident.html" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back to incident</a>
+    <div class="muted">Print-ready A4 · single incident filing</div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
+      <button class="btn btn-primary btn-sm" onclick="window.print()"><i class="bi bi-download me-1"></i>Save as PDF</button>
+    </div>
+  </div>
+
+  <article class="print-page">
+
+    <header class="brand-bar">
+      <div class="logo">
+        <div class="mark">M</div>
+        <div>
+          <div style="font-weight:800;font-size:14px;line-height:1.1;">M Dashboard Corp.</div>
+          <div style="font-size:11px;color:#555;">Security Operations · 12 Independence Ave., Accra</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div style="font-weight:700;color:#000;font-size:11px;">Incident Report</div>
+        <div>Reference: INC-2026-09-014</div>
+        <div>Filed: 14 Sep 2026 · 14:32</div>
+        <div>Status: <strong style="color:#1f7a45;">Resolved</strong></div>
+      </div>
+    </header>
+
+    <h1>Formal Incident Report</h1>
+    <div style="color:#555;font-size:12px;">Incident reference: <strong>INC-2026-09-014</strong></div>
+
+    <h2>1. Incident details</h2>
+    <table class="print-table">
+      <tbody>
+        <tr><td style="width:30%;background:#f7f8fb;font-weight:600;">Incident type</td><td>Breaking In</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Date &amp; time</td><td>14 September 2026 · 04:12</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Location</td><td>Aboadze — East gate, perimeter fence section B</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Severity / priority</td><td>High</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Reporting officer</td><td>Kwasi Ansah · ID G-001</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Officer on post</td><td>Adwoa Mensah · ID G-004 (Royal Knights)</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Vendor</td><td>Royal Knights Security</td></tr>
+      </tbody>
+    </table>
+
+    <h2>2. Description of incident</h2>
+    <p style="font-size:12px;text-align:justify;">
+      At approximately 04:12 on 14 September 2026, the east-gate motion sensor at Aboadze was triggered. CCTV footage
+      reviewed at the post showed an unknown individual attempting to force entry through the perimeter fence (section B).
+      The officer on post (Adwoa Mensah, G-004) responded within 90 seconds, at which point the suspect fled the scene.
+      No items were reported lost, and no injuries were sustained. The fence panel was found slightly bent but not breached.
+    </p>
+
+    <h2>3. Action taken</h2>
+    <ul style="font-size:12px;margin-top:4px;padding-left:18px;">
+      <li>Officer on post (G-004) raised alarm and notified shift supervisor.</li>
+      <li>Reporting officer (G-001) attended scene at 04:23 to verify and document.</li>
+      <li>CCTV footage saved to secure evidence drive (clip-2026-09-14-0412.mp4).</li>
+      <li>Locks on east-gate access point re-keyed by maintenance same day (12:00).</li>
+      <li>Perimeter fence panel scheduled for replacement on 15 Sep 2026.</li>
+    </ul>
+
+    <h2>4. Follow-up &amp; status</h2>
+    <table class="print-table">
+      <tbody>
+        <tr><td style="width:30%;background:#f7f8fb;font-weight:600;">Follow-up required</td><td>Yes — maintenance, vendor briefing</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Police involvement</td><td>None at this stage</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Attachments</td><td>incident-2026-09-14_cctv.pdf · 3.2 MB</td></tr>
+        <tr><td style="background:#f7f8fb;font-weight:600;">Current status</td><td><strong style="color:#1f7a45;">Resolved</strong> (closed 14 Sep 2026 · 17:02)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>5. Comments &amp; updates</h2>
+    <table class="print-table">
+      <thead><tr><th style="width:20%">Date &amp; time</th><th style="width:24%">By</th><th>Comment</th></tr></thead>
+      <tbody>
+        <tr><td>14/09 · 16:38</td><td>Ama Mensah (Head)</td><td>CCTV reviewed; suspect identification inconclusive but description matches a prior incident at Tema. Routed to investigator.</td></tr>
+        <tr><td>14/09 · 17:02</td><td>Kwasi Ansah (Officer)</td><td>Locks re-keyed and fence panel work order raised. Marking as resolved.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sig-row">
+      <div><div class="sig-line">Reporting officer — Kwasi Ansah · 14 Sep 2026</div></div>
+      <div><div class="sig-line">Head of Security — David Kofi · _________</div></div>
+    </div>
+
+    <footer>
+      <span>M Dashboard Corp. · CONFIDENTIAL</span>
+      <span>Page 1 of 1 · INC-2026-09-014</span>
+    </footer>
+  </article>
+
+</body>
+</html>

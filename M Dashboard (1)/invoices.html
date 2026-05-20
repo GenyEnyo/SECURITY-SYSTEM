@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vendor invoices · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+  <link href="assets/css/extras.css" rel="stylesheet">
+</head>
+<body data-page="invoices" data-crumbs='[{"label":"Reports"},{"label":"Vendor invoices"}]'>
+
+  <div class="app">
+    <aside class="app-sidebar" data-shell="sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" data-shell="topbar"></header>
+      <main class="app-content">
+
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Vendor invoices</h1>
+            <p class="page-subtitle">Upload, reconcile, approve and pay monthly invoices</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newInv">
+              <i class="bi bi-cloud-upload me-2"></i>Upload new invoice
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-3"><div class="metric-card"><div class="label">Outstanding (this month)</div><div class="value">GHS 178,895</div><div class="delta down">2 pending approval</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label">Approved YTD</div><div class="value">GHS 1.94M</div><div class="delta up">across 12 invoices</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label">Avg deduction</div><div class="value">8.4%</div><div class="delta down">shortfall avg</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label">Disputes open</div><div class="value">1</div><div class="delta down" style="color:var(--brand-warning);">Royal Knights</div></div></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="toolbar">
+          <div class="search-shadow">
+            <i class="bi bi-search"></i><input placeholder="search invoice #...">
+          </div>
+          <select class="form-control" style="width:140px;"><option>All vendors</option><option>G4S</option><option>Royal Knights</option><option>Starry Eagles</option></select>
+          <select class="form-control" style="width:140px;"><option>All statuses</option><option>Pending</option><option>Approved</option><option>Paid</option><option>Disputed</option></select>
+          <div class="spacer"></div>
+          <button class="btn btn-outline-primary"><i class="bi bi-file-earmark-excel me-2"></i>Export</button>
+        </div>
+
+        <!-- Invoice table -->
+        <table class="brand-table">
+          <thead>
+            <tr>
+              <th style="width:80px">No.</th>
+              <th>Invoice #</th>
+              <th>Vendor</th>
+              <th>Period</th>
+              <th>Invoice amount</th>
+              <th>Adjusted</th>
+              <th>Status</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-7">1</td>
+              <td><span class="fw-7">INV-2026-05-G4S</span></td>
+              <td>G4S Ghana</td>
+              <td>May 2026</td>
+              <td>GHS 130,200.00</td>
+              <td class="fw-7">GHS 121,737.00</td>
+              <td><span class="pill pill-reviewing">Pending</span></td>
+              <td><div class="row-actions">
+                <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                <a class="ra-btn" href="reconciliation.html"><i class="bi bi-calculator"></i></a>
+                <button class="ra-btn"><i class="bi bi-download"></i></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td class="fw-7">2</td>
+              <td><span class="fw-7">INV-2026-05-RK</span></td>
+              <td>Royal Knights</td>
+              <td>May 2026</td>
+              <td>GHS 46,500.00</td>
+              <td class="fw-7">GHS 39,153.00</td>
+              <td><span class="pill pill-escalated">Disputed</span></td>
+              <td><div class="row-actions">
+                <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                <a class="ra-btn" href="reconciliation.html"><i class="bi bi-calculator"></i></a>
+                <button class="ra-btn"><i class="bi bi-download"></i></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td class="fw-7">3</td>
+              <td><span class="fw-7">INV-2026-05-SE</span></td>
+              <td>Starry Eagles</td>
+              <td>May 2026</td>
+              <td>GHS 18,600.00</td>
+              <td class="fw-7">GHS 18,005.00</td>
+              <td><span class="pill pill-resolved">Approved</span></td>
+              <td><div class="row-actions">
+                <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                <a class="ra-btn" href="reconciliation.html"><i class="bi bi-calculator"></i></a>
+                <button class="ra-btn"><i class="bi bi-download"></i></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td class="fw-7">4</td>
+              <td><span class="fw-7">INV-2026-04-G4S</span></td>
+              <td>G4S Ghana</td>
+              <td>April 2026</td>
+              <td>GHS 126,000.00</td>
+              <td class="fw-7">GHS 118,440.00</td>
+              <td><span class="pill pill-closed">Paid</span></td>
+              <td><div class="row-actions">
+                <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                <a class="ra-btn" href="reconciliation.html"><i class="bi bi-calculator"></i></a>
+                <button class="ra-btn"><i class="bi bi-download"></i></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td class="fw-7">5</td>
+              <td><span class="fw-7">INV-2026-04-RK</span></td>
+              <td>Royal Knights</td>
+              <td>April 2026</td>
+              <td>GHS 45,000.00</td>
+              <td class="fw-7">GHS 41,400.00</td>
+              <td><span class="pill pill-closed">Paid</span></td>
+              <td><div class="row-actions">
+                <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                <a class="ra-btn" href="reconciliation.html"><i class="bi bi-calculator"></i></a>
+                <button class="ra-btn"><i class="bi bi-download"></i></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td class="fw-7">6</td>
+              <td><span class="fw-7">INV-2026-04-SE</span></td>
+              <td>Starry Eagles</td>
+              <td>April 2026</td>
+              <td>GHS 18,000.00</td>
+              <td class="fw-7">GHS 17,460.00</td>
+              <td><span class="pill pill-closed">Paid</span></td>
+              <td><div class="row-actions">
+                <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                <a class="ra-btn" href="reconciliation.html"><i class="bi bi-calculator"></i></a>
+                <button class="ra-btn"><i class="bi bi-download"></i></button>
+              </div></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="brand-pagination">
+          <div class="page-of">Page 1 of 4</div>
+          <div class="rows-pill">6</div>
+          <div class="rpp">rows per page</div>
+          <div class="pager">
+            <div class="pg label">Previous</div>
+            <div class="pg active">1</div><div class="pg">2</div><div class="pg">3</div><div class="pg">4</div>
+            <div class="pg label">Next</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Upload invoice modal -->
+  <div class="modal fade" id="newInv" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="border-radius:14px;border:0;">
+        <div class="modal-header">
+          <h5 class="modal-title fw-7">Upload new vendor invoice</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="field-label">Vendor</label>
+              <select class="brand-input brand-select" style="height:44px;">
+                <option>G4S Ghana</option><option>Royal Knights</option><option>Starry Eagles</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Period (month)</label>
+              <input type="month" class="brand-input" value="2026-05">
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Invoice #</label>
+              <input class="brand-input" placeholder="INV-2026-06-G4S">
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Invoice amount (GHS)</label>
+              <input type="number" class="brand-input" placeholder="195300.00">
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Contracted guard-days</label>
+              <input type="number" class="brand-input" placeholder="1302">
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Issue date</label>
+              <input type="date" class="brand-input">
+            </div>
+            <div class="col-12">
+              <label class="field-label">Attach invoice file</label>
+              <div class="brand-dropzone">
+                <i class="bi bi-cloud-arrow-up"></i>
+                <div class="dz-label">
+                  <div class="fw-7">Drop PDF here, or click to browse</div>
+                  <div class="muted fw-5" style="font-size:12px;">PDF only · max 10MB</div>
+                </div>
+                <input type="file" accept=".pdf" hidden>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-success" data-bs-dismiss="modal" onclick="window.mNotify('Invoice uploaded','success')">
+            <i class="bi bi-cloud-upload me-2"></i>Upload &amp; reconcile
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>System settings · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+  <style>
+    .settings-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; border-bottom:1px solid var(--border-soft); padding-bottom:10px;}
+    .settings-tabs .tab {
+      padding: 8px 14px; border-radius: 8px; cursor:pointer; font-weight:600; font-size:13px;
+      color: var(--text-muted); background:transparent; border:0;
+    }
+    .settings-tabs .tab.active { background: var(--brand-primary); color:#fff; }
+    .settings-pane { display:none; }
+    .settings-pane.active { display:block; }
+    .logo-uploader {
+      display:flex; gap: 18px; align-items:center;
+      background:#fff; border:1px dashed var(--border-soft); border-radius:12px; padding:18px;
+    }
+    .logo-uploader .preview {
+      width: 96px; height: 96px; border-radius:12px;
+      background: var(--brand-primary); color:#fff;
+      display:grid; place-items:center; font-weight:800; font-size:42px;
+    }
+  </style>
+</head>
+<body data-page="system-settings" data-crumbs='[{"label":"Setups"},{"label":"System settings"}]'>
+
+  <div class="app">
+    <aside class="app-sidebar" data-shell="sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" data-shell="topbar"></header>
+      <main class="app-content">
+
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">System settings</h1>
+            <p class="page-subtitle">Company info, branding, notifications and fiscal year</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-success" onclick="window.mNotify('Settings saved','success')"><i class="bi bi-check-lg me-2"></i>Save changes</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="settings-tabs">
+          <button class="tab active" data-tab="company">Company</button>
+          <button class="tab"        data-tab="branding">Branding</button>
+          <button class="tab"        data-tab="notify">Notifications</button>
+          <button class="tab"        data-tab="fiscal">Fiscal year</button>
+          <button class="tab"        data-tab="security">Security</button>
+          <button class="tab"        data-tab="integrations">Integrations</button>
+        </div>
+
+        <!-- COMPANY -->
+        <div class="settings-pane active" data-pane="company">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="field-label">Company name</label><input class="brand-input" value="M Dashboard Corp."></div>
+            <div class="col-md-6"><label class="field-label">Trading name</label><input class="brand-input" value="MDashboard"></div>
+            <div class="col-md-6"><label class="field-label">Address line 1</label><input class="brand-input" value="12 Independence Avenue"></div>
+            <div class="col-md-6"><label class="field-label">Address line 2</label><input class="brand-input" value="Ridge, Accra"></div>
+            <div class="col-md-4"><label class="field-label">Country</label><select class="brand-input brand-select"><option>Ghana</option><option>Nigeria</option><option>Kenya</option></select></div>
+            <div class="col-md-4"><label class="field-label">Tax ID</label><input class="brand-input" value="GHA-1234567"></div>
+            <div class="col-md-4"><label class="field-label">Currency</label><select class="brand-input brand-select"><option>GHS — Cedi</option><option>USD</option><option>EUR</option></select></div>
+            <div class="col-md-6"><label class="field-label">Primary contact email</label><input type="email" class="brand-input" value="admin@m-dashboard.app"></div>
+            <div class="col-md-6"><label class="field-label">Primary phone</label><input class="brand-input" value="+233 30 200 1234"></div>
+          </div>
+        </div>
+
+        <!-- BRANDING -->
+        <div class="settings-pane" data-pane="branding">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="field-label">Company logo</label>
+              <div class="logo-uploader">
+                <div class="preview">M</div>
+                <div class="flex-fill">
+                  <div class="fw-7" style="font-size:14px;">Upload your logo</div>
+                  <div class="muted fw-5" style="font-size:12px;">Recommended: 240×240 px PNG with transparent background. Max 2MB.</div>
+                  <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-primary btn-sm"><i class="bi bi-cloud-upload me-1"></i>Upload</button>
+                    <button class="btn btn-outline-primary btn-sm">Remove</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4"><label class="field-label">Primary brand color</label>
+              <div class="d-flex align-items-center gap-2"><input type="color" value="#081f39" style="width:46px;height:42px;padding:0;border:1px solid var(--border-soft);border-radius:8px;"><input class="brand-input" value="#081F39" style="flex:1;"></div>
+            </div>
+            <div class="col-md-4"><label class="field-label">Accent color</label>
+              <div class="d-flex align-items-center gap-2"><input type="color" value="#FFA91F" style="width:46px;height:42px;padding:0;border:1px solid var(--border-soft);border-radius:8px;"><input class="brand-input" value="#FFA91F" style="flex:1;"></div>
+            </div>
+            <div class="col-md-4"><label class="field-label">Success color</label>
+              <div class="d-flex align-items-center gap-2"><input type="color" value="#3DB36E" style="width:46px;height:42px;padding:0;border:1px solid var(--border-soft);border-radius:8px;"><input class="brand-input" value="#3DB36E" style="flex:1;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div class="settings-pane" data-pane="notify">
+          <div class="form-card">
+            <div class="fw-7 mb-2" style="font-size:15px;">Email notifications</div>
+            <div class="muted fw-5 mb-3" style="font-size:13px;">Choose which events trigger an email.</div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n1" checked><label class="form-check-label fw-7" for="n1">KPI scorecard not submitted by 18:00</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n2" checked><label class="form-check-label fw-7" for="n2">Deployment % below 80% on any day</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n3" checked><label class="form-check-label fw-7" for="n3">New incident logged</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n4"><label class="form-check-label fw-7" for="n4">Urgent incident logged</label></div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n5" checked><label class="form-check-label fw-7" for="n5">Monthly reconciliation ready for review</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n6" checked><label class="form-check-label fw-7" for="n6">Vendor invoice uploaded</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n7"><label class="form-check-label fw-7" for="n7">Guard contract expiring in 30 days</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n8"><label class="form-check-label fw-7" for="n8">Weekly digest (Mondays 08:00)</label></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FISCAL -->
+        <div class="settings-pane" data-pane="fiscal">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="field-label">Fiscal year starts</label>
+              <select class="brand-input brand-select"><option>January</option><option selected>April</option><option>July</option><option>October</option></select>
+            </div>
+            <div class="col-md-6"><label class="field-label">Reporting timezone</label>
+              <select class="brand-input brand-select"><option>Africa/Accra (UTC+0)</option><option>Africa/Lagos</option><option>Africa/Nairobi</option></select>
+            </div>
+            <div class="col-md-6"><label class="field-label">KPI cut-off time (daily)</label><input type="time" class="brand-input" value="18:00"></div>
+            <div class="col-md-6"><label class="field-label">Default invoice payment terms</label>
+              <select class="brand-input brand-select"><option>Net 7</option><option selected>Net 14</option><option>Net 30</option></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECURITY -->
+        <div class="settings-pane" data-pane="security">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="field-label">Password expiry</label>
+              <select class="brand-input brand-select"><option>Never</option><option>60 days</option><option selected>90 days</option><option>180 days</option></select>
+            </div>
+            <div class="col-md-6"><label class="field-label">Session timeout</label>
+              <select class="brand-input brand-select"><option>15 min</option><option selected>30 min</option><option>1 hour</option><option>4 hours</option></select>
+            </div>
+            <div class="col-12">
+              <div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" id="2fa" checked><label class="form-check-label fw-7" for="2fa">Require 2FA for all admin accounts</label></div>
+              <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="audit" checked><label class="form-check-label fw-7" for="audit">Keep full audit log (incident edits, settings changes)</label></div>
+              <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="ipwl"><label class="form-check-label fw-7" for="ipwl">Restrict logins to office IP allowlist</label></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INTEGRATIONS -->
+        <div class="settings-pane" data-pane="integrations">
+          <div class="row g-3">
+            <div class="col-md-6"><div class="shadow-card p-3 h-100">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="icon-wrap mb-0" style="background:rgba(61,179,110,.12);color:var(--brand-success);"><i class="bi bi-whatsapp"></i></div>
+                <div><div class="fw-7">WhatsApp alerts</div><div class="muted" style="font-size:12px;">Send incident pings to a WhatsApp group</div></div>
+                <div class="form-check form-switch ms-auto m-0"><input class="form-check-input" type="checkbox" checked></div>
+              </div>
+              <input class="brand-input mt-2" placeholder="WhatsApp group webhook URL" style="height:38px;font-size:13px;">
+            </div></div>
+            <div class="col-md-6"><div class="shadow-card p-3 h-100">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="icon-wrap mb-0"><i class="bi bi-file-earmark-excel"></i></div>
+                <div><div class="fw-7">Excel export</div><div class="muted" style="font-size:12px;">Auto-email monthly Excel to finance</div></div>
+                <div class="form-check form-switch ms-auto m-0"><input class="form-check-input" type="checkbox" checked></div>
+              </div>
+              <input class="brand-input mt-2" placeholder="finance@company.com" style="height:38px;font-size:13px;">
+            </div></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.querySelectorAll('.settings-tabs .tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.settings-tabs .tab').forEach(x=>x.classList.remove('active'));
+        document.querySelectorAll('.settings-pane').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        document.querySelector(`[data-pane="${t.dataset.tab}"]`).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

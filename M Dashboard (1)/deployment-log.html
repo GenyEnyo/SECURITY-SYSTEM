@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deployment log · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+  <link href="assets/css/extras.css" rel="stylesheet">
+</head>
+<body data-page="deployment-log" data-crumbs='[{"label":"Daily entry"},{"label":"Deployment log"}]'>
+
+  <div class="app">
+    <aside class="app-sidebar" data-shell="sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-topbar" data-shell="topbar"></header>
+
+      <main class="app-content" style="padding-bottom:110px;">
+
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Deployment log</h1>
+            <p class="page-subtitle">Mark today's attendance for each contracted guard</p>
+          </div>
+          <div class="actions">
+            <input type="date" class="form-control" value="2026-05-18" style="width:160px;">
+            <button class="btn btn-outline-primary"><i class="bi bi-save me-2"></i>Save draft</button>
+            <button class="btn btn-success" onclick="window.mNotify('Deployment log submitted','success'); setTimeout(()=>location.href='dashboard.html',900);">
+              <i class="bi bi-check-lg me-2"></i>Submit log
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-3"><div class="metric-card"><div class="label">Contracted today</div><div class="value">42</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label" style="color:#1f7a45;">Present</div><div class="value" style="color:#1f7a45;" id="cnt-present">38</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label" style="color:#b07000;">Late</div><div class="value" style="color:#b07000;" id="cnt-late">3</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label" style="color:#b22216;">Absent</div><div class="value" style="color:#b22216;" id="cnt-absent">1</div></div></div>
+        </div>
+
+        <!-- Bulk action toolbar -->
+        <div class="toolbar">
+          <div class="search-shadow">
+            <i class="bi bi-search"></i>
+            <input type="search" placeholder="search guard, ID, post...">
+          </div>
+          <select class="form-control" style="width:160px;">
+            <option>All vendors</option><option>G4S</option><option>Royal Knights</option><option>Starry Eagles</option>
+          </select>
+          <div class="spacer"></div>
+          <div class="d-flex gap-2 align-items-center" style="font-size:13px;">
+            <span class="muted fw-7">Mark all:</span>
+            <button class="btn btn-sm btn-success" onclick="markAll('Present')">Present</button>
+            <button class="btn btn-sm btn-warning" onclick="markAll('Late')">Late</button>
+            <button class="btn btn-sm btn-danger" onclick="markAll('Absent')">Absent</button>
+          </div>
+        </div>
+
+        <!-- Table — guards × status -->
+        <table class="brand-table">
+          <thead>
+            <tr>
+              <th style="width:60px">#</th>
+              <th>Guard</th>
+              <th>Vendor</th>
+              <th>Post</th>
+              <th>Shift</th>
+              <th>Status</th>
+              <th>Check-in time</th>
+            </tr>
+          </thead>
+          <tbody id="depl-tbody">
+            <!-- rows rendered by JS -->
+          </tbody>
+        </table>
+
+        <!-- Sticky summary -->
+        <div class="kpi-total-bar">
+          <div class="stat"><span class="lbl">Date</span><span class="val" style="font-size:14px;">Mon, 18 May 2026</span></div>
+          <div class="stat"><span class="lbl">Contracted</span><span class="val">42</span></div>
+          <div class="stat"><span class="lbl">Deployed</span><span class="val" id="deployed-val">38</span></div>
+          <div class="stat"><span class="lbl">Deployment %</span><span class="val" id="deployment-pct" style="color:var(--brand-warning);">90.5%</span></div>
+          <div class="ms-auto">
+            <button class="btn btn-success" onclick="window.mNotify('Deployment log submitted','success'); setTimeout(()=>location.href='dashboard.html',900);">
+              <i class="bi bi-check-lg me-2"></i>Submit log
+            </button>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // Demo data
+    const guards = [
+      ['G-001','Kojo Anane',     'G4S',            'Main Gate',          'Day',   'Present','06:55'],
+      ['G-002','Akua Boateng',   'G4S',            'East Wing',          'Day',   'Present','07:02'],
+      ['G-003','Yaw Mensah',     'G4S',            'Reception',          'Day',   'Late',   '07:18'],
+      ['G-004','Adwoa Mensah',   'Royal Knights',  'Engineering Bldg.',  'Day',   'Present','06:58'],
+      ['G-005','Kwame Asante',   'Royal Knights',  'Mess Hall',          'Night', 'Absent', '—'],
+      ['G-006','Esi Owusu',      'Royal Knights',  'Loading Bay',        'Day',   'Present','06:52'],
+      ['G-007','Kofi Tetteh',    'Starry Eagles',  'VRA Hospital',       'Day',   'Present','07:01'],
+      ['G-008','Ama Sarpong',    'Starry Eagles',  'KTS Tema',           'Night', 'Late',   '19:21'],
+      ['G-009','Nii Quaye',      'G4S',            'Head Office',        'Day',   'Present','06:48'],
+      ['G-010','Maame Aboagye',  'G4S',            'Academy',            'Day',   'Present','06:59'],
+      ['G-011','Ofori Atta',     'Royal Knights',  'Tema Office',        'Day',   'Late',   '07:22'],
+      ['G-012','Linda Owusu',    'Starry Eagles',  'Osu Hospital',       'Night', 'Present','19:01'],
+    ];
+    const pill = s => ({
+      Present: '<span class="pill pill-resolved">Present</span>',
+      Late:    '<span class="pill pill-reviewing">Late</span>',
+      Absent:  '<span class="pill pill-escalated">Absent</span>',
+    }[s]);
+    const tbody = document.getElementById('depl-tbody');
+    guards.forEach((g, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="fw-7">${i+1}</td>
+        <td><div class="d-flex align-items-center gap-2">
+          <div class="avatar" style="width:30px;height:30px;font-size:11px;">${g[1].split(' ').map(s=>s[0]).join('').slice(0,2)}</div>
+          <div><div class="fw-7">${g[1]}</div><div class="muted" style="font-size:11px;">${g[0]}</div></div>
+        </div></td>
+        <td>${g[2]}</td>
+        <td>${g[3]}</td>
+        <td>${g[4]}</td>
+        <td>
+          <select class="form-select form-select-sm" data-status data-row="${i}" style="font-size:12px;width:120px;">
+            <option ${g[5]==='Present'?'selected':''}>Present</option>
+            <option ${g[5]==='Late'?'selected':''}>Late</option>
+            <option ${g[5]==='Absent'?'selected':''}>Absent</option>
+          </select>
+        </td>
+        <td><input type="time" class="form-control form-control-sm" value="${g[6]==='—'?'':convertTime(g[6])}" style="width:120px;font-size:12px;"></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    function convertTime(t){ if(!t||t==='—') return ''; return t.length===5 ? t : ''; }
+    function recalc(){
+      const sels = [...document.querySelectorAll('[data-status]')];
+      const p = sels.filter(s=>s.value==='Present').length;
+      const l = sels.filter(s=>s.value==='Late').length;
+      const a = sels.filter(s=>s.value==='Absent').length;
+      const contracted = 42;
+      document.getElementById('cnt-present').textContent = p;
+      document.getElementById('cnt-late').textContent = l;
+      document.getElementById('cnt-absent').textContent = a + (contracted - sels.length);
+      const deployed = p + l;
+      const pct = ((deployed / contracted) * 100).toFixed(1);
+      document.getElementById('deployed-val').textContent = deployed;
+      const pctEl = document.getElementById('deployment-pct');
+      pctEl.textContent = pct + '%';
+      pctEl.style.color = pct >= 95 ? 'var(--brand-success)' : pct >= 80 ? 'var(--brand-warning)' : 'var(--brand-danger)';
+    }
+    document.querySelectorAll('[data-status]').forEach(s => s.addEventListener('change', recalc));
+    function markAll(v){ document.querySelectorAll('[data-status]').forEach(s=>s.value=v); recalc(); }
+    recalc();
+  </script>
+</body>
+</html>

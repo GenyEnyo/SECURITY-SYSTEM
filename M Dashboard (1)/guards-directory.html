@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guards directory · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+  <style>
+    .gd-card {
+      background:#fff; border:1px solid var(--border-soft); border-radius:12px;
+      box-shadow: var(--shadow-sm); padding: 16px 16px 14px;
+      transition: transform .12s ease;
+    }
+    .gd-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .gd-card .head { display:flex; gap: 10px; align-items:center; margin-bottom:10px; }
+    .gd-card .name { font-weight: 700; font-size: 14px; line-height:1.15; }
+    .gd-card .id { color: var(--text-muted); font-size: 11.5px; font-weight: 600; }
+    .gd-card .row-info { display:grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; font-size:12px; }
+    .gd-card .row-info .muted { font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+    .gd-card .stat-bar { display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border-soft); font-size:11.5px; }
+    .gd-card .stat-bar .col { flex:1; text-align:center; }
+    .gd-card .stat-bar .col .v { font-weight:700; font-size:14px; }
+    .gd-card .stat-bar .col .l { color: var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+  </style>
+</head>
+<body data-page="guards-directory" data-crumbs='[{"label":"Setups"},{"label":"Guards directory"}]'>
+
+  <div class="app">
+    <aside class="app-sidebar" data-shell="sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" data-shell="topbar"></header>
+      <main class="app-content">
+
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Guards directory <span class="muted fw-5" style="font-size:13px;">(read-only)</span></h1>
+            <p class="page-subtitle">Head-of-Security view: deployment stats per guard, this month</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-outline-primary"><i class="bi bi-printer me-2"></i>Print</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-shadow"><i class="bi bi-search"></i><input placeholder="search guard or post..."></div>
+          <select class="form-control" style="width:140px;"><option>All vendors</option><option>G4S</option><option>Royal Knights</option><option>Starry Eagles</option></select>
+          <div class="spacer"></div>
+          <div class="d-flex gap-2 align-items-center" style="font-size:13px;">
+            <span class="muted fw-7">View:</span>
+            <button class="btn btn-sm btn-primary"><i class="bi bi-grid-3x3-gap me-1"></i>Cards</button>
+            <a class="btn btn-sm btn-outline-primary" href="guards.html"><i class="bi bi-list me-1"></i>Table</a>
+          </div>
+        </div>
+
+        <!-- Cards grid -->
+        <div class="row g-3" id="gd-grid"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    const data = [
+      ['G-001','Kojo Anane','G4S','Main Gate','Day',     28,30,98],
+      ['G-002','Akua Boateng','G4S','East Wing','Day',   29,30,96],
+      ['G-003','Yaw Mensah','G4S','Reception','Day',     26,30,82],
+      ['G-004','Adwoa Mensah','Royal Knights','Engineering Bldg.','Day',  27,30,90],
+      ['G-005','Kwame Asante','Royal Knights','Mess Hall','Night', 24,30,75],
+      ['G-006','Esi Owusu','Royal Knights','Loading Bay','Day',    30,30,100],
+      ['G-007','Kofi Tetteh','Starry Eagles','VRA Hospital','Day', 29,30,95],
+      ['G-008','Ama Sarpong','Starry Eagles','KTS Tema','Night',   28,30,93],
+      ['G-009','Nii Quaye','G4S','Head Office','Day',              30,30,98],
+      ['G-010','Maame Aboagye','G4S','Academy','Day',              22,30,70],
+      ['G-011','Ofori Atta','Royal Knights','Tema Office','Day',   25,30,80],
+      ['G-012','Linda Owusu','Starry Eagles','Osu Hospital','Night',28,30,90],
+    ];
+    const colors = ['var(--brand-primary)','var(--brand-warning)','var(--brand-success)','var(--brand-info)','var(--brand-neutral)'];
+    const grid = document.getElementById('gd-grid');
+    data.forEach((g,i)=>{
+      const initials = g[1].split(' ').map(s=>s[0]).join('').slice(0,2);
+      const c = colors[i % colors.length];
+      const pct = (g[5]/g[6]*100).toFixed(1);
+      const kpiColor = g[7]>=95 ? '#1f7a45' : g[7]>=80 ? '#b07000' : '#a8210d';
+      grid.innerHTML += `
+        <div class="col-md-6 col-lg-4 col-xl-3">
+          <div class="gd-card">
+            <div class="head">
+              <div class="avatar" style="width:40px;height:40px;font-size:13px;background:${c};color:#fff;">${initials}</div>
+              <div>
+                <div class="name">${g[1]}</div>
+                <div class="id">${g[0]} · ${g[2]}</div>
+              </div>
+            </div>
+            <div class="row-info">
+              <div><div class="muted">Post</div><div class="fw-7">${g[3]}</div></div>
+              <div><div class="muted">Shift</div><div class="fw-7">${g[4]}</div></div>
+            </div>
+            <div class="stat-bar">
+              <div class="col"><div class="v">${g[5]}/${g[6]}</div><div class="l">Deployed</div></div>
+              <div class="col"><div class="v">${pct}%</div><div class="l">Coverage</div></div>
+              <div class="col"><div class="v" style="color:${kpiColor};">${g[7]}%</div><div class="l">KPI avg</div></div>
+            </div>
+          </div>
+        </div>`;
+    });
+  </script>
+</body>
+</html>

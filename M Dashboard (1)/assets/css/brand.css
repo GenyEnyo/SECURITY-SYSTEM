@@ -1,0 +1,151 @@
+/* =====================================================================
+   M Dashboard — Brand tokens
+   Updated palette: deep navy primary + tighter type scale.
+   ===================================================================== */
+
+:root {
+  /* ---- Brand palette ---- */
+  --brand-primary:        #081f39;          /* deep navy — buttons, headers, sidebar */
+  --brand-primary-600:    #0c2a4d;
+  --brand-primary-700:    #061629;
+  --brand-primary-rgb:    8,31,57;          /* for rgba() usage */
+  --brand-primary-tint:   #cfd9e6;          /* navy tint — card backgrounds */
+  --brand-primary-soft:   #eaf2fa;          /* lightest navy wash */
+
+  --brand-success:        #3DB36E;
+  --brand-warning:        #FFA91F;
+  --brand-warning-soft:   #EBE9D4;
+  --brand-danger:         #FC3320;
+  --brand-info:           #2A8FE0;
+  --brand-neutral:        #504A4A;
+  --brand-neutral-soft:   rgba(80,74,74,.09);
+
+  /* ---- Text ---- */
+  --text-strong:    #000000;
+  --text-muted:     rgba(0,0,0,.61);
+  --text-on-brand:  #ffffff;
+
+  /* ---- Surface ---- */
+  --surface-page:   #f5f6fb;
+  --surface-card:   #ffffff;
+  --border-soft:    rgba(0,0,0,.08);
+
+  /* ---- Shape ---- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  /* ---- Elevation ---- */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-md: 0 2px 6px rgba(0,0,0,.12);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.12);
+
+  /* ---- Layout ---- */
+  --sidebar-w: 232px;
+  --topbar-h: 60px;
+}
+
+/* =====================================================================
+   Typography — Open Sans (humanist sans-serif), tightened scale
+   ===================================================================== */
+
+html, body {
+  font-family: 'Open Sans', system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--surface-page);
+  color: var(--text-strong);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 { font-weight: 700; }
+
+.page-title       { font-size: 24px; font-weight: 700; line-height: 1.15; margin: 0; }
+.page-subtitle    { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 4px; margin-bottom: 0; }
+
+/* =====================================================================
+   Bootstrap 5 overrides — map to brand palette
+   ===================================================================== */
+
+.btn {
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .005em;
+}
+.btn-lg { padding: 11px 20px; font-size: 15px; }
+.btn-sm { padding: 5px 12px; font-size: 12.5px; }
+
+.btn-primary {
+  --bs-btn-bg:           var(--brand-primary);
+  --bs-btn-border-color: var(--brand-primary);
+  --bs-btn-hover-bg:     var(--brand-primary-600);
+  --bs-btn-hover-border-color: var(--brand-primary-600);
+  --bs-btn-active-bg:    var(--brand-primary-700);
+  --bs-btn-active-border-color: var(--brand-primary-700);
+}
+
+.btn-success {
+  --bs-btn-bg:           var(--brand-success);
+  --bs-btn-border-color: var(--brand-success);
+  --bs-btn-hover-bg:     #34a060;
+  --bs-btn-hover-border-color: #34a060;
+  color: #fff;
+}
+
+.btn-danger {
+  --bs-btn-bg:           var(--brand-danger);
+  --bs-btn-border-color: var(--brand-danger);
+  --bs-btn-hover-bg:     #e22d1c;
+  --bs-btn-hover-border-color: #e22d1c;
+}
+
+.btn-warning {
+  --bs-btn-bg:           var(--brand-warning);
+  --bs-btn-border-color: var(--brand-warning);
+  --bs-btn-color:        #fff;
+  --bs-btn-hover-bg:     #ec991b;
+  --bs-btn-hover-border-color: #ec991b;
+  --bs-btn-hover-color:  #fff;
+}
+
+.btn-outline-primary {
+  --bs-btn-color:        var(--brand-primary);
+  --bs-btn-border-color: var(--brand-primary);
+  --bs-btn-hover-bg:     var(--brand-primary);
+  --bs-btn-hover-border-color: var(--brand-primary);
+}
+
+a { color: var(--brand-primary); text-decoration: none; }
+a:hover { color: var(--brand-primary-700); text-decoration: underline; }
+
+/* Bootstrap form-control look */
+.form-control,
+.form-select {
+  border-radius: var(--radius-md);
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.form-control::placeholder { color: var(--text-muted); font-weight: 500; }
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 .2rem rgba(var(--brand-primary-rgb), .15);
+}
+.form-control[readonly],
+.form-control:disabled,
+.form-select:disabled {
+  background-color: var(--brand-neutral-soft);
+  color: var(--text-strong);
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--text-strong);
+}

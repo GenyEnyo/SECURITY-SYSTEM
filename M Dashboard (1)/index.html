@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>M Dashboard — Security Management System</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- Open Sans (humanist sans-serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+
+  <style>
+    body { background: var(--surface-page); }
+    .hero {
+      background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-600) 55%, var(--brand-primary-700) 100%);
+      color: #fff;
+      padding: 48px 36px 56px;
+      border-radius: 0 0 24px 24px;
+      position: relative; overflow: hidden;
+    }
+    .hero h1 { font-size: 34px; font-weight: 700; max-width: 720px; }
+    .hero p { font-size: 15px; opacity: .9; max-width: 580px; }
+    .hero .ring { position: absolute; border: 1px solid rgba(255,255,255,.15); border-radius: 50%; }
+    .hero .ring.r1 { width: 360px; height: 360px; right: -100px; top: -100px; }
+    .hero .ring.r2 { width: 220px; height: 220px; right: 80px; bottom: -90px; }
+    .screen-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 16px; }
+    .screen-card {
+      background: #fff; border-radius: 12px; padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-soft);
+      transition: transform .15s ease, box-shadow .15s ease;
+      display: flex; flex-direction: column; gap: 6px;
+      text-decoration: none; color: inherit;
+    }
+    .screen-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); text-decoration: none; color: inherit; }
+    .screen-card .ico {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--brand-primary-tint); color: var(--brand-primary);
+      display: grid; place-items: center; font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .screen-card.green .ico   { background: rgba(61,179,110,.15); color: var(--brand-success); }
+    .screen-card.amber .ico   { background: rgba(255,169,31,.18); color: var(--brand-warning); }
+    .screen-card.danger .ico  { background: rgba(252,51,32,.12); color: var(--brand-danger); }
+    .screen-card.purple .ico  { background: rgba(var(--brand-primary-rgb),.10); color: var(--brand-primary); }
+    .screen-card .name { font-weight: 700; font-size: 14px; }
+    .screen-card .desc { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+    .screen-card .num  { margin-left: auto; color: var(--text-muted); font-size: 11.5px; font-weight: 700; background: var(--surface-page); padding:2px 8px; border-radius:6px;}
+    .screen-card .top  { display: flex; align-items: center; }
+
+    .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .swatch {
+      width: 70px; height: 70px; border-radius: 10px;
+      display: flex; align-items: flex-end; padding: 6px;
+      color: #fff; font-weight: 700; font-size: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .role-pill {
+      display:inline-block; padding: 2px 10px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 700; letter-spacing:.04em; text-transform:uppercase;
+      background: rgba(var(--brand-primary-rgb),.1); color: var(--brand-primary);
+      margin-bottom: 4px;
+    }
+    .role-pill.officer { background: rgba(61,179,110,.15);  color:#1f7a45; }
+    .role-pill.head    { background: rgba(255,169,31,.2);   color:#8a5500; }
+    .role-pill.admin   { background: rgba(252,51,32,.12);   color:#a8210d; }
+    .role-pill.shared  { background: var(--surface-page);   color: var(--text-muted); }
+    .role-pill.print   { background: #000;                  color:#fff; }
+
+    .section-header { display:flex; justify-content:space-between; align-items:end; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <div style="width:52px;height:52px;border-radius:12px;background:#fff;color:var(--brand-primary);display:grid;place-items:center;font-weight:800;font-size:24px;">M</div>
+      <div>
+        <div class="fw-7" style="font-size:12px;letter-spacing:.2em;opacity:.7;">M&nbsp;DASHBOARD</div>
+        <div class="fw-7" style="font-size:18px;">Security Management System</div>
+      </div>
+    </div>
+    <h1 class="mt-3">A Bootstrap 5 template for tracking deployment, KPIs and incidents.</h1>
+    <p class="mt-2"><strong>25 production-ready screens</strong>, built from the Figma source and the design brief. Open Sans typography, navy brand palette, drop straight into a Laravel <code style="background:rgba(255,255,255,.15);padding:2px 8px;border-radius:6px;color:#fff;">resources/views</code> folder.</p>
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+      <a href="login.html" class="btn btn-light btn-sm fw-7"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a>
+      <a href="dashboard.html" class="btn btn-warning btn-sm"><i class="bi bi-speedometer2 me-1"></i>Officer dashboard</a>
+      <a href="head-dashboard.html" class="btn btn-success btn-sm"><i class="bi bi-bar-chart-line me-1"></i>Head dashboard</a>
+      <a href="design-system.html" class="btn btn-outline-light btn-sm"><i class="bi bi-palette me-1"></i>Design system</a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1240px; padding: 50px 24px 80px;">
+
+    <!-- ================== SHARED ================== -->
+    <div class="section-header">
+      <div>
+        <div class="role-pill shared">Shared / global</div>
+        <h2 class="page-title mt-1" style="font-size:22px;">Auth &amp; app shell</h2>
+      </div>
+      <div class="muted fw-7" style="font-size:12px;">4 screens</div>
+    </div>
+    <div class="screen-grid mb-5">
+
+      <a class="screen-card" href="login.html">
+        <div class="top"><div class="ico"><i class="bi bi-shield-lock"></i></div><span class="num">01</span></div>
+        <div class="name">Login</div>
+        <div class="desc">Email + password, branded poster panel.</div>
+      </a>
+      <a class="screen-card" href="forgot-password.html">
+        <div class="top"><div class="ico"><i class="bi bi-key"></i></div><span class="num">02</span></div>
+        <div class="name">Forgot / reset password</div>
+        <div class="desc">Two-step request → new password flow.</div>
+      </a>
+      <a class="screen-card purple" href="dashboard.html">
+        <div class="top"><div class="ico"><i class="bi bi-grid-1x2"></i></div><span class="num">03</span></div>
+        <div class="name">App shell layout</div>
+        <div class="desc">Sidebar + topbar + content area.</div>
+      </a>
+      <a class="screen-card danger" href="404.html">
+        <div class="top"><div class="ico"><i class="bi bi-shield-slash"></i></div><span class="num">04</span></div>
+        <div class="name">Empty states &amp; 404</div>
+        <div class="desc">Reusable patterns &amp; 404 page.</div>
+      </a>
+
+    </div>
+
+    <!-- ================== OFFICER ================== -->
+    <div class="section-header">
+      <div>
+        <div class="role-pill officer">Senior security officer</div>
+        <h2 class="page-title mt-1" style="font-size:22px;">Daily entry &amp; field work</h2>
+      </div>
+      <div class="muted fw-7" style="font-size:12px;">6 screens</div>
+    </div>
+    <div class="screen-grid mb-5">
+
+      <a class="screen-card green" href="dashboard.html">
+        <div class="top"><div class="ico"><i class="bi bi-speedometer2"></i></div><span class="num">05</span></div>
+        <div class="name">Officer dashboard</div>
+        <div class="desc">Today summary, quick actions, week chart.</div>
+      </a>
+      <a class="screen-card" href="kpi-entry.html">
+        <div class="top"><div class="ico"><i class="bi bi-clipboard-check"></i></div><span class="num">06</span></div>
+        <div class="name">KPI daily entry</div>
+        <div class="desc">4 group cards, auto-calc Per%, sticky total bar.</div>
+      </a>
+      <a class="screen-card" href="deployment-log.html">
+        <div class="top"><div class="ico"><i class="bi bi-people"></i></div><span class="num">07</span></div>
+        <div class="name">Deployment log</div>
+        <div class="desc">Mark Present / Late / Absent per guard.</div>
+      </a>
+      <a class="screen-card danger" href="add-incident.html">
+        <div class="top"><div class="ico"><i class="bi bi-shield-plus"></i></div><span class="num">08</span></div>
+        <div class="name">Incident report form</div>
+        <div class="desc">Two-column form with dropzone.</div>
+      </a>
+      <a class="screen-card" href="incidents.html">
+        <div class="top"><div class="ico"><i class="bi bi-shield-exclamation"></i></div><span class="num">09</span></div>
+        <div class="name">Incident list / history</div>
+        <div class="desc">My filed incidents with status pills.</div>
+      </a>
+      <a class="screen-card amber" href="my-submissions.html">
+        <div class="top"><div class="ico"><i class="bi bi-calendar3"></i></div><span class="num">10</span></div>
+        <div class="name">My submissions</div>
+        <div class="desc">Calendar + list views, KPI score per day.</div>
+      </a>
+
+    </div>
+
+    <!-- ================== HEAD ================== -->
+    <div class="section-header">
+      <div>
+        <div class="role-pill head">Head of Security</div>
+        <h2 class="page-title mt-1" style="font-size:22px;">Manager &amp; approver views</h2>
+      </div>
+      <div class="muted fw-7" style="font-size:12px;">6 screens</div>
+    </div>
+    <div class="screen-grid mb-5">
+
+      <a class="screen-card amber" href="head-dashboard.html">
+        <div class="top"><div class="ico"><i class="bi bi-bar-chart-line"></i></div><span class="num">11</span></div>
+        <div class="name">Head dashboard</div>
+        <div class="desc">Monthly KPIs, billing card, daily deployment chart.</div>
+      </a>
+      <a class="screen-card" href="reconciliation.html">
+        <div class="top"><div class="ico"><i class="bi bi-calculator"></i></div><span class="num">12</span></div>
+        <div class="name">Monthly reconciliation</div>
+        <div class="desc">31-day matrix, vendor breakdown, formula card.</div>
+      </a>
+      <a class="screen-card" href="invoices.html">
+        <div class="top"><div class="ico"><i class="bi bi-receipt"></i></div><span class="num">13</span></div>
+        <div class="name">Vendor invoices</div>
+        <div class="desc">Upload, reconcile, approve &amp; pay.</div>
+      </a>
+      <a class="screen-card green" href="kpi-reports.html">
+        <div class="top"><div class="ico"><i class="bi bi-graph-up"></i></div><span class="num">14</span></div>
+        <div class="name">KPI reports</div>
+        <div class="desc">Charts, trends, period selector, PDF export.</div>
+      </a>
+      <a class="screen-card amber" href="all-incidents.html">
+        <div class="top"><div class="ico"><i class="bi bi-shield-shaded"></i></div><span class="num">15</span></div>
+        <div class="name">All incidents (overview)</div>
+        <div class="desc">Across all officers, bulk actions.</div>
+      </a>
+      <a class="screen-card" href="guards-directory.html">
+        <div class="top"><div class="ico"><i class="bi bi-book"></i></div><span class="num">16</span></div>
+        <div class="name">Guards directory</div>
+        <div class="desc">Read-only roster with deployment stats.</div>
+      </a>
+
+    </div>
+
+    <!-- ================== ADMIN ================== -->
+    <div class="section-header">
+      <div>
+        <div class="role-pill admin">Admin</div>
+        <h2 class="page-title mt-1" style="font-size:22px;">System setup &amp; CRUD</h2>
+      </div>
+      <div class="muted fw-7" style="font-size:12px;">6 screens</div>
+    </div>
+    <div class="screen-grid mb-5">
+
+      <a class="screen-card danger" href="kpi-settings.html">
+        <div class="top"><div class="ico"><i class="bi bi-sliders"></i></div><span class="num">17</span></div>
+        <div class="name">KPI settings</div>
+        <div class="desc">Groups + sub-items, drag-reorder, weight validator.</div>
+      </a>
+      <a class="screen-card" href="guards.html">
+        <div class="top"><div class="ico"><i class="bi bi-person-badge"></i></div><span class="num">18</span></div>
+        <div class="name">Guards CRUD</div>
+        <div class="desc">Roster table, add / edit modal, filters.</div>
+      </a>
+      <a class="screen-card purple" href="locations.html">
+        <div class="top"><div class="ico"><i class="bi bi-geo-alt"></i></div><span class="num">19</span></div>
+        <div class="name">Locations / Posts</div>
+        <div class="desc">Tile grid of posts plus companies table.</div>
+      </a>
+      <a class="screen-card" href="users.html">
+        <div class="top"><div class="ico"><i class="bi bi-people"></i></div><span class="num">20</span></div>
+        <div class="name">Users &amp; roles</div>
+        <div class="desc">Role assignment, invite new user.</div>
+      </a>
+      <a class="screen-card" href="vendors.html">
+        <div class="top"><div class="ico"><i class="bi bi-building"></i></div><span class="num">21</span></div>
+        <div class="name">Vendor management</div>
+        <div class="desc">Company cards + history, contract details.</div>
+      </a>
+      <a class="screen-card amber" href="system-settings.html">
+        <div class="top"><div class="ico"><i class="bi bi-gear"></i></div><span class="num">22</span></div>
+        <div class="name">System settings</div>
+        <div class="desc">Company info, logo, notifications, fiscal year.</div>
+      </a>
+
+    </div>
+
+    <!-- ================== PRINT ================== -->
+    <div class="section-header">
+      <div>
+        <div class="role-pill print">Printable / PDF exports</div>
+        <h2 class="page-title mt-1" style="font-size:22px;">A4 print views — branded header &amp; signatures</h2>
+      </div>
+      <div class="muted fw-7" style="font-size:12px;">3 screens</div>
+    </div>
+    <div class="screen-grid mb-5">
+
+      <a class="screen-card" href="print-kpi.html">
+        <div class="top"><div class="ico"><i class="bi bi-file-earmark-pdf"></i></div><span class="num">23</span></div>
+        <div class="name">Monthly KPI report (PDF)</div>
+        <div class="desc">Summary, group results, recommendations.</div>
+      </a>
+      <a class="screen-card" href="print-billing.html">
+        <div class="top"><div class="ico"><i class="bi bi-file-earmark-pdf"></i></div><span class="num">24</span></div>
+        <div class="name">Billing reconciliation (PDF)</div>
+        <div class="desc">Contract terms, payable math line-by-line.</div>
+      </a>
+      <a class="screen-card" href="print-incident.html">
+        <div class="top"><div class="ico"><i class="bi bi-file-earmark-pdf"></i></div><span class="num">25</span></div>
+        <div class="name">Incident report (PDF)</div>
+        <div class="desc">Formal filing with signature lines.</div>
+      </a>
+
+    </div>
+
+    <!-- Palette & stack -->
+    <div class="section-divider mt-5">Brand palette</div>
+    <div class="swatch-row">
+      <div class="swatch" style="background:var(--brand-primary);">#081F39</div>
+      <div class="swatch" style="background:var(--brand-success);">#3DB36E</div>
+      <div class="swatch" style="background:var(--brand-warning);color:#000;">#FFA91F</div>
+      <div class="swatch" style="background:var(--brand-danger);">#FC3320</div>
+      <div class="swatch" style="background:var(--brand-primary-tint);color:#000;">#CFD9E6</div>
+      <div class="swatch" style="background:var(--brand-warning-soft);color:#000;">#EBE9D4</div>
+      <div class="swatch" style="background:#000;">#000000</div>
+    </div>
+
+    <div class="section-divider mt-5">Tech stack &amp; design system</div>
+    <div class="muted fw-7" style="font-size:13px;line-height:1.7">
+      Bootstrap 5.3 · Open Sans · vanilla JS · Bootstrap Icons<br>
+      <span class="fw-7">brand.css</span> — CSS variables only · <span class="fw-7">components.css</span> — all custom components · <span class="fw-7">extras.css</span> — KPI tables &amp; print layout<br>
+      Static partials in <span class="fw-7">partials.js</span> — swap for Laravel Blade includes when wiring.
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

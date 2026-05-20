@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Design System · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+
+  <style>
+    .ds-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .swatch-card {
+      border-radius: 12px; padding: 18px;
+      box-shadow: var(--shadow-sm); border:1px solid var(--border-soft);
+      background:#fff; display:flex; flex-direction:column; gap:6px;
+    }
+    .swatch-card .chip {
+      width: 100%; height: 80px; border-radius: 10px; margin-bottom: 10px;
+    }
+    .swatch-card code { background: var(--surface-page); padding: 2px 8px; border-radius: 6px; font-size: 12px; color: var(--text-strong); }
+    .ds-section { background:#fff; border-radius:14px; padding: 28px; border:1px solid var(--border-soft); margin-bottom: 22px; box-shadow: var(--shadow-sm); }
+    .ds-section h3 { font-size: 22px; font-weight:700; margin-bottom: 14px; }
+    .ds-section .lead { color: var(--text-muted); font-weight: 500; margin-bottom: 20px; }
+  </style>
+</head>
+<body data-page="design" data-crumbs='[{"label":"Design System"}]'>
+
+  <div class="app">
+    <aside class="app-sidebar" data-shell="sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-topbar" data-shell="topbar"></header>
+
+      <main class="app-content">
+
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Design System</h1>
+            <p class="page-subtitle">Colors, type, buttons, forms, tables, and status pills used across the app</p>
+          </div>
+        </div>
+
+        <!-- ============================== COLORS ============================== -->
+        <div class="ds-section">
+          <h3>Brand colors</h3>
+          <div class="lead">All colors are exposed as CSS variables in <code>assets/css/brand.css</code>.</div>
+          <div class="ds-grid">
+            <div class="swatch-card"><div class="chip" style="background:var(--brand-primary);"></div><div class="fw-7">Primary</div><code>--brand-primary · #081F39</code></div>
+            <div class="swatch-card"><div class="chip" style="background:var(--brand-success);"></div><div class="fw-7">Success</div><code>--brand-success · #3DB36E</code></div>
+            <div class="swatch-card"><div class="chip" style="background:var(--brand-warning);"></div><div class="fw-7">Warning</div><code>--brand-warning · #FFA91F</code></div>
+            <div class="swatch-card"><div class="chip" style="background:var(--brand-danger);"></div><div class="fw-7">Danger</div><code>--brand-danger · #FC3320</code></div>
+            <div class="swatch-card"><div class="chip" style="background:var(--brand-primary-tint);"></div><div class="fw-7">Primary tint</div><code>--brand-primary-tint · #C4CFF3</code></div>
+            <div class="swatch-card"><div class="chip" style="background:var(--brand-warning-soft);"></div><div class="fw-7">Warning soft</div><code>--brand-warning-soft · #EBE9D4</code></div>
+            <div class="swatch-card"><div class="chip" style="background:var(--brand-info);"></div><div class="fw-7">Info</div><code>--brand-info · #2A8FE0</code></div>
+            <div class="swatch-card"><div class="chip" style="background:#000;"></div><div class="fw-7">Text strong</div><code>--text-strong · #000000</code></div>
+          </div>
+        </div>
+
+        <!-- ============================== TYPE ============================== -->
+        <div class="ds-section">
+          <h3>Typography — Open Sans</h3>
+          <div class="lead">Display weight 700 (Semi&nbsp;Bold), body weight 500 (Medium), regular for paragraphs.</div>
+          <div class="d-flex flex-column gap-3">
+            <div><div class="muted fw-7" style="font-size:12px;">Display · 36px / 700</div><div style="font-size:36px;font-weight:700;">Manage incident reporting here</div></div>
+            <div><div class="muted fw-7" style="font-size:12px;">Headline · 24px / 700</div><div style="font-size:24px;font-weight:700;">Engineering Building</div></div>
+            <div><div class="muted fw-7" style="font-size:12px;">Title · 20px / 700</div><div style="font-size:20px;font-weight:700;">Reporting Officer</div></div>
+            <div><div class="muted fw-7" style="font-size:12px;">Body · 16px / 700</div><div style="font-size:16px;font-weight:700;">Manage incident reporting here</div></div>
+            <div><div class="muted fw-7" style="font-size:12px;">Body / Medium · 16px / 500</div><div style="font-size:16px;font-weight:500;">View incident details and add comments below the form.</div></div>
+            <div><div class="muted fw-7" style="font-size:12px;">Muted · 16px / 700 · 61% black</div><div class="muted fw-7">search for incident...</div></div>
+          </div>
+        </div>
+
+        <!-- ============================== BUTTONS ============================== -->
+        <div class="ds-section">
+          <h3>Buttons</h3>
+          <div class="lead">Bootstrap 5 classes with brand-color overrides. All buttons radius 10px, weight 700.</div>
+          <div class="d-flex flex-wrap gap-3 mb-3">
+            <button class="btn btn-primary">Primary</button>
+            <button class="btn btn-success">Success</button>
+            <button class="btn btn-danger">Danger</button>
+            <button class="btn btn-warning">Warning</button>
+            <button class="btn btn-outline-primary">Outline</button>
+            <button class="btn btn-link">Ghost / link</button>
+          </div>
+          <div class="d-flex flex-wrap gap-3 mb-3">
+            <button class="btn btn-primary"><i class="bi bi-plus-square me-2"></i>With icon</button>
+            <button class="btn btn-success"><i class="bi bi-check-lg me-2"></i>Save</button>
+            <button class="btn btn-danger"><i class="bi bi-x-lg me-2"></i>Cancel</button>
+            <button class="btn btn-primary" disabled><span class="spinner-border spinner-border-sm me-2"></span>Loading…</button>
+            <button class="btn btn-primary" disabled>Disabled</button>
+          </div>
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <button class="btn btn-primary btn-sm">Small</button>
+            <button class="btn btn-primary">Default</button>
+            <button class="btn btn-primary btn-lg">Large</button>
+          </div>
+        </div>
+
+        <!-- ============================== INPUTS ============================== -->
+        <div class="ds-section">
+          <h3>Form inputs</h3>
+          <div class="lead">Brand-style inputs are 82px tall with drop shadow (per Figma). Bootstrap <code>.form-control</code> is also styled to match.</div>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="field-label">Default</label>
+              <input class="brand-input" placeholder="Type something...">
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Filled</label>
+              <input class="brand-input" value="Kwasi Ansah">
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Read-only</label>
+              <input class="brand-input readonly" value="Auto-filled from session" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Dropdown</label>
+              <select class="brand-input brand-select">
+                <option>Select option...</option>
+                <option>Low</option><option>Medium</option><option>High</option>
+              </select>
+            </div>
+            <div class="col-md-12">
+              <label class="field-label">Textarea</label>
+              <textarea class="brand-input" rows="3" placeholder="The issue I want to report is..."></textarea>
+            </div>
+            <div class="col-md-12">
+              <label class="field-label">File dropzone</label>
+              <div class="brand-dropzone">
+                <i class="bi bi-cloud-arrow-up"></i>
+                <div class="dz-label">
+                  <div class="fw-7">Drop a file here, or click to browse</div>
+                  <div class="muted fw-5" style="font-size:14px;">PNG, JPG, PDF, DOCX — max 5MB</div>
+                </div>
+                <input type="file" hidden>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================== PILLS / BADGES ============================== -->
+        <div class="ds-section">
+          <h3>Status pills</h3>
+          <div class="lead">Used in tables for status & severity columns. Semantic color families.</div>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="pill pill-resolved">Resolved</span>
+            <span class="pill pill-reported">Reported</span>
+            <span class="pill pill-reviewing">Reviewing</span>
+            <span class="pill pill-escalated">Escalated</span>
+            <span class="pill pill-closed">Closed</span>
+          </div>
+          <div class="muted fw-7 mt-3" style="font-size:13px;">Severity</div>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <span class="pill pill-low">Low</span>
+            <span class="pill pill-medium">Medium</span>
+            <span class="pill pill-high">High</span>
+            <span class="pill pill-urgent">Urgent</span>
+          </div>
+        </div>
+
+        <!-- ============================== TABLE ============================== -->
+        <div class="ds-section">
+          <h3>Data table</h3>
+          <div class="lead">Indigo header bar, white rows, row hover state, inline icon actions.</div>
+          <table class="brand-table">
+            <thead><tr>
+              <th style="width:80px">No.</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th class="actions-col">Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="fw-7">1</td><td>Kwasi Ansah</td><td>Senior Officer</td><td><span class="pill pill-resolved">Active</span></td>
+                <td><div class="row-actions">
+                  <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                  <button class="ra-btn"><i class="bi bi-pencil-square"></i></button>
+                  <button class="ra-btn danger"><i class="bi bi-trash"></i></button>
+                </div></td></tr>
+              <tr><td class="fw-7">2</td><td>Ama Mensah</td><td>Admin</td><td><span class="pill pill-closed">Inactive</span></td>
+                <td><div class="row-actions">
+                  <button class="ra-btn"><i class="bi bi-eye"></i></button>
+                  <button class="ra-btn"><i class="bi bi-pencil-square"></i></button>
+                  <button class="ra-btn danger"><i class="bi bi-trash"></i></button>
+                </div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ============================== CARDS ============================== -->
+        <div class="ds-section">
+          <h3>Cards</h3>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="metric-card">
+                <div class="icon-wrap"><i class="bi bi-people-fill"></i></div>
+                <div class="label">Metric card</div>
+                <div class="value">42</div>
+                <div class="delta up"><i class="bi bi-arrow-up"></i> 2 vs. last shift</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="location-tile">
+                <div>
+                  <div class="title">Location tile</div>
+                  <div class="sub muted mt-2">Tema</div>
+                </div>
+                <button class="btn btn-primary">Manage</button>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="shadow-card p-4 h-100">
+                <div class="fw-7 mb-2" style="font-size:18px;">Content card</div>
+                <div class="muted fw-5">White surface, drop-shadow, 10px radius. Use for form groups and panels.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================== ALERTS ============================== -->
+        <div class="ds-section">
+          <h3>Alerts</h3>
+          <div class="d-flex flex-column gap-3">
+            <div class="alert d-flex align-items-center gap-3 mb-0" style="background:rgba(61,179,110,.1);border:1px solid var(--brand-success);border-radius:10px;color:#1f7a45;">
+              <i class="bi bi-check-circle-fill" style="font-size:22px;"></i>
+              <div><div class="fw-7">KPI scorecard submitted</div><div class="fw-5">Your daily scorecard has been recorded.</div></div>
+            </div>
+            <div class="alert d-flex align-items-center gap-3 mb-0" style="background:var(--brand-warning-soft);border:1px solid var(--brand-warning);border-radius:10px;color:#b07000;">
+              <i class="bi bi-exclamation-octagon-fill" style="font-size:22px;"></i>
+              <div><div class="fw-7">Deployment % below target</div><div class="fw-5">Only 90.5% of contracted guards on post today.</div></div>
+            </div>
+            <div class="alert d-flex align-items-center gap-3 mb-0" style="background:rgba(252,51,32,.08);border:1px solid var(--brand-danger);border-radius:10px;color:#b22216;">
+              <i class="bi bi-x-octagon-fill" style="font-size:22px;"></i>
+              <div><div class="fw-7">Unable to save</div><div class="fw-5">Network error — your draft was kept locally.</div></div>
+            </div>
+            <div class="alert d-flex align-items-center gap-3 mb-0" style="background:var(--brand-primary-soft);border:1px solid var(--brand-info);border-radius:10px;color:#1a5fa1;">
+              <i class="bi bi-info-circle-fill" style="font-size:22px;"></i>
+              <div><div class="fw-7">A new incident type was added</div><div class="fw-5">"Suspicious package" is now selectable in the report form.</div></div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-primary" onclick="window.mNotify('Saved successfully','success')">Show success toast</button>
+            <button class="btn btn-danger" onclick="window.mNotify('Could not delete record','danger')">Show error toast</button>
+          </div>
+        </div>
+
+        <!-- ============================== PAGINATION ============================== -->
+        <div class="ds-section">
+          <h3>Pagination</h3>
+          <div class="brand-pagination" style="margin-top:0;">
+            <div class="page-of">Page 1 of 10</div>
+            <div class="rows-pill">5</div>
+            <div class="rpp">rows per page</div>
+            <div class="pager">
+              <div class="pg label">Previous</div>
+              <div class="pg active">1</div>
+              <div class="pg">2</div>
+              <div class="pg">…</div>
+              <div class="pg">4</div>
+              <div class="pg">5</div>
+              <div class="pg label">Next</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================== AVATARS ============================== -->
+        <div class="ds-section">
+          <h3>Avatars</h3>
+          <div class="d-flex gap-3 align-items-center">
+            <div class="avatar">KA</div>
+            <div class="avatar" style="background:rgba(255,169,31,.2);color:#b07000;">GA</div>
+            <div class="avatar" style="background:rgba(252,51,32,.15);color:#b22216;">BA</div>
+            <div class="avatar" style="background:rgba(61,179,110,.18);color:#1f7a45;">DK</div>
+            <div class="avatar" style="background:#000;color:#fff;">AM</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guards · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+</head>
+<body data-page="guards" data-crumbs='[{"label":"Setups"},{"label":"Guards"}]'>
+
+  <div class="app">
+    <aside class="app-sidebar" data-shell="sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" data-shell="topbar"></header>
+      <main class="app-content">
+
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Guards</h1>
+            <p class="page-subtitle">Roster of contracted guards across all vendors</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-outline-primary"><i class="bi bi-file-earmark-excel me-2"></i>Export</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGuard"><i class="bi bi-plus-square me-2"></i>Add guard</button>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-shadow">
+            <i class="bi bi-search"></i><input placeholder="search name, ID, phone...">
+          </div>
+          <select class="form-control" style="width:140px;"><option>All vendors</option><option>G4S</option><option>Royal Knights</option><option>Starry Eagles</option></select>
+          <select class="form-control" style="width:140px;"><option>All posts</option><option>Main Gate</option><option>East Wing</option><option>Reception</option></select>
+          <select class="form-control" style="width:140px;"><option>All statuses</option><option>Active</option><option>On leave</option><option>Inactive</option></select>
+        </div>
+
+        <!-- Guards table -->
+        <table class="brand-table">
+          <thead>
+            <tr>
+              <th style="width:60px">#</th>
+              <th>Guard</th>
+              <th>ID number</th>
+              <th>Phone</th>
+              <th>Vendor</th>
+              <th>Post assigned</th>
+              <th>Shift</th>
+              <th>Status</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="guards-tbody"></tbody>
+        </table>
+
+        <div class="brand-pagination">
+          <div class="page-of">Page 1 of 4</div>
+          <div class="rows-pill">10</div>
+          <div class="rpp">rows per page</div>
+          <div class="pager">
+            <div class="pg label">Previous</div>
+            <div class="pg active">1</div><div class="pg">2</div><div class="pg">3</div><div class="pg">4</div>
+            <div class="pg label">Next</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Add / Edit guard modal -->
+  <div class="modal fade" id="addGuard" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="border-radius:14px;border:0;">
+        <div class="modal-header"><h5 class="modal-title fw-7">Add a guard</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="field-label">Full name</label><input class="brand-input" placeholder="e.g. Kojo Anane"></div>
+            <div class="col-md-6"><label class="field-label">ID number</label><input class="brand-input" placeholder="e.g. G-013"></div>
+            <div class="col-md-6"><label class="field-label">Phone</label><input class="brand-input" placeholder="+233 ..."></div>
+            <div class="col-md-6"><label class="field-label">Gender</label>
+              <select class="brand-input brand-select"><option>Male</option><option>Female</option></select>
+            </div>
+            <div class="col-md-6"><label class="field-label">Vendor</label>
+              <select class="brand-input brand-select"><option>G4S</option><option>Royal Knights</option><option>Starry Eagles</option></select>
+            </div>
+            <div class="col-md-6"><label class="field-label">Post / Location</label>
+              <select class="brand-input brand-select"><option>Main Gate</option><option>East Wing</option><option>Reception</option><option>Mess Hall</option></select>
+            </div>
+            <div class="col-md-6"><label class="field-label">Shift</label>
+              <select class="brand-input brand-select"><option>Day</option><option>Night</option><option>Rotating</option></select>
+            </div>
+            <div class="col-md-3"><label class="field-label">Contract start</label><input type="date" class="brand-input"></div>
+            <div class="col-md-3"><label class="field-label">Contract end</label><input type="date" class="brand-input"></div>
+            <div class="col-12">
+              <div class="form-check form-switch mt-2">
+                <input class="form-check-input" type="checkbox" id="g-active" checked>
+                <label class="form-check-label fw-7" for="g-active">Active</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-success" data-bs-dismiss="modal" onclick="window.mNotify('Guard added','success')"><i class="bi bi-check-lg me-2"></i>Save guard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    const guards = [
+      ['G-001','Kojo Anane','+233 24 311 2201','G4S','Main Gate','Day','Active'],
+      ['G-002','Akua Boateng','+233 24 311 2202','G4S','East Wing','Day','Active'],
+      ['G-003','Yaw Mensah','+233 24 311 2203','G4S','Reception','Day','Active'],
+      ['G-004','Adwoa Mensah','+233 20 411 3204','Royal Knights','Engineering Bldg.','Day','Active'],
+      ['G-005','Kwame Asante','+233 20 411 3205','Royal Knights','Mess Hall','Night','On leave'],
+      ['G-006','Esi Owusu','+233 20 411 3206','Royal Knights','Loading Bay','Day','Active'],
+      ['G-007','Kofi Tetteh','+233 26 511 4207','Starry Eagles','VRA Hospital','Day','Active'],
+      ['G-008','Ama Sarpong','+233 26 511 4208','Starry Eagles','KTS Tema','Night','Active'],
+      ['G-009','Nii Quaye','+233 24 311 2209','G4S','Head Office','Day','Active'],
+      ['G-010','Maame Aboagye','+233 24 311 2210','G4S','Academy','Day','Inactive'],
+    ];
+    const statusPill = {
+      Active: '<span class="pill pill-resolved">Active</span>',
+      'On leave': '<span class="pill pill-reviewing">On leave</span>',
+      Inactive: '<span class="pill pill-closed">Inactive</span>',
+    };
+    const tb = document.getElementById('guards-tbody');
+    guards.forEach((g,i)=>{
+      const initials = g[1].split(' ').map(s=>s[0]).join('').slice(0,2);
+      const dim = g[6]==='Inactive' ? 'style="opacity:.6;"' : '';
+      tb.innerHTML += `
+        <tr ${dim}>
+          <td class="fw-7">${i+1}</td>
+          <td><div class="d-flex align-items-center gap-2">
+            <div class="avatar" style="width:30px;height:30px;font-size:11px;">${initials}</div>
+            <div class="fw-7">${g[1]}</div>
+          </div></td>
+          <td class="fw-7">${g[0]}</td>
+          <td>${g[2]}</td>
+          <td>${g[3]}</td>
+          <td>${g[4]}</td>
+          <td>${g[5]}</td>
+          <td>${statusPill[g[6]]}</td>
+          <td><div class="row-actions">
+            <button class="ra-btn"><i class="bi bi-eye"></i></button>
+            <button class="ra-btn" data-bs-toggle="modal" data-bs-target="#addGuard"><i class="bi bi-pencil-square"></i></button>
+            <button class="ra-btn danger"><i class="bi bi-trash"></i></button>
+          </div></td>
+        </tr>`;
+    });
+  </script>
+</body>
+</html>

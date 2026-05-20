@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My submissions · M Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/brand.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+  <style>
+    .cal-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .cal-day {
+      background:#fff; border:1px solid var(--border-soft); border-radius:8px;
+      padding: 8px; min-height: 78px;
+      display:flex; flex-direction:column; gap:4px;
+      position: relative;
+    }
+    .cal-day.outside { opacity:.35; }
+    .cal-day .dnum { font-size:11px; font-weight:700; color: var(--text-muted); }
+    .cal-day .marks { display:flex; gap:3px; flex-wrap:wrap; }
+    .cal-day .mark {
+      width:8px; height:8px; border-radius:50%;
+    }
+    .cal-day .pct {
+      position:absolute; bottom:6px; right:8px;
+      font-size:10px; font-weight:700; color: var(--text-muted);
+    }
+    .cal-head {
+      display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .04em;
+      padding: 0 4px 6px;
+    }
+    .legend { display:flex; gap:14px; font-size:12px; align-items:center; }
+    .legend .mark { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  </style>
+</head>
+<body data-page="my-submissions" data-crumbs='[{"label":"Records"},{"label":"My submissions"}]'>
+
+  <div class="app">
+    <aside class="app-sidebar" data-shell="sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" data-shell="topbar"></header>
+      <main class="app-content">
+
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">My submissions</h1>
+            <p class="page-subtitle">KPI scorecards and deployment logs you've filed</p>
+          </div>
+          <div class="actions">
+            <select class="form-control" style="width:160px;"><option>April 2026</option><option selected>May 2026</option><option>June 2026</option></select>
+            <div class="btn-group">
+              <button class="btn btn-primary btn-sm" id="view-cal"><i class="bi bi-calendar3 me-1"></i>Calendar</button>
+              <button class="btn btn-outline-primary btn-sm" id="view-list"><i class="bi bi-list me-1"></i>List</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-3"><div class="metric-card"><div class="label">KPI scorecards</div><div class="value">22 / 22</div><div class="delta up">100% compliance</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label">Deployment logs</div><div class="value">22 / 22</div><div class="delta up">100% compliance</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label">Avg KPI score</div><div class="value">89.4%</div><div class="delta up">+2.1 vs Apr</div></div></div>
+          <div class="col-md-3"><div class="metric-card"><div class="label">Incidents filed</div><div class="value">3</div><div class="delta muted" style="color:var(--text-muted);">1 still open</div></div></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend mb-3">
+          <span><span class="mark" style="background:var(--brand-primary);"></span> KPI scorecard</span>
+          <span><span class="mark" style="background:var(--brand-success);"></span> Deployment log</span>
+          <span><span class="mark" style="background:var(--brand-warning);"></span> Incident reported</span>
+          <span class="muted">• % shows the day's KPI score</span>
+        </div>
+
+        <!-- Calendar view -->
+        <div id="cal-view">
+          <div class="cal-head">
+            <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+
+        <!-- List view -->
+        <div id="list-view" style="display:none;" class="mt-3">
+          <table class="brand-table">
+            <thead><tr><th>Date</th><th>Day</th><th>KPI</th><th>Deployment</th><th>Incidents</th><th>KPI score</th><th class="actions-col">Actions</th></tr></thead>
+            <tbody id="list-tbody"></tbody>
+          </table>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // May 2026 starts on Friday. 31 days. We'll render 6 weeks.
+    const grid = document.getElementById('cal-grid');
+    const listTb = document.getElementById('list-tbody');
+    // Mon=0 in our layout
+    const firstWeekday = 4; // Mon=0..Sun=6 -> May 1 2026 is Friday
+    const totalDays = 31;
+    const cells = 42; // 6 weeks
+    const today = 18;
+    const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    for (let i = 0; i < cells; i++) {
+      const dnum = i - firstWeekday + 1;
+      const inMonth = dnum >= 1 && dnum <= totalDays;
+      const div = document.createElement('div');
+      div.className = 'cal-day' + (inMonth ? '' : ' outside');
+      const isFuture = inMonth && dnum > today;
+      const isWeekend = i % 7 >= 5;
+      let marks = '';
+      let pct = '';
+      if (inMonth && !isFuture && !isWeekend) {
+        marks += '<span class="mark" style="background:var(--brand-primary);"></span>';
+        marks += '<span class="mark" style="background:var(--brand-success);"></span>';
+        const score = 80 + Math.round(Math.random()*18);
+        pct = score + '%';
+        if ([3, 11, 18].includes(dnum)) marks += '<span class="mark" style="background:var(--brand-warning);"></span>';
+        // build list row
+        listTb.innerHTML += `<tr>
+          <td class="fw-7">${String(dnum).padStart(2,'0')} May 2026</td>
+          <td>${dayNames[i%7]}</td>
+          <td><span class="pill pill-resolved">Filed</span></td>
+          <td><span class="pill pill-resolved">Filed</span></td>
+          <td>${[3,11,18].includes(dnum) ? '<span class="pill pill-reviewing">1</span>' : '<span class="muted">0</span>'}</td>
+          <td><strong>${score}%</strong></td>
+          <td><div class="row-actions"><button class="ra-btn"><i class="bi bi-eye"></i></button><button class="ra-btn"><i class="bi bi-download"></i></button></div></td>
+        </tr>`;
+      } else if (inMonth && !isFuture && isWeekend) {
+        div.style.background = 'var(--surface-page)';
+      }
+      div.innerHTML = `<div class="dnum">${inMonth ? dnum : ''}</div>
+                       <div class="marks">${marks}</div>
+                       <div class="pct">${pct}</div>`;
+      if (dnum === today) {
+        div.style.border = '2px solid var(--brand-primary)';
+        div.style.background = 'var(--brand-primary-soft)';
+      }
+      grid.appendChild(div);
+    }
+    // Toggle views
+    document.getElementById('view-cal').addEventListener('click', () => {
+      document.getElementById('cal-view').style.display = '';
+      document.getElementById('list-view').style.display = 'none';
+      document.getElementById('view-cal').classList.add('btn-primary'); document.getElementById('view-cal').classList.remove('btn-outline-primary');
+      document.getElementById('view-list').classList.remove('btn-primary'); document.getElementById('view-list').classList.add('btn-outline-primary');
+    });
+    document.getElementById('view-list').addEventListener('click', () => {
+      document.getElementById('cal-view').style.display = 'none';
+      document.getElementById('list-view').style.display = '';
+      document.getElementById('view-list').classList.add('btn-primary'); document.getElementById('view-list').classList.remove('btn-outline-primary');
+      document.getElementById('view-cal').classList.remove('btn-primary'); document.getElementById('view-cal').classList.add('btn-outline-primary');
+    });
+  </script>
+</body>
+</html>
