@@ -18,7 +18,6 @@ class UpdateIncidentOccurrenceRequest extends FormRequest
             'occurred_at'        => ['required', 'date'],
             'location_id'        => ['required', 'exists:locations,id'],
             'severity_id'        => ['required', 'exists:severities,id'],
-            'incident_status_id' => ['nullable', 'exists:incident_statuses,id'],
             'description'        => ['nullable', 'string', 'max:5000'],
             'attachment'         => ['nullable', 'file', 'mimes:png,jpg,jpeg,pdf,docx', 'max:5120'],
         ];

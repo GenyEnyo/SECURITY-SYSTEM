@@ -20,6 +20,12 @@
       { id: 'locations',       label: 'Locations',            icon: 'bi-geo-alt',             href: '/locations' },
       { id: 'users',           label: 'Users',                icon: 'bi-people',              href: '/users' },
     ]},
+    { title: 'Settings', items: [
+      { id: 'settings', label: 'Settings', icon: 'bi-gear', children: [
+        { id: 'incident-types',  label: 'Incident Types', icon: 'bi-tag',       href: '/settings/incident-types' },
+        { id: 'severity-levels', label: 'Severity Level', icon: 'bi-bar-chart', href: '/settings/severity-levels' },
+      ]},
+    ]},
     { title: 'Resources', items: [
       { id: 'logout',          label: 'Sign out',             icon: 'bi-box-arrow-right',     href: '#', logout: true },
     ]},
@@ -41,7 +47,25 @@
       g.items.forEach(it => {
         const isActive = it.id === active ? ' active' : '';
         const badge = it.badge ? `<span class="sidebar-badge">${it.badge}</span>` : '';
-        if (it.logout) {
+        if (it.children) {
+          const childActive = it.children.some(c => c.id === active);
+          const openCls = childActive ? ' open' : '';
+          const hiddenCls = childActive ? '' : ' d-none';
+          html += `<button type="button" class="nav-link sidebar-link sidebar-parent${openCls}"
+                            onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('d-none')"
+                            style="width:100%;background:none;border:0;text-align:left;display:flex;align-items:center;">
+                      <i class="bi ${it.icon}"></i><span>${it.label}</span>
+                      <i class="bi bi-chevron-down ms-auto" style="font-size:11px;"></i>
+                    </button>
+                    <div class="sidebar-children${hiddenCls}" style="padding-left:24px;">`;
+          it.children.forEach(c => {
+            const cActive = c.id === active ? ' active' : '';
+            html += `<a class="nav-link sidebar-link${cActive}" href="${c.href}">
+                        <i class="bi ${c.icon}"></i><span>${c.label}</span>
+                     </a>`;
+          });
+          html += `</div>`;
+        } else if (it.logout) {
           html += `<form action="/logout" method="POST" style="margin:0;">
                       <input type="hidden" name="_token" value="${csrf}">
                       <button type="submit" class="nav-link sidebar-link${isActive}" style="width:100%;background:none;border:0;text-align:left;">

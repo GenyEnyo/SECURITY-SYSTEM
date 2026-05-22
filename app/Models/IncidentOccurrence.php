@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class IncidentOccurrence extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'incident_type_id',
         'occurred_at',
@@ -24,7 +27,7 @@ class IncidentOccurrence extends Model
 
     public function incidentType(): BelongsTo
     {
-        return $this->belongsTo(IncidentType::class);
+        return $this->belongsTo(IncidentType::class)->withTrashed();
     }
 
     public function location(): BelongsTo
@@ -34,7 +37,7 @@ class IncidentOccurrence extends Model
 
     public function severity(): BelongsTo
     {
-        return $this->belongsTo(Severity::class);
+        return $this->belongsTo(Severity::class)->withTrashed();
     }
 
     public function status(): BelongsTo

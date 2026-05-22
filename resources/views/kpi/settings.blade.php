@@ -35,10 +35,10 @@
         </div>
 
         <!-- Weight banner -->
-        <div class="weight-banner valid">
+        {{-- <div class="weight-banner valid">
           <i class="bi bi-check-circle-fill"></i>
           <div><strong>Total weight: 100%</strong> — configuration is valid and ready for officer use.</div>
-        </div>
+        </div> --}}
 
         <!-- ============== Group 1 ============== -->
         <section class="kpi-group" data-group>

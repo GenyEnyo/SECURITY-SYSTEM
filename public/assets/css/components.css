@@ -468,3 +468,55 @@ textarea.brand-input { height: auto; min-height: 96px; line-height: 1.45; }
 .muted { color: var(--text-muted); }
 .fw-7  { font-weight: 700; }
 .fw-5  { font-weight: 500; }
+
+/* ---------- DataTables.net 2.x Bootstrap 5 — brand overrides ---------- */
+
+.dt-search input {
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.dt-search label { width: 100%; display: block; }
+.pagination .page-link {
+  color: var(--brand-primary);
+  border-color: var(--border-soft);
+}
+.pagination .page-item.active .page-link {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #fff;
+}
+.dt-length label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.dt-length select {
+  width: auto;
+  height: 34px;
+  padding: 4px 28px 4px 10px;
+  font-size: 13px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background-position: right 8px center;
+}
+.dt-info { font-size: 13px; color: var(--text-muted); }
+
+/* Keep the No. (and any numeric) column left-aligned in brand tables */
+.brand-table td.dt-type-numeric,
+.brand-table th.dt-type-numeric {
+  text-align: left;
+}
+
+/* ---------- Sidebar dropdown parent ---------- */
+
+.sidebar-parent { cursor: pointer; }
+.sidebar-parent .bi-chevron-down { transition: transform .15s ease; }
+.sidebar-parent.open .bi-chevron-down { transform: rotate(180deg); }
+.sidebar-children .sidebar-link { font-size: 13px; }

@@ -39,7 +39,7 @@ class IncidentOccurrenceController extends Controller
     public function store(StoreIncidentOccurrenceRequest $request)
     {
         $data = $request->validated();
-        $data['incident_status_id'] ??= IncidentStatus::where('name', 'Reported')->value('id');
+        $data['incident_status_id'] = IncidentStatus::where('name', 'Reported')->value('id');
         $data['user_id'] = 1;
 
         if ($request->hasFile('attachment')) {
