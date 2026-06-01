@@ -13,4 +13,9 @@ class Location extends Model
     {
         return $this->hasMany(IncidentOccurrence::class);
     }
+
+    public function buildings(): HasMany
+    {
+        return $this->hasMany(Building::class)->orderBy('name');
+    }
 }

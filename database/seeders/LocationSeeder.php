@@ -9,7 +9,7 @@ class LocationSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (['Accra', 'Akuse', 'Aboadze', 'Akosombo', 'Tema', 'Head Office'] as $name) {
+        foreach (['Accra', 'Akuse', 'Aboadze', 'Akosombo', 'Tema'] as $name) {
             Location::firstOrCreate(['name' => $name]);
         }
     }

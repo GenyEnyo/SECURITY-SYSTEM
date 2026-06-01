@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
             IncidentStatusSeeder::class,
             IncidentTypeSeeder::class,
             LocationSeeder::class,
+            BuildingSeeder::class,
+            SecurityCompanySeeder::class,
+            ShiftSeeder::class,
             SeveritySeeder::class,
             UserSeeder::class,
         ]);

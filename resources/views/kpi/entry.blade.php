@@ -30,7 +30,7 @@
             <p class="page-subtitle">Record today's performance scores for each KPI group</p>
           </div>
           <div class="actions">
-            <input type="date" class="form-control" id="kpi-date" value="2026-05-18" style="width:160px;">
+            <input type="date" class="form-control" id="kpi-date" value="{{ now()->toDateString() }}" style="width:160px;">
             <!-- <button class="btn btn-outline-primary"><i class="bi bi-save me-2"></i>Save draft</button>
             <button class="btn btn-success" onclick="window.mNotify('Scorecard submitted','success'); setTimeout(()=>location.href='/dashboard',900);">
               <i class="bi bi-check-lg me-2"></i>Submit scorecard
@@ -44,163 +44,53 @@
           <div>Active groups total <strong>100%</strong> — scoring is enabled.</div>
         </div> -->
 
-        <!-- =================== KPI Group 1 =================== -->
-        <section class="kpi-group" data-group>
-          <header onclick="this.parentElement.classList.toggle('collapsed')">
-            <div>
-              <h4>Bearing &amp; App 10</h4>
-              <div class="muted fw-5" style="font-size:12px;">weight 10%</div>
+        @forelse ($groups as $group)
+          <section class="kpi-group" data-group>
+            <header onclick="this.parentElement.classList.toggle('collapsed')">
+              <div>
+                <h4>{{ $group->name }}</h4>
+                <div class="muted fw-5" style="font-size:12px;">
+                  {{ $group->subItems->count() }} sub-item{{ $group->subItems->count() === 1 ? '' : 's' }} · weight {{ $group->weight }}%
+                </div>
+              </div>
+              <div class="kpi-meta">
+                <i class="bi bi-chevron-down chev" style="font-size:16px;"></i>
+              </div>
+            </header>
+            <div class="body">
+              @if ($group->subItems->isEmpty())
+                <p class="muted fw-5 mb-0" style="font-size:13px;">No sub-items configured for this group.</p>
+              @else
+                <table class="kpi-table">
+                  <thead>
+                    <tr>
+                      <th style="width:48%">{{ $group->criteria_label }}</th>
+                      <th>{{ $group->target_label }}</th>
+                      <th>Scored</th>
+                      <th>Per %</th>
+                      <th>Merit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach ($group->subItems as $item)
+                      <tr data-sub-item-id="{{ $item->id }}">
+                        <td>{{ $item->criteria }}</td>
+                        <td><input type="number" value="{{ $item->target }}" readonly></td>
+                        <td><input type="number" name="scored[{{ $item->id }}]"></td>
+                        <td class="per-cell">—</td>
+                        <td><input type="number" step="0.1" name="merit[{{ $item->id }}]"></td>
+                      </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              @endif
             </div>
-            <div class="kpi-meta">
-              <span>Group score <strong id="g1-score" style="color:var(--text-strong);font-size:14px;">88%</strong></span>
-              <i class="bi bi-chevron-down chev" style="font-size:16px;"></i>
-            </div>
-          </header>
-          <div class="body">
-            <table class="kpi-table">
-              <thead>
-                <tr>
-                  <th style="width:48%">Sub-item</th>
-                  <th>Target</th>
-                  <th>Scored</th>
-                  <th>Per %</th>
-                  <th>Merit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Criteria</td>
-                  <td><input type="number" value="42"></td>
-                  <td><input type="number" value="40"></td>
-                  <td class="per-cell per-green">95.2%</td>
-                  <td><input type="number" value="9.5"></td>
-                </tr>
-                <tr>
-                  <td>Turnout</td>
-                  <td><input type="number" value="42"></td>
-                  <td><input type="number" value="32"></td>
-                  <td class="per-cell per-amber">76.2%</td>
-                  <td><input type="number" value="7.6"></td>
-                </tr>
-                <tr>
-                  <td>Neatness</td>
-                  <td><input type="number" value="3"></td>
-                  <td><input type="number" value="6"></td>
-                  <td class="per-cell per-red">50.0%</td>
-                  <td><input type="number" value="5.0"></td>
-                </tr>
-                <tr>
-                  <td>Equipped</td>
-                  <td><input type="number" value="3"></td>
-                  <td><input type="number" value="6"></td>
-                  <td class="per-cell per-red">50.0%</td>
-                  <td><input type="number" value="5.0"></td>
-                </tr>
-              </tbody>
-            </table>
+          </section>
+        @empty
+          <div class="muted fw-5" style="padding:32px;text-align:center;border:1px dashed var(--border-soft);border-radius:12px;">
+            No KPI groups configured yet. Configure them under <a href="{{ route('kpi.settings') }}">KPI Settings</a> first.
           </div>
-        </section>
-
-        <!-- =================== KPI Group 2 =================== -->
-        <section class="kpi-group" data-group>
-          <header onclick="this.parentElement.classList.toggle('collapsed')">
-            <div>
-              <h4>Post Discipline &amp; Conduct</h4>
-              <div class="muted fw-5" style="font-size:12px;">3 sub-items · weight 25%</div>
-            </div>
-            <div class="kpi-meta">
-              <span>Group score <strong style="color:var(--text-strong);font-size:14px;">92%</strong></span>
-              <i class="bi bi-chevron-down chev" style="font-size:16px;"></i>
-            </div>
-          </header>
-          <div class="body">
-            <table class="kpi-table">
-              <thead>
-                <tr><th style="width:48%">Sub-item</th><th>Target</th><th>Scored</th><th>Per %</th><th>Merit</th></tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Uniform &amp; appearance</td>
-                  <td><input value="42"></td><td><input value="42"></td>
-                  <td class="per-cell per-green">100%</td>
-                  <td><input value="10"></td>
-                </tr>
-                <tr>
-                  <td>Logbook completeness</td>
-                  <td><input value="42"></td><td><input value="38"></td>
-                  <td class="per-cell per-green">90.5%</td>
-                  <td><input value="9"></td>
-                </tr>
-                <tr>
-                  <td>Complaints filed against officers</td>
-                  <td><input value="0"></td><td><input value="1"></td>
-                  <td class="per-cell per-amber">75.0%</td>
-                  <td><input value="7.5"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- =================== KPI Group 3 =================== -->
-        <section class="kpi-group" data-group>
-          <header onclick="this.parentElement.classList.toggle('collapsed')">
-            <div>
-              <h4>Incident Response</h4>
-              <div class="muted fw-5" style="font-size:12px;">2 sub-items · weight 25%</div>
-            </div>
-            <div class="kpi-meta">
-              <span>Group score <strong style="color:var(--text-strong);font-size:14px;">82%</strong></span>
-              <i class="bi bi-chevron-down chev" style="font-size:16px;"></i>
-            </div>
-          </header>
-          <div class="body">
-            <table class="kpi-table">
-              <thead>
-                <tr><th style="width:48%">Sub-item</th><th>Target</th><th>Scored</th><th>Per %</th><th>Merit</th></tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Avg. response time (min)</td>
-                  <td><input value="2"></td><td><input value="3"></td>
-                  <td class="per-cell per-amber">66.7%</td>
-                  <td><input value="6.7"></td>
-                </tr>
-                <tr>
-                  <td>Incidents documented within 30 min</td>
-                  <td><input value="100"></td><td><input value="98"></td>
-                  <td class="per-cell per-green">98.0%</td>
-                  <td><input value="9.8"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- =================== KPI Group 4 =================== -->
-        <section class="kpi-group collapsed" data-group>
-          <header onclick="this.parentElement.classList.toggle('collapsed')">
-            <div>
-              <h4>Equipment &amp; Reporting</h4>
-              <div class="muted fw-5" style="font-size:12px;">2 sub-items · weight 20%</div>
-            </div>
-            <div class="kpi-meta">
-              <span>Group score <strong style="color:var(--text-strong);font-size:14px;">95%</strong></span>
-              <i class="bi bi-chevron-down chev" style="font-size:16px;"></i>
-            </div>
-          </header>
-          <div class="body">
-            <table class="kpi-table">
-              <thead>
-                <tr><th style="width:48%">Sub-item</th><th>Target</th><th>Scored</th><th>Per %</th><th>Merit</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Radio check-ins on schedule</td><td><input value="24"></td><td><input value="23"></td><td class="per-cell per-green">95.8%</td><td><input value="9.6"></td></tr>
-                <tr><td>Daily report submitted on time</td><td><input value="1"></td><td><input value="1"></td><td class="per-cell per-green">100%</td><td><input value="10"></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+        @endforelse
 
         <!-- Comments -->
         <div class="form-card mt-4">
@@ -210,11 +100,11 @@
 
         <!-- Sticky total bar -->
         <div class="kpi-total-bar">
-          <div class="stat"><span class="lbl">Date</span><span class="val" style="font-size:14px;">Mon, 18 May 2026</span></div>
-          <div class="stat"><span class="lbl">Groups</span><span class="val">4</span></div>
-          <div class="stat"><span class="lbl">Sub-items</span><span class="val">10</span></div>
-          <div class="stat"><span class="lbl">Total weight</span><span class="val">100%</span></div>
-          <div class="stat"><span class="lbl">Total merit</span><span class="val" style="color:var(--brand-success);">88.7 / 100</span></div>
+          <div class="stat"><span class="lbl">Date</span><span class="val" style="font-size:14px;">{{ now()->isoFormat('ddd, D MMM Y') }}</span></div>
+          <div class="stat"><span class="lbl">Groups</span><span class="val">{{ $groups->count() }}</span></div>
+          <div class="stat"><span class="lbl">Sub-items</span><span class="val">{{ $groups->sum(fn ($g) => $g->subItems->count()) }}</span></div>
+          <div class="stat"><span class="lbl">Total weight</span><span class="val">{{ $groups->sum('weight') }}%</span></div>
+          <div class="stat"><span class="lbl">Total merit</span><span class="val" id="kpi-total-merit" style="color:var(--brand-success);">— / 100</span></div>
           <div class="ms-auto d-flex gap-2">
             <button class="btn btn-outline-primary"><i class="bi bi-eye me-2"></i>Preview</button>
             <button class="btn btn-success" onclick="window.mNotify('Scorecard submitted','success'); setTimeout(()=>location.href='/dashboard',900);">
@@ -242,7 +132,6 @@
       if (pct >= 80) cell.classList.add('per-green');
       else if (pct >= 50) cell.classList.add('per-amber');
       else cell.classList.add('per-red');
-      row.cells[4].querySelector('input').value = (pct/10).toFixed(1);
     }
     document.querySelectorAll('.kpi-table tbody tr').forEach(tr => {
       tr.querySelectorAll('input[type=number],input').forEach(i => i.addEventListener('input', () => recalc(tr)));

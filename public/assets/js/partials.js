@@ -7,7 +7,7 @@
       { id: 'dashboard',       label: 'Officer dashboard',    icon: 'bi-speedometer2',        href: '/dashboard' },
     ]},
     { title: 'Daily entry', items: [
-      { id: 'kpi-entry',       label: 'KPI scorecard',        icon: 'bi-clipboard-check',     href: '/kpi/entry' },
+      { id: 'kpi-entry',       label: 'KPI scorecard',        icon: 'bi-clipboard-check',     href: '/kpi/entries' },
       { id: 'add-incident',    label: 'Report incident',      icon: 'bi-plus-square',         href: '/incidents/create' },
     ]},
     { title: 'Records', items: [
@@ -18,6 +18,7 @@
     { title: 'Setups', items: [
       { id: 'kpi-settings',    label: 'KPI settings',         icon: 'bi-sliders',             href: '/kpi/settings' },
       { id: 'locations',       label: 'Locations',            icon: 'bi-geo-alt',             href: '/locations' },
+      { id: 'security-companies', label: 'Security companies', icon: 'bi-shield-lock',        href: '/security-companies' },
       { id: 'users',           label: 'Users',                icon: 'bi-people',              href: '/users' },
     ]},
     { title: 'Settings', items: [
