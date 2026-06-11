@@ -12,11 +12,20 @@
     </div>
     <div class="actions d-flex gap-2">
       <a class="btn btn-primary" href="{{ route('incidents.index') }}"><i class="bi bi-arrow-left me-2"></i>Back</a>
-      <a class="btn btn-warning" href="{{ route('incidents.edit', $incident) }}"><i class="bi bi-pencil-square me-2"></i>Edit</a>
-      <form action="{{ route('incidents.destroy', $incident) }}" method="POST" onsubmit="return confirm('Delete this incident?');">
-        @csrf @method('DELETE')
-        <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-2"></i>Delete</button>
-      </form>
+      @unless ($incident->isAcknowledged())
+        <form action="{{ route('incidents.acknowledge', $incident) }}" method="POST"
+              onsubmit="return confirm('Acknowledge receipt? The reporter will no longer be able to edit or delete it.');">
+          @csrf
+          <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-2"></i>Acknowledge</button>
+        </form>
+      @endunless
+      @if (! $incident->isLocked())
+        <a class="btn btn-warning" href="{{ route('incidents.edit', $incident) }}"><i class="bi bi-pencil-square me-2"></i>Edit</a>
+        <form action="{{ route('incidents.destroy', $incident) }}" method="POST" onsubmit="return confirm('Delete this incident?');">
+          @csrf @method('DELETE')
+          <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-2"></i>Delete</button>
+        </form>
+      @endif
     </div>
   </div>
 
@@ -31,11 +40,20 @@
       <dt class="col-sm-3 muted fw-7">Location</dt>
       <dd class="col-sm-9">{{ $incident->location->name }}</dd>
 
+      <dt class="col-sm-3 muted fw-7">Building</dt>
+      <dd class="col-sm-9">{{ $incident->building?->name ?: '—' }}</dd>
+
+      <dt class="col-sm-3 muted fw-7">Specific location</dt>
+      <dd class="col-sm-9">{{ $incident->place?->name ?: '—' }}</dd>
+
       <dt class="col-sm-3 muted fw-7">Severity</dt>
       <dd class="col-sm-9"><span class="pill" style="background:{{ $incident->severity->color }}1f;color:{{ $incident->severity->color }};">{{ $incident->severity->name }}</span></dd>
 
       <dt class="col-sm-3 muted fw-7">Status</dt>
       <dd class="col-sm-9"><span class="pill pill-{{ strtolower($incident->status->name) }}">{{ $incident->status->name }}</span></dd>
+
+      <dt class="col-sm-3 muted fw-7">Acknowledged</dt>
+      <dd class="col-sm-9">{{ $incident->acknowledged_at?->format('d M Y, H:i') ?: '—' }}</dd>
 
       <dt class="col-sm-3 muted fw-7">Reported by</dt>
       <dd class="col-sm-9">{{ $incident->user->name }}</dd>

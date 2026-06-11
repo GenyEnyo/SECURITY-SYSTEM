@@ -24,13 +24,6 @@
   @endif
 
   <div class="toolbar">
-    <div class="d-flex gap-2 align-items-center" style="font-size:14px;">
-      <span class="muted fw-7">Filter:</span>
-      <button class="btn btn-sm btn-primary">All</button>
-      <button class="btn btn-sm btn-outline-primary">Open</button>
-      <button class="btn btn-sm btn-outline-primary">Reviewing</button>
-      <button class="btn btn-sm btn-outline-primary">Resolved</button>
-    </div>
     <div class="spacer"></div>
     <div class="search-shadow">
       <i class="bi bi-search"></i>
@@ -62,11 +55,16 @@
           <td>
             <div class="row-actions">
               <a href="{{ route('incidents.show', $occurrence) }}" class="ra-btn" data-bs-toggle="tooltip" title="View"><i class="bi bi-eye"></i></a>
-              <a href="{{ route('incidents.edit', $occurrence) }}" class="ra-btn" data-bs-toggle="tooltip" title="Edit"><i class="bi bi-pencil-square"></i></a>
-              <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident? This cannot be undone.');">
-                @csrf @method('DELETE')
-                <button type="submit" class="ra-btn danger" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></button>
-              </form>
+              @if (! $occurrence->isLocked())
+                <a href="{{ route('incidents.edit', $occurrence) }}" class="ra-btn" data-bs-toggle="tooltip" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident? This cannot be undone.');">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="ra-btn danger" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              @else
+                <span class="ra-btn" style="opacity:.45;cursor:default;" data-bs-toggle="tooltip"
+                      title="Locked — acknowledged or older than 1 day"><i class="bi bi-lock"></i></span>
+              @endif
             </div>
           </td>
         </tr>

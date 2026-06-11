@@ -52,6 +52,22 @@
       </div>
 
       <div class="col-lg-6">
+        <label class="field-label" for="f-building">Building</label>
+        <select id="f-building" name="building_id" class="brand-input brand-select" required disabled>
+          <option value="" disabled selected>Select a location first...</option>
+        </select>
+        @error('building_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+      </div>
+
+      <div class="col-lg-6">
+        <label class="field-label" for="f-place">Specific Location</label>
+        <select id="f-place" name="place_id" class="brand-input brand-select" required disabled>
+          <option value="" disabled selected>Select a building first...</option>
+        </select>
+        @error('place_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+      </div>
+
+      <div class="col-lg-6">
         <label class="field-label" for="f-sev">Severity / Priority Level</label>
         <select id="f-sev" name="severity_id" class="brand-input brand-select" required>
           <option value="" disabled @selected(! old('severity_id'))>Select priority level...</option>
@@ -98,3 +114,63 @@
 
   </form>
 @endsection
+
+@push('scripts')
+  <script>
+    const BUILDINGS = @json($buildings);
+    const PLACES = @json($places);
+    const SELECTED = {
+      location: @json(old('location_id')),
+      building: @json(old('building_id')),
+      place: @json(old('place_id')),
+    };
+
+    const locSel = document.getElementById('f-loc');
+    const buildingSel = document.getElementById('f-building');
+    const placeSel = document.getElementById('f-place');
+
+    function fill(select, items, placeholder, selectedId) {
+      select.innerHTML = '';
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.disabled = true;
+      ph.textContent = placeholder;
+      select.appendChild(ph);
+
+      items.forEach((it) => {
+        const opt = document.createElement('option');
+        opt.value = it.id;
+        opt.textContent = it.name;
+        if (String(it.id) === String(selectedId)) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      if (!items.some((it) => String(it.id) === String(selectedId))) ph.selected = true;
+      select.disabled = items.length === 0;
+    }
+
+    function loadBuildings(selectedBuilding) {
+      const locId = locSel.value;
+      const items = BUILDINGS.filter((b) => String(b.location_id) === String(locId));
+      fill(buildingSel, items, 'Select a building...', selectedBuilding);
+    }
+
+    function loadPlaces(selectedPlace) {
+      const buildingId = buildingSel.value;
+      const items = PLACES.filter((p) => String(p.building_id) === String(buildingId));
+      fill(placeSel, items, 'Select a specific location...', selectedPlace);
+    }
+
+    locSel.addEventListener('change', () => {
+      loadBuildings(null);
+      loadPlaces(null);
+    });
+    buildingSel.addEventListener('change', () => loadPlaces(null));
+
+    // Re-apply previously chosen values (e.g. after a validation error)
+    if (SELECTED.location) {
+      loadBuildings(SELECTED.building);
+      loadPlaces(SELECTED.place);
+    }
+  </script>
+@endpush
