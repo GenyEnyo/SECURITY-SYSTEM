@@ -18,6 +18,7 @@
     { title: 'Setups', items: [
       { id: 'kpi-settings',    label: 'KPI settings',         icon: 'bi-sliders',             href: '/kpi/settings' },
       { id: 'locations',       label: 'Locations',            icon: 'bi-geo-alt',             href: '/locations' },
+      { id: 'deployments',     label: 'Deployments',          icon: 'bi-clipboard-data',      href: '/deployments' },
       { id: 'security-companies', label: 'Security companies', icon: 'bi-shield-lock',        href: '/security-companies' },
       { id: 'users',           label: 'Users',                icon: 'bi-people',              href: '/users' },
     ]},

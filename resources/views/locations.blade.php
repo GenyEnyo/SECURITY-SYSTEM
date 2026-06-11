@@ -73,7 +73,7 @@
                   <div class="title">{{ $building->name }}</div>
                   <div class="sub muted mt-2">{{ $building->location->name }}</div>
                 </div>
-                <a href="{{ route('buildings.deployments.index', $building) }}" class="btn btn-primary">Manage</a>
+                <a href="{{ route('buildings.places.index', $building) }}" class="btn btn-primary">Manage</a>
               </div>
             </div>
           @empty
@@ -89,6 +89,53 @@
           </div>
         </div>
 
+        <!-- Locations -->
+        <div class="page-head mt-5">
+          <div>
+            <h2 class="page-title" style="font-size:22px;">Locations</h2>
+            <p class="page-subtitle">Add the locations buildings can belong to</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLocation">
+              <i class="bi bi-plus-square me-2"></i>Add location
+            </button>
+          </div>
+        </div>
+
+        <table class="brand-table">
+          <thead>
+            <tr>
+              <th style="width:80px">No.</th>
+              <th>Name</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse ($locations as $location)
+              <tr>
+                <td class="fw-7">{{ $loop->iteration }}</td>
+                <td>{{ $location->name }}</td>
+                <td><div class="row-actions">
+                  <button type="button" class="ra-btn js-edit-location"
+                          data-bs-toggle="tooltip" title="Edit"
+                          data-id="{{ $location->id }}"
+                          data-name="{{ $location->name }}">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button type="button" class="ra-btn danger js-delete-location"
+                          data-bs-toggle="tooltip" title="Delete"
+                          data-id="{{ $location->id }}"
+                          data-name="{{ $location->name }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div></td>
+              </tr>
+            @empty
+              <tr><td colspan="3" class="text-center muted fw-5">No locations yet.</td></tr>
+            @endforelse
+          </tbody>
+        </table>
+
       </main>
     </div>
   </div>
@@ -97,12 +144,16 @@
   @include('partials.buildings.edit-building')
   @include('partials.buildings.delete-building')
 
+  @include('partials.locations.add-location')
+  @include('partials.locations.edit-location')
+  @include('partials.locations.delete-location')
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/assets/js/partials.js"></script>
   <script src="/assets/js/app.js"></script>
   <script>
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('.js-edit-building, .js-delete-building');
+      const t = e.target.closest('.js-edit-building, .js-delete-building, .js-edit-location, .js-delete-location');
       if (!t) return;
       const d = t.dataset;
       const open = (id, fill) => {
@@ -116,9 +167,19 @@
           el.querySelector('[name="name"]').value = d.name;
           el.querySelector('[name="location_id"]').value = d.locationId;
         });
-      } else {
+      } else if (t.classList.contains('js-delete-building')) {
         open('deleteBuilding', (el) => {
           el.querySelector('form').action = `/buildings/${d.id}`;
+          el.querySelector('.target-name').textContent = d.name;
+        });
+      } else if (t.classList.contains('js-edit-location')) {
+        open('editLocation', (el) => {
+          el.querySelector('form').action = `/locations/${d.id}`;
+          el.querySelector('[name="name"]').value = d.name;
+        });
+      } else {
+        open('deleteLocation', (el) => {
+          el.querySelector('form').action = `/locations/${d.id}`;
           el.querySelector('.target-name').textContent = d.name;
         });
       }

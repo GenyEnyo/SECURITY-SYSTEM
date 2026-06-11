@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('title', 'Manage ' . $building->name . ' · M Dashboard')
-@section('page', 'deployments')
+@section('page', 'locations')
 @section('crumbs', json_encode([
     ['label' => 'Setups'],
-    ['label' => 'Deployments', 'href' => '/deployments'],
+    ['label' => 'Locations', 'href' => '/locations'],
     ['label' => $building->name],
 ]))
 
@@ -16,12 +16,12 @@
   <div class="page-head">
     <div>
       <h1 class="page-title">Manage {{ $building->name }}</h1>
-      <p class="page-subtitle">{{ $building->location->name }} — Deployments for this building</p>
+      <p class="page-subtitle">{{ $building->location->name }} — Specific locations in this building</p>
     </div>
     <div class="actions">
-      <a class="btn btn-primary" href="{{ route('buildings.deployments.create', $building) }}">
-        <i class="bi bi-plus-square me-2"></i>Add Deployment
-      </a>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlace">
+        <i class="bi bi-plus-square me-2"></i>Add specific location
+      </button>
     </div>
   </div>
 
@@ -39,39 +39,31 @@
     </div>
   @endif
 
-  <table id="deployments-table" class="brand-table">
+  <table id="places-table" class="brand-table">
     <thead>
       <tr>
-        <th>Shift</th>
-        <th>Date</th>
-        <th>Guard No.</th>
-        <th>Start Time</th>
-        <th>End Time</th>
+        <th style="width:80px">No.</th>
+        <th>Name</th>
         <th class="actions-col">Actions</th>
       </tr>
     </thead>
     <tbody>
-      @foreach ($deployments as $d)
+      @foreach ($places as $place)
         <tr>
-          <td>{{ $d->shift->name }}</td>
-          <td>{{ $d->start_at->format('Y-m-d') }}</td>
-          <td>{{ $d->number_of_guards }}</td>
-          <td>{{ $d->start_at->format('H:i') }}</td>
-          <td>{{ $d->end_at->format('H:i') }}</td>
+          <td class="fw-7">{{ $loop->iteration }}</td>
+          <td>{{ $place->name }}</td>
           <td>
             <div class="row-actions">
-              <a href="{{ route('buildings.deployments.show', [$building, $d]) }}"
-                 class="ra-btn" data-bs-toggle="tooltip" title="View">
-                <i class="bi bi-eye"></i>
-              </a>
-              <a href="{{ route('buildings.deployments.edit', [$building, $d]) }}"
-                 class="ra-btn" data-bs-toggle="tooltip" title="Edit">
+              <button type="button" class="ra-btn js-edit-place"
+                      data-bs-toggle="tooltip" title="Edit"
+                      data-id="{{ $place->id }}"
+                      data-name="{{ $place->name }}">
                 <i class="bi bi-pencil-square"></i>
-              </a>
-              <button type="button" class="ra-btn danger js-delete-deployment"
+              </button>
+              <button type="button" class="ra-btn danger js-delete-place"
                       data-bs-toggle="tooltip" title="Delete"
-                      data-id="{{ $d->id }}"
-                      data-label="{{ $d->shift->name }} on {{ $d->start_at->format('Y-m-d') }}">
+                      data-id="{{ $place->id }}"
+                      data-name="{{ $place->name }}">
                 <i class="bi bi-trash"></i>
               </button>
             </div>
@@ -81,7 +73,9 @@
     </tbody>
   </table>
 
-  @include('partials.deployments.delete-deployment')
+  @include('partials.places.add-place')
+  @include('partials.places.edit-place')
+  @include('partials.places.delete-place')
 @endsection
 
 @push('scripts')
@@ -89,21 +83,30 @@
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
   <script>
-    $('#deployments-table').DataTable({
+    $('#places-table').DataTable({
       pageLength: 10,
       lengthMenu: [5, 10, 25, 50],
       columnDefs: [{ targets: -1, orderable: false, searchable: false }],
-      language: { search: '', searchPlaceholder: 'search deployments...' },
+      language: { search: '', searchPlaceholder: 'search specific locations...' },
     });
 
+    const buildingId = {{ $building->id }};
+
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('.js-delete-deployment');
+      const t = e.target.closest('.js-edit-place, .js-delete-place');
       if (!t) return;
-      const buildingId = {{ $building->id }};
-      const el = document.getElementById('deleteDeployment');
-      el.querySelector('form').action = `/buildings/${buildingId}/deployments/${t.dataset.id}`;
-      el.querySelector('.target-name').textContent = t.dataset.label;
-      new bootstrap.Modal(el).show();
+      const d = t.dataset;
+      if (t.classList.contains('js-edit-place')) {
+        const el = document.getElementById('editPlace');
+        el.querySelector('form').action = `/buildings/${buildingId}/places/${d.id}`;
+        el.querySelector('[name="name"]').value = d.name;
+        new bootstrap.Modal(el).show();
+      } else {
+        const el = document.getElementById('deletePlace');
+        el.querySelector('form').action = `/buildings/${buildingId}/places/${d.id}`;
+        el.querySelector('.target-name').textContent = d.name;
+        new bootstrap.Modal(el).show();
+      }
     });
   </script>
 @endpush

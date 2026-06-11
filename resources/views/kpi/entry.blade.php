@@ -44,7 +44,35 @@
           <div>Active groups total <strong>100%</strong> — scoring is enabled.</div>
         </div> -->
 
+        <!-- Deployment location selector -->
+        <div class="form-card mb-4">
+          <div class="row g-3">
+            <div class="col-lg-4">
+              <label class="field-label" for="kpi-loc">Location</label>
+              <select id="kpi-loc" class="brand-input brand-select">
+                <option value="" disabled selected>Select a location...</option>
+                @foreach ($locations as $location)
+                  <option value="{{ $location->id }}">{{ $location->name }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="col-lg-4">
+              <label class="field-label" for="kpi-building">Building</label>
+              <select id="kpi-building" class="brand-input brand-select" disabled>
+                <option value="" disabled selected>Select a location first...</option>
+              </select>
+            </div>
+            <div class="col-lg-4">
+              <label class="field-label" for="kpi-place">Specific place <span class="muted fw-5">(optional)</span></label>
+              <select id="kpi-place" class="brand-input brand-select" disabled>
+                <option value="">All places in building</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         @forelse ($groups as $group)
+          @php $isDeployment = strtolower(trim($group->name)) === 'deployment'; @endphp
           <section class="kpi-group" data-group>
             <header onclick="this.parentElement.classList.toggle('collapsed')">
               <div>
@@ -58,7 +86,23 @@
               </div>
             </header>
             <div class="body">
-              @if ($group->subItems->isEmpty())
+              @if ($isDeployment)
+                <div id="kpi-deploy-summary" class="muted fw-5 mb-3" style="font-size:13px;">
+                  Select a building and date to load the deployment.
+                </div>
+                <table class="kpi-table" id="kpi-beats-table">
+                  <thead>
+                    <tr>
+                      <th style="width:48%">{{ $group->criteria_label }}</th>
+                      <th>{{ $group->target_label }}</th>
+                      <th>Scored</th>
+                      <th>Per %</th>
+                      <th>Merit</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kpi-beats-body"></tbody>
+                </table>
+              @elseif ($group->subItems->isEmpty())
                 <p class="muted fw-5 mb-0" style="font-size:13px;">No sub-items configured for this group.</p>
               @else
                 <table class="kpi-table">
@@ -133,9 +177,96 @@
       else if (pct >= 50) cell.classList.add('per-amber');
       else cell.classList.add('per-red');
     }
-    document.querySelectorAll('.kpi-table tbody tr').forEach(tr => {
+    function bindRow(tr){
       tr.querySelectorAll('input[type=number],input').forEach(i => i.addEventListener('input', () => recalc(tr)));
-    });
+    }
+    document.querySelectorAll('.kpi-table tbody tr').forEach(bindRow);
+
+    // ---- Deployment selector: Location -> Building -> (optional) Place ----
+    const BUILDINGS = @json($buildings);
+    const PLACES = @json($places);
+    const DEPLOYMENTS = @json($deployments);
+
+    const locSel   = document.getElementById('kpi-loc');
+    const buildSel = document.getElementById('kpi-building');
+    const placeSel = document.getElementById('kpi-place');
+    const dateInp  = document.getElementById('kpi-date');
+    const summary  = document.getElementById('kpi-deploy-summary');
+    const beatsBody = document.getElementById('kpi-beats-body');
+
+    function fill(select, items, placeholder, allowAll){
+      select.innerHTML = '';
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = placeholder;
+      if (!allowAll) ph.disabled = true;
+      ph.selected = true;
+      select.appendChild(ph);
+      items.forEach(it => {
+        const opt = document.createElement('option');
+        opt.value = it.id;
+        opt.textContent = it.name;
+        select.appendChild(opt);
+      });
+      select.disabled = items.length === 0 && !allowAll;
+    }
+
+    function loadBuildings(){
+      const items = BUILDINGS.filter(b => String(b.location_id) === String(locSel.value));
+      fill(buildSel, items, 'Select a building...', false);
+    }
+    function loadPlaces(){
+      const items = PLACES.filter(p => String(p.building_id) === String(buildSel.value));
+      fill(placeSel, items, 'All places in building', true);
+      placeSel.disabled = false; // optional filter is always usable
+    }
+
+    function renderDeployment(){
+      const buildingId = buildSel.value;
+      const placeId = placeSel.value;
+      const date = dateInp ? dateInp.value : '';
+
+      // --- Deployment summary for the building on the chosen date ---
+      if (!buildingId) {
+        summary.textContent = 'Select a building and date to load the deployment.';
+      } else {
+        const matches = DEPLOYMENTS.filter(d => String(d.building_id) === String(buildingId) && d.date === date);
+        if (!matches.length) {
+          summary.textContent = 'No deployment recorded for this building on this date.';
+        } else {
+          summary.innerHTML = matches.map(d =>
+            `<div><i class="bi bi-shield-check me-2"></i><strong>${esc(d.company || '—')}</strong>`
+            + ` · ${esc(d.shift || '—')} shift · ${d.guards} guard${d.guards == 1 ? '' : 's'}`
+            + ` · ${esc(d.officer || '—')} <span class="muted">(${d.start}–${d.end})</span></div>`
+          ).join('');
+        }
+      }
+
+      // --- Beats = places under the building (or just the chosen place) ---
+      beatsBody.innerHTML = '';
+      if (!buildingId) return;
+      let beats = PLACES.filter(p => String(p.building_id) === String(buildingId));
+      if (placeId) beats = beats.filter(p => String(p.id) === String(placeId));
+
+      beats.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td></td>`
+          + `<td><input type="number" value="50" readonly></td>`
+          + `<td><input type="number"></td>`
+          + `<td class="per-cell">—</td>`
+          + `<td><input type="number" step="0.1"></td>`;
+        tr.cells[0].textContent = p.name; // safe assignment
+        beatsBody.appendChild(tr);
+        bindRow(tr);
+      });
+    }
+
+    function esc(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    locSel.addEventListener('change', () => { loadBuildings(); placeSel.innerHTML = '<option value="">All places in building</option>'; placeSel.disabled = true; renderDeployment(); });
+    buildSel.addEventListener('change', () => { loadPlaces(); renderDeployment(); });
+    placeSel.addEventListener('change', renderDeployment);
+    if (dateInp) dateInp.addEventListener('change', renderDeployment);
   </script>
 </body>
 </html>

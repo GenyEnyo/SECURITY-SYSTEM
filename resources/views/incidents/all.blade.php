@@ -16,15 +16,6 @@
   </div>
 
   <div class="toolbar">
-    <div class="d-flex gap-2 align-items-center" style="font-size:13px;">
-      <span class="muted fw-7">Status:</span>
-      <button class="btn btn-sm btn-primary">All</button>
-      <button class="btn btn-sm btn-outline-primary">Reported</button>
-      <button class="btn btn-sm btn-outline-primary">Reviewing</button>
-      <button class="btn btn-sm btn-outline-primary">Escalated</button>
-      <button class="btn btn-sm btn-outline-primary">Resolved</button>
-      <button class="btn btn-sm btn-outline-primary">Closed</button>
-    </div>
     <div class="spacer"></div>
     <div class="search-shadow"><i class="bi bi-search"></i><input placeholder="search...">
     </div>
@@ -69,16 +60,30 @@
               <span class="fw-7" style="font-size:12.5px;">{{ $occurrence->user->name }}</span>
             </div>
           </td>
-          <td><span class="pill pill-{{ strtolower($occurrence->status->name) }}">{{ $occurrence->status->name }}</span></td>
+          <td>
+            <span class="pill pill-{{ strtolower($occurrence->status->name) }}">{{ $occurrence->status->name }}</span>
+            @if ($occurrence->isAcknowledged())
+              <span class="pill" style="background:rgba(61,179,110,.14);color:var(--brand-success);">Acknowledged</span>
+            @endif
+          </td>
           <td><span class="pill" style="background:{{ $occurrence->severity->color }}1f;color:{{ $occurrence->severity->color }};">{{ $occurrence->severity->name }}</span></td>
           <td>
             <div class="row-actions">
               <a class="ra-btn" href="{{ route('incidents.show', $occurrence) }}" data-bs-toggle="tooltip" title="View"><i class="bi bi-eye"></i></a>
-              <a class="ra-btn" href="{{ route('incidents.edit', $occurrence) }}" data-bs-toggle="tooltip" title="Edit"><i class="bi bi-pencil-square"></i></a>
-              <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident?');">
-                @csrf @method('DELETE')
-                <button type="submit" class="ra-btn danger" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></button>
-              </form>
+              @unless ($occurrence->isAcknowledged())
+                <form action="{{ route('incidents.acknowledge', $occurrence) }}" method="POST" style="display:inline;"
+                      onsubmit="return confirm('Acknowledge receipt? The reporter will no longer be able to edit or delete it.');">
+                  @csrf
+                  <button type="submit" class="ra-btn" data-bs-toggle="tooltip" title="Acknowledge receipt"><i class="bi bi-check2-circle"></i></button>
+                </form>
+              @endunless
+              @if (! $occurrence->isLocked())
+                <a class="ra-btn" href="{{ route('incidents.edit', $occurrence) }}" data-bs-toggle="tooltip" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident?');">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="ra-btn danger" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              @endif
             </div>
           </td>
         </tr>

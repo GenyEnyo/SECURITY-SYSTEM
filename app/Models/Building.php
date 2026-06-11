@@ -19,4 +19,9 @@ class Building extends Model
     {
         return $this->hasMany(Deployment::class)->orderByDesc('start_at');
     }
+
+    public function places(): HasMany
+    {
+        return $this->hasMany(Place::class)->orderBy('name');
+    }
 }

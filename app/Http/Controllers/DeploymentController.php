@@ -11,6 +11,13 @@ use Illuminate\Validation\Rule;
 
 class DeploymentController extends Controller
 {
+    public function picker()
+    {
+        return view('deployments.index', [
+            'buildings' => Building::with('location')->orderBy('name')->get(),
+        ]);
+    }
+
     public function index(Building $building)
     {
         $building->load('location');

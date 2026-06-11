@@ -7,6 +7,8 @@ use App\Http\Controllers\IncidentTypeController;
 use App\Http\Controllers\KpiEntryController;
 use App\Http\Controllers\KpiGroupController;
 use App\Http\Controllers\KpiSubItemController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\SecurityCompanyController;
 use App\Http\Controllers\SeverityController;
 use Illuminate\Support\Facades\Route;
@@ -31,13 +33,21 @@ Route::prefix('kpi')->name('kpi.')->group(function () {
 Route::resource('kpi/entries', KpiEntryController::class);
 
 Route::get('/incidents/all', [IncidentOccurrenceController::class, 'all'])->name('incidents.all');
+Route::post('incidents/{incident}/acknowledge', [IncidentOccurrenceController::class, 'acknowledge'])
+    ->name('incidents.acknowledge');
 Route::resource('incidents', IncidentOccurrenceController::class)->parameters(['incidents' => 'incident']);
 
 Route::view('/my-submissions', 'my-submissions')->name('submissions.index');
 
 Route::get('locations', [BuildingController::class, 'index'])->name('locations.index');
+Route::resource('locations', LocationController::class)
+    ->only(['store', 'update', 'destroy']);
 Route::resource('buildings', BuildingController::class)
     ->only(['store', 'update', 'destroy']);
+Route::resource('buildings.places', PlaceController::class)
+    ->only(['index', 'store', 'update', 'destroy']);
+
+Route::get('deployments', [DeploymentController::class, 'picker'])->name('deployments.picker');
 Route::resource('buildings.deployments', DeploymentController::class);
 Route::resource('security-companies', SecurityCompanyController::class)
     ->parameters(['security-companies' => 'securityCompany']);
