@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             SecurityCompanySeeder::class,
             ShiftSeeder::class,
             SeveritySeeder::class,
+            KpiGroupSeeder::class,
             UserSeeder::class,
         ]);
     }
