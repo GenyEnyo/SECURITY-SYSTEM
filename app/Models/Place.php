@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Place extends Model
 {
-    protected $fillable = ['name', 'building_id'];
+    protected $fillable = ['name', 'building_id', 'estimated_guards'];
 
     public function building(): BelongsTo
     {

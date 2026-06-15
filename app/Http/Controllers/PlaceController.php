@@ -48,4 +48,18 @@ class PlaceController extends Controller
         return redirect()->route('buildings.places.index', $building)
             ->with('status', 'Specific location deleted.');
     }
+
+    public function updateEstimates(Request $request, Building $building)
+    {
+        $data = $request->validate([
+            'estimates'   => ['array'],
+            'estimates.*' => ['nullable', 'integer', 'min:0'],
+        ]);
+
+        foreach ($data['estimates'] ?? [] as $placeId => $value) {
+            $building->places()->whereKey($placeId)->update(['estimated_guards' => $value]);
+        }
+
+        return back()->with('status', 'Estimated guards saved.');
+    }
 }

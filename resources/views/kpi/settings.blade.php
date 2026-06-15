@@ -36,13 +36,18 @@
   @endif
 
   @forelse ($groups as $group)
+    @php $isDeployment = strtolower(trim($group->name)) === 'deployment'; @endphp
     <section class="kpi-group" data-group>
       <header>
         <div class="d-flex align-items-center gap-2">
           <div>
             <h4>{{ $group->name }}</h4>
             <div class="muted fw-5" style="font-size:12px;">
-              Weight {{ $group->weight }}% · {{ $group->subItems->count() }} sub-item{{ $group->subItems->count() === 1 ? '' : 's' }}
+              @if ($isDeployment)
+                Weight {{ $group->weight }}% · estimates by location &amp; building
+              @else
+                Weight {{ $group->weight }}% · {{ $group->subItems->count() }} sub-item{{ $group->subItems->count() === 1 ? '' : 's' }}
+              @endif
             </div>
           </div>
         </div>
@@ -63,50 +68,54 @@
         </div>
       </header>
       <div class="body">
-        @if ($group->subItems->isEmpty())
-          <p class="muted fw-5 mb-3" style="font-size:13px;">No sub-items yet.</p>
+        @if ($isDeployment)
+          @include('partials.kpi.deployment-estimates')
         @else
-          <table class="kpi-table">
-            <thead>
-              <tr>
-                <th>{{ $group->criteria_label }}</th>
-                <th style="width:120px">{{ $group->target_label }}</th>
-                <th class="actions-col" style="width:120px">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach ($group->subItems as $item)
+          @if ($group->subItems->isEmpty())
+            <p class="muted fw-5 mb-3" style="font-size:13px;">No sub-items yet.</p>
+          @else
+            <table class="kpi-table">
+              <thead>
                 <tr>
-                  <td>{{ $item->criteria }}</td>
-                  <td>{{ $item->target }}</td>
-                  <td>
-                    <div class="row-actions">
-                      <button type="button" class="ra-btn js-edit-sub-item"
-                              data-bs-toggle="tooltip" title="Edit"
-                              data-id="{{ $item->id }}"
-                              data-criteria="{{ $item->criteria }}"
-                              data-target="{{ $item->target }}"
-                              data-criteria-label="{{ $group->criteria_label }}"
-                              data-target-label="{{ $group->target_label }}">
-                        <i class="bi bi-pencil-square"></i>
-                      </button>
-                      <button type="button" class="ra-btn danger js-delete-sub-item"
-                              data-bs-toggle="tooltip" title="Delete"
-                              data-id="{{ $item->id }}"
-                              data-criteria="{{ $item->criteria }}">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
+                  <th>{{ $group->criteria_label }}</th>
+                  <th style="width:120px">{{ $group->target_label }}</th>
+                  <th class="actions-col" style="width:120px">Actions</th>
                 </tr>
-              @endforeach
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @foreach ($group->subItems as $item)
+                  <tr>
+                    <td>{{ $item->criteria }}</td>
+                    <td>{{ $item->target }}</td>
+                    <td>
+                      <div class="row-actions">
+                        <button type="button" class="ra-btn js-edit-sub-item"
+                                data-bs-toggle="tooltip" title="Edit"
+                                data-id="{{ $item->id }}"
+                                data-criteria="{{ $item->criteria }}"
+                                data-target="{{ $item->target }}"
+                                data-criteria-label="{{ $group->criteria_label }}"
+                                data-target-label="{{ $group->target_label }}">
+                          <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button type="button" class="ra-btn danger js-delete-sub-item"
+                                data-bs-toggle="tooltip" title="Delete"
+                                data-id="{{ $item->id }}"
+                                data-criteria="{{ $item->criteria }}">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          @endif
+          <button type="button" class="btn btn-outline-primary btn-sm mt-3"
+                  onclick="openAddSubItem({{ $group->id }}, '{{ addslashes($group->name) }}', '{{ addslashes($group->criteria_label) }}', '{{ addslashes($group->target_label) }}')">
+            <i class="bi bi-plus-square me-2"></i>Add sub-item
+          </button>
         @endif
-        <button type="button" class="btn btn-outline-primary btn-sm mt-3"
-                onclick="openAddSubItem({{ $group->id }}, '{{ addslashes($group->name) }}', '{{ addslashes($group->criteria_label) }}', '{{ addslashes($group->target_label) }}')">
-          <i class="bi bi-plus-square me-2"></i>Add sub-item
-        </button>
       </div>
     </section>
   @empty
@@ -128,7 +137,7 @@
     // Accordion toggle — preserves the existing UX.
     document.querySelectorAll('.kpi-group > header').forEach(h => {
       h.addEventListener('click', e => {
-        if (e.target.closest('.ra-btn,.form-check,input')) return;
+        if (e.target.closest('.ra-btn,.form-check,input,button,.btn,select,textarea,a')) return;
         h.parentElement.classList.toggle('collapsed');
       });
     });

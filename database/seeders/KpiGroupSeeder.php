@@ -64,27 +64,13 @@ class KpiGroupSeeder extends Seeder
             ],
 
             [
+                // Deployment beats are now driven by per-place guard estimates
+                // (places.estimated_guards), not hand-entered sub-items.
                 'name'           => 'Deployment',
                 'weight'         => 60,
                 'criteria_label' => 'Beats',
                 'target_label'   => 'Estimated',
-               'items'  => [
-                    ['criteria' => 'VGIF',                            'target' => 50],
-                    ['criteria' => 'TTPC (Main and Emergency Gate)',  'target' => 50],
-                    ['criteria' => 'TTPC (Station 1)',                'target' => 50],
-                    ['criteria' => 'TTPC (Station 2,3 gate)',         'target' => 50],
-                    ['criteria' => 'TTPC (Station 2, tower 1)',       'target' => 50],
-                    ['criteria' => 'TTPC (Stat 3 Cable Yard)',        'target' => 50],
-                    ['criteria' => 'Old Procurement Yard',            'target' => 50],
-                    ['criteria' => 'TTPC (Station 2, tower 2)',       'target' => 50],
-                    ['criteria' => 'TTPC (Station 3, tower)',         'target' => 50],
-                    ['criteria' => "TTPC (Stat 3 W'hse)",             'target' => 50],
-                    ['criteria' => 'KTPS (Procurement)',              'target' => 50],
-                    ['criteria' => 'KTPS (Main Gate)',                'target' => 50],
-                    ['criteria' => 'KTPS (Warehouse)',                'target' => 50],
-                    ['criteria' => 'Pwalugu',                         'target' => 50],
-                    ['criteria' => 'Supervisor',                      'target' => 50],
-                ],
+                'items'          => [],
             ],
         ];
 

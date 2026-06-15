@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KpiGroup;
+use App\Models\Location;
 use Illuminate\Http\Request;
 
 class KpiGroupController extends Controller
@@ -11,7 +12,12 @@ class KpiGroupController extends Controller
     {
         $groups = KpiGroup::with('subItems')->orderBy('id')->get();
 
-        return view('kpi.settings', ['groups' => $groups]);
+        $locations = Location::with([
+            'buildings'        => fn ($q) => $q->orderBy('name'),
+            'buildings.places' => fn ($q) => $q->orderBy('name'),
+        ])->orderBy('name')->get();
+
+        return view('kpi.settings', compact('groups', 'locations'));
     }
 
     public function store(Request $request)

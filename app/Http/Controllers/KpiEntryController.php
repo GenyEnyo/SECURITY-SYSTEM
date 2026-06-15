@@ -17,7 +17,7 @@ class KpiEntryController extends Controller
             'groups'      => KpiGroup::with('subItems')->orderBy('id')->get(),
             'locations'   => Location::orderBy('name')->get(),
             'buildings'   => Building::orderBy('name')->get(['id', 'name', 'location_id']),
-            'places'      => Place::orderBy('name')->get(['id', 'name', 'building_id']),
+            'places'      => Place::orderBy('name')->get(['id', 'name', 'building_id', 'estimated_guards']),
             'deployments' => Deployment::with(['securityCompany:id,name', 'shift:id,name'])->get()
                 ->map(fn ($d) => [
                     'building_id' => $d->building_id,

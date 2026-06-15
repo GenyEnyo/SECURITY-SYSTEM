@@ -46,6 +46,8 @@ Route::resource('buildings', BuildingController::class)
     ->only(['store', 'update', 'destroy']);
 Route::resource('buildings.places', PlaceController::class)
     ->only(['index', 'store', 'update', 'destroy']);
+Route::put('buildings/{building}/place-estimates', [PlaceController::class, 'updateEstimates'])
+    ->name('buildings.place-estimates.update');
 
 Route::get('deployments', [DeploymentController::class, 'picker'])->name('deployments.picker');
 Route::resource('buildings.deployments', DeploymentController::class);

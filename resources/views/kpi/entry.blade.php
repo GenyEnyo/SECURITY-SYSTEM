@@ -251,7 +251,7 @@
       beats.forEach(p => {
         const tr = document.createElement('tr');
         tr.innerHTML = `<td></td>`
-          + `<td><input type="number" value="50" readonly></td>`
+          + `<td><input type="number" value="${p.estimated_guards ?? 0}" readonly></td>`
           + `<td><input type="number"></td>`
           + `<td class="per-cell">—</td>`
           + `<td><input type="number" step="0.1"></td>`;
