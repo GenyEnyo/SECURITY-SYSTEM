@@ -5,7 +5,10 @@ use App\Http\Controllers\DeploymentController;
 use App\Http\Controllers\IncidentOccurrenceController;
 use App\Http\Controllers\IncidentTypeController;
 use App\Http\Controllers\KpiEntryController;
+use App\Http\Controllers\KpiComplianceController;
 use App\Http\Controllers\KpiGroupController;
+use App\Http\Controllers\KpiRecordController;
+use App\Http\Controllers\KpiReportController;
 use App\Http\Controllers\KpiSubItemController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PlaceController;
@@ -29,8 +32,14 @@ Route::prefix('kpi')->name('kpi.')->group(function () {
     Route::post('groups/{kpiGroup}/sub-items', [KpiSubItemController::class, 'store'])  ->name('sub-items.store');
     Route::put('sub-items/{kpiSubItem}',       [KpiSubItemController::class, 'update']) ->name('sub-items.update');
     Route::delete('sub-items/{kpiSubItem}',    [KpiSubItemController::class, 'destroy'])->name('sub-items.destroy');
+
+    Route::get('reports',         [KpiReportController::class, 'index'])    ->name('reports.index');
+    Route::get('reports/monthly', [KpiReportController::class, 'monthly'])  ->name('reports.monthly');
+    Route::get('compliance',      [KpiComplianceController::class, 'index'])->name('compliance');
 });
 Route::resource('kpi/entries', KpiEntryController::class);
+Route::resource('kpi/records', KpiRecordController::class)
+    ->only(['index', 'show', 'edit', 'update', 'destroy']);
 
 Route::get('/incidents/all', [IncidentOccurrenceController::class, 'all'])->name('incidents.all');
 Route::post('incidents/{incident}/acknowledge', [IncidentOccurrenceController::class, 'acknowledge'])

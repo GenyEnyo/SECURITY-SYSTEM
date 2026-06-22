@@ -44,6 +44,26 @@
           <div>Active groups total <strong>100%</strong> — scoring is enabled.</div>
         </div> -->
 
+        @if (session('status'))
+          <div class="alert alert-success" role="alert" style="background:rgba(61,179,110,.12);border:1px solid var(--brand-success);border-radius:10px;padding:12px 18px;">
+            <i class="bi bi-check-circle me-2"></i>{{ session('status') }}
+          </div>
+        @endif
+
+        @if ($errors->any())
+          <div class="alert alert-danger" role="alert" style="background:rgba(252,51,32,.10);border:1px solid var(--brand-danger);border-radius:10px;padding:12px 18px;">
+            @foreach ($errors->all() as $message)
+              <div><i class="bi bi-exclamation-triangle me-2"></i>{{ $message }}</div>
+            @endforeach
+          </div>
+        @endif
+
+        <form method="POST" action="{{ route('entries.store') }}">
+          @csrf
+          <input type="hidden" name="location_id" id="kpi-loc-input">
+          <input type="hidden" name="building_id" id="kpi-building-input">
+          <input type="hidden" name="date" id="kpi-date-input">
+
         <!-- Deployment location selector -->
         <div class="form-card mb-4">
           <div class="row g-3">
@@ -73,7 +93,7 @@
 
         @forelse ($groups as $group)
           @php $isDeployment = strtolower(trim($group->name)) === 'deployment'; @endphp
-          <section class="kpi-group" data-group>
+          <section class="kpi-group" data-group data-weight="{{ $group->weight }}">
             <header onclick="this.parentElement.classList.toggle('collapsed')">
               <div>
                 <h4>{{ $group->name }}</h4>
@@ -122,7 +142,7 @@
                         <td><input type="number" value="{{ $item->target }}" readonly></td>
                         <td><input type="number" name="scored[{{ $item->id }}]"></td>
                         <td class="per-cell">—</td>
-                        <td><input type="number" step="0.1" name="merit[{{ $item->id }}]"></td>
+                        <td class="merit-cell muted">—</td>
                       </tr>
                     @endforeach
                   </tbody>
@@ -139,7 +159,7 @@
         <!-- Comments -->
         <div class="form-card mt-4">
           <label class="field-label">Officer comments <span class="muted fw-5">(optional)</span></label>
-          <textarea class="brand-input" rows="3" placeholder="Note anything unusual about today's shift..."></textarea>
+          <textarea class="brand-input" name="comments" rows="3" placeholder="Note anything unusual about today's shift...">{{ old('comments') }}</textarea>
         </div>
 
         <!-- Sticky total bar -->
@@ -150,12 +170,14 @@
           <div class="stat"><span class="lbl">Total weight</span><span class="val">{{ $groups->sum('weight') }}%</span></div>
           <div class="stat"><span class="lbl">Total merit</span><span class="val" id="kpi-total-merit" style="color:var(--brand-success);">— / 100</span></div>
           <div class="ms-auto d-flex gap-2">
-            <button class="btn btn-outline-primary"><i class="bi bi-eye me-2"></i>Preview</button>
-            <button class="btn btn-success" onclick="window.mNotify('Scorecard submitted','success'); setTimeout(()=>location.href='/dashboard',900);">
+            <button type="button" class="btn btn-outline-primary"><i class="bi bi-eye me-2"></i>Preview</button>
+            <button type="submit" class="btn btn-success">
               <i class="bi bi-check-lg me-2"></i>Submit
             </button>
           </div>
         </div>
+
+        </form>
 
       </main>
     </div>
@@ -165,18 +187,55 @@
   <script src="/assets/js/partials.js"></script>
   <script src="/assets/js/app.js"></script>
   <script>
-    // Auto-calculate Per % and color it on input
-    function recalc(row){
-      const tgt = +row.cells[1].querySelector('input').value || 0;
-      const got = +row.cells[2].querySelector('input').value || 0;
-      const pct = tgt ? Math.min((got/tgt)*100, 200) : 0;
-      const cell = row.cells[3];
+    // Per-row Per % colouring.
+    function colourPer(cell, pct){
       cell.textContent = pct.toFixed(1) + '%';
       cell.classList.remove('per-green','per-amber','per-red');
       if (pct >= 80) cell.classList.add('per-green');
       else if (pct >= 50) cell.classList.add('per-amber');
       else cell.classList.add('per-red');
     }
+
+    // Merit is system-generated: per line = weight × (scored ÷ Σ targets in the group).
+    // Recompute the whole group a row belongs to, then refresh the grand total.
+    function recalc(row){
+      const section = row.closest('.kpi-group');
+      if (!section) return;
+      const weight = +section.dataset.weight || 0;
+      const rows = section.querySelectorAll('tbody tr');
+
+      let targetSum = 0;
+      rows.forEach(r => { targetSum += +r.cells[1]?.querySelector('input')?.value || 0; });
+
+      rows.forEach(r => {
+        const tgt = +r.cells[1]?.querySelector('input')?.value || 0;
+        const got = +r.cells[2]?.querySelector('input')?.value || 0;
+        const perCell = r.cells[3];
+        if (perCell) colourPer(perCell, tgt ? Math.min((got/tgt)*100, 200) : 0);
+
+        const meritCell = r.cells[4];
+        if (meritCell) {
+          const merit = targetSum > 0 ? weight * (got / targetSum) : 0;
+          meritCell.textContent = merit.toFixed(1);
+          meritCell.classList.toggle('muted', merit === 0);
+        }
+      });
+
+      updateTotal();
+    }
+
+    // Sum every merit cell on the page → "X.X / <total weight>".
+    function updateTotal(){
+      const el = document.getElementById('kpi-total-merit');
+      if (!el) return;
+      let total = 0, weight = 0;
+      document.querySelectorAll('.kpi-group').forEach(s => {
+        weight += +s.dataset.weight || 0;
+        s.querySelectorAll('.merit-cell').forEach(c => { total += +c.textContent || 0; });
+      });
+      el.textContent = total.toFixed(1) + ' / ' + weight;
+    }
+
     function bindRow(tr){
       tr.querySelectorAll('input[type=number],input').forEach(i => i.addEventListener('input', () => recalc(tr)));
     }
@@ -193,6 +252,17 @@
     const dateInp  = document.getElementById('kpi-date');
     const summary  = document.getElementById('kpi-deploy-summary');
     const beatsBody = document.getElementById('kpi-beats-body');
+
+    // Mirror the selectors into the hidden form inputs so they submit with the scorecard.
+    const locInput   = document.getElementById('kpi-loc-input');
+    const buildInput = document.getElementById('kpi-building-input');
+    const dateInput  = document.getElementById('kpi-date-input');
+    function syncHidden(){
+      locInput.value   = locSel.value;
+      buildInput.value = buildSel.value;
+      dateInput.value  = dateInp ? dateInp.value : '';
+    }
+    syncHidden();
 
     function fill(select, items, placeholder, allowAll){
       select.innerHTML = '';
@@ -252,9 +322,9 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `<td></td>`
           + `<td><input type="number" value="${p.estimated_guards ?? 0}" readonly></td>`
-          + `<td><input type="number"></td>`
+          + `<td><input type="number" name="beat_scored[${p.id}]"></td>`
           + `<td class="per-cell">—</td>`
-          + `<td><input type="number" step="0.1"></td>`;
+          + `<td class="merit-cell muted">—</td>`;
         tr.cells[0].textContent = p.name; // safe assignment
         beatsBody.appendChild(tr);
         bindRow(tr);
@@ -263,10 +333,10 @@
 
     function esc(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-    locSel.addEventListener('change', () => { loadBuildings(); placeSel.innerHTML = '<option value="">All places in building</option>'; placeSel.disabled = true; renderDeployment(); });
-    buildSel.addEventListener('change', () => { loadPlaces(); renderDeployment(); });
+    locSel.addEventListener('change', () => { loadBuildings(); placeSel.innerHTML = '<option value="">All places in building</option>'; placeSel.disabled = true; syncHidden(); renderDeployment(); });
+    buildSel.addEventListener('change', () => { loadPlaces(); syncHidden(); renderDeployment(); });
     placeSel.addEventListener('change', renderDeployment);
-    if (dateInp) dateInp.addEventListener('change', renderDeployment);
+    if (dateInp) dateInp.addEventListener('change', () => { syncHidden(); renderDeployment(); });
   </script>
 </body>
 </html>

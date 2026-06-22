@@ -13,7 +13,13 @@
     { title: 'Records', items: [
       { id: 'incidents',       label: 'Incidents',            icon: 'bi-shield-exclamation',  href: '/incidents', badge: '5' },
       { id: 'all-incidents',   label: 'All incidents',        icon: 'bi-shield-shaded',       href: '/incidents/all' },
+      { id: 'kpi-records',     label: 'KPI Records',          icon: 'bi-card-checklist',      href: '/kpi/records' },
       { id: 'my-submissions',  label: 'My submissions',       icon: 'bi-folder2-open',        href: '/my-submissions' },
+    ]},
+    { title: 'Reports', items: [
+      { id: 'kpi-reports',     label: 'KPI Reports',          icon: 'bi-graph-up',            href: '/kpi/reports' },
+      { id: 'kpi-monthly',     label: 'Monthly report',       icon: 'bi-file-earmark-pdf',    href: '/kpi/reports/monthly' },
+      { id: 'kpi-compliance',  label: 'Deployment compliance',icon: 'bi-calendar-week',       href: '/kpi/compliance' },
     ]},
     { title: 'Setups', items: [
       { id: 'kpi-settings',    label: 'KPI settings',         icon: 'bi-sliders',             href: '/kpi/settings' },
