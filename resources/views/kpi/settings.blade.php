@@ -1,128 +1,135 @@
 @extends('layouts.app')
 
 @section('title', 'KPI settings · M Dashboard')
-@section('page', 'kpi-settings')
-@section('crumbs', '[{"label":"Setups"},{"label":"KPI settings"}]')
-
-@push('head')
-  <link href="/assets/css/extras.css" rel="stylesheet">
-@endpush
+@section('page-title', 'KPI settings')
+@section('crumbs')
+  <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Setups</a></li>
+  <li class="breadcrumb-item active">KPI settings</li>
+@endsection
 
 @section('content')
-  <div class="page-head">
+  <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
-      <h1 class="page-title">KPI Settings</h1>
-      <p class="page-subtitle">Configure KPI groups and sub-items used for daily scorecards</p>
+      <h4 class="mb-0">KPI Settings</h4>
+      <p class="text-muted mb-0">Configure KPI groups and sub-items used for daily scorecards</p>
     </div>
-    <div class="actions">
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGroup">
-        <i class="bi bi-plus-square me-2"></i>Add KPI group
-      </button>
-    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGroup">
+      <i class="ti ti-plus me-1"></i>Add KPI group
+    </button>
   </div>
 
   @if (session('status'))
-    <div class="alert alert-success" role="alert" style="background:rgba(61,179,110,.12);border:1px solid var(--brand-success);border-radius:10px;padding:12px 18px;">
-      <i class="bi bi-check-circle me-2"></i>{{ session('status') }}
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+      <i class="ti ti-circle-check me-2 fs-lg"></i>{{ session('status') }}
     </div>
   @endif
 
   @if ($errors->any())
-    <div class="alert alert-danger" role="alert" style="background:rgba(252,51,32,.10);border:1px solid var(--brand-danger);border-radius:10px;padding:12px 18px;">
+    <div class="alert alert-danger" role="alert">
       @foreach ($errors->all() as $message)
-        <div><i class="bi bi-exclamation-triangle me-2"></i>{{ $message }}</div>
+        <div><i class="ti ti-alert-triangle me-2"></i>{{ $message }}</div>
       @endforeach
     </div>
   @endif
 
-  @forelse ($groups as $group)
-    @php $isDeployment = strtolower(trim($group->name)) === 'deployment'; @endphp
-    <section class="kpi-group" data-group>
-      <header>
-        <div class="d-flex align-items-center gap-2">
-          <div>
-            <h4>{{ $group->name }}</h4>
-            <div class="muted fw-5" style="font-size:12px;">
-              @if ($isDeployment)
-                Weight {{ $group->weight }}% · estimates by location &amp; building
-              @else
-                Weight {{ $group->weight }}% · {{ $group->subItems->count() }} sub-item{{ $group->subItems->count() === 1 ? '' : 's' }}
-              @endif
+  <div class="accordion" id="kpiSettingsGroups">
+    @forelse ($groups as $group)
+      @php
+        $isDeployment = strtolower(trim($group->name)) === 'deployment';
+        $gIdx = $loop->index;
+      @endphp
+      <div class="accordion-item kpi-group" data-group>
+        <h2 class="accordion-header d-flex align-items-center">
+          <button class="accordion-button flex-grow-1" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#kpiSet{{ $gIdx }}" aria-expanded="true" aria-controls="kpiSet{{ $gIdx }}">
+            <div>
+              <span class="fw-semibold d-block">{{ $group->name }}</span>
+              <small class="text-muted">
+                @if ($isDeployment)
+                  Weight {{ $group->weight }}% · estimates by location &amp; building
+                @else
+                  Weight {{ $group->weight }}% · {{ $group->subItems->count() }} sub-item{{ $group->subItems->count() === 1 ? '' : 's' }}
+                @endif
+              </small>
             </div>
+          </button>
+          <div class="d-flex gap-1 px-3">
+            <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-group"
+                    title="Edit group"
+                    data-id="{{ $group->id }}"
+                    data-name="{{ $group->name }}"
+                    data-weight="{{ $group->weight }}">
+              <i class="ti ti-pencil"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-group"
+                    title="Delete group"
+                    data-id="{{ $group->id }}"
+                    data-name="{{ $group->name }}">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </h2>
+        <div id="kpiSet{{ $gIdx }}" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+            @if ($isDeployment)
+              @include('partials.kpi.deployment-estimates')
+            @else
+              @if ($group->subItems->isEmpty())
+                <p class="text-muted mb-3 small">No sub-items yet.</p>
+              @else
+                <div class="table-responsive">
+                  <table class="kpi-table table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>{{ $group->criteria_label }}</th>
+                        <th style="width:120px">{{ $group->target_label }}</th>
+                        <th class="text-end" style="width:120px">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach ($group->subItems as $item)
+                        <tr>
+                          <td>{{ $item->criteria }}</td>
+                          <td>{{ $item->target }}</td>
+                          <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-sub-item"
+                                    title="Edit"
+                                    data-id="{{ $item->id }}"
+                                    data-criteria="{{ $item->criteria }}"
+                                    data-target="{{ $item->target }}"
+                                    data-criteria-label="{{ $group->criteria_label }}"
+                                    data-target-label="{{ $group->target_label }}">
+                              <i class="ti ti-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-sub-item"
+                                    title="Delete"
+                                    data-id="{{ $item->id }}"
+                                    data-criteria="{{ $item->criteria }}">
+                              <i class="ti ti-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
+              @endif
+              <button type="button" class="btn btn-outline-primary btn-sm mt-3"
+                      onclick="openAddSubItem({{ $group->id }}, '{{ addslashes($group->name) }}', '{{ addslashes($group->criteria_label) }}', '{{ addslashes($group->target_label) }}')">
+                <i class="ti ti-plus me-1"></i>Add sub-item
+              </button>
+            @endif
           </div>
         </div>
-        <div class="row-actions">
-          <button type="button" class="ra-btn js-edit-group"
-                  data-bs-toggle="tooltip" title="Edit group"
-                  data-id="{{ $group->id }}"
-                  data-name="{{ $group->name }}"
-                  data-weight="{{ $group->weight }}">
-            <i class="bi bi-pencil-square"></i>
-          </button>
-          <button type="button" class="ra-btn danger js-delete-group"
-                  data-bs-toggle="tooltip" title="Delete group"
-                  data-id="{{ $group->id }}"
-                  data-name="{{ $group->name }}">
-            <i class="bi bi-trash"></i>
-          </button>
-        </div>
-      </header>
-      <div class="body">
-        @if ($isDeployment)
-          @include('partials.kpi.deployment-estimates')
-        @else
-          @if ($group->subItems->isEmpty())
-            <p class="muted fw-5 mb-3" style="font-size:13px;">No sub-items yet.</p>
-          @else
-            <table class="kpi-table">
-              <thead>
-                <tr>
-                  <th>{{ $group->criteria_label }}</th>
-                  <th style="width:120px">{{ $group->target_label }}</th>
-                  <th class="actions-col" style="width:120px">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach ($group->subItems as $item)
-                  <tr>
-                    <td>{{ $item->criteria }}</td>
-                    <td>{{ $item->target }}</td>
-                    <td>
-                      <div class="row-actions">
-                        <button type="button" class="ra-btn js-edit-sub-item"
-                                data-bs-toggle="tooltip" title="Edit"
-                                data-id="{{ $item->id }}"
-                                data-criteria="{{ $item->criteria }}"
-                                data-target="{{ $item->target }}"
-                                data-criteria-label="{{ $group->criteria_label }}"
-                                data-target-label="{{ $group->target_label }}">
-                          <i class="bi bi-pencil-square"></i>
-                        </button>
-                        <button type="button" class="ra-btn danger js-delete-sub-item"
-                                data-bs-toggle="tooltip" title="Delete"
-                                data-id="{{ $item->id }}"
-                                data-criteria="{{ $item->criteria }}">
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
-          @endif
-          <button type="button" class="btn btn-outline-primary btn-sm mt-3"
-                  onclick="openAddSubItem({{ $group->id }}, '{{ addslashes($group->name) }}', '{{ addslashes($group->criteria_label) }}', '{{ addslashes($group->target_label) }}')">
-            <i class="bi bi-plus-square me-2"></i>Add sub-item
-          </button>
-        @endif
       </div>
-    </section>
-  @empty
-    <div class="muted fw-5" style="padding:32px;text-align:center;border:1px dashed var(--border-soft);border-radius:12px;">
-      No KPI groups yet. Click <strong>Add KPI group</strong> to create your first one.
-    </div>
-  @endforelse
+    @empty
+      <div class="card">
+        <div class="card-body text-center text-muted py-5">
+          No KPI groups yet. Click <strong>Add KPI group</strong> to create your first one.
+        </div>
+      </div>
+    @endforelse
+  </div>
 
   @include('partials.kpi.add-group')
   @include('partials.kpi.edit-group')
@@ -134,14 +141,6 @@
 
 @push('scripts')
   <script>
-    // Accordion toggle — preserves the existing UX.
-    document.querySelectorAll('.kpi-group > header').forEach(h => {
-      h.addEventListener('click', e => {
-        if (e.target.closest('.ra-btn,.form-check,input,button,.btn,select,textarea,a')) return;
-        h.parentElement.classList.toggle('collapsed');
-      });
-    });
-
     window.openAddSubItem = (groupId, groupName, criteriaLabel, targetLabel) => {
       const el = document.getElementById('addSubItem');
       el.querySelector('form').action = `/kpi/groups/${groupId}/sub-items`;

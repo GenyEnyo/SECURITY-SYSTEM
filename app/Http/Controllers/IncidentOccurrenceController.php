@@ -19,7 +19,7 @@ class IncidentOccurrenceController extends Controller
     {
         $occurrences = IncidentOccurrence::with(['incidentType', 'location', 'building', 'place', 'severity', 'status', 'user'])
             ->latest('occurred_at')
-            ->paginate(15);
+            ->get();
 
         return view('incidents.index', compact('occurrences'));
     }

@@ -1,97 +1,114 @@
 @extends('layouts.app')
 
 @section('title', 'All incidents · M Dashboard')
-@section('page', 'all-incidents')
-@section('crumbs', '[{"label":"Records"},{"label":"All incidents"}]')
+@section('page-title', 'All incidents')
+@section('crumbs')
+  <li class="breadcrumb-item">Records</li>
+  <li class="breadcrumb-item active">All incidents</li>
+@endsection
 
 @section('content')
-  <div class="page-head">
+  <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h1 class="page-title">All incidents <span class="muted fw-5" style="font-size:13px;">(Head of Security view)</span></h1>
-      <p class="page-subtitle">Every incident across all officers and locations</p>
+      <h4 class="mb-0">All incidents <span class="text-muted fw-medium fs-13">(Head of Security view)</span></h4>
+      <p class="text-muted mb-0">Every incident across all officers and locations</p>
     </div>
-    <div class="actions">
-      <button class="btn btn-outline-primary"><i class="bi bi-file-earmark-excel me-2"></i>Export</button>
-    </div>
+    <button class="btn btn-outline-primary"><i class="ti ti-file-spreadsheet me-1"></i>Export</button>
   </div>
 
-  <div class="toolbar">
-    <div class="spacer"></div>
-    <div class="search-shadow"><i class="bi bi-search"></i><input placeholder="search...">
-    </div>
-  </div>
+  @php
+    $statusColors = [
+      'low' => 'success', 'resolved' => 'success', 'closed' => 'success',
+      'reviewing' => 'info',
+      'medium' => 'warning', 'reported' => 'warning',
+      'urgent' => 'danger', 'escalated' => 'danger',
+    ];
+  @endphp
 
-  <div id="bulk-bar" class="alert d-none align-items-center justify-content-between mb-2"
-       style="background:var(--brand-primary-soft); border:1px solid var(--brand-primary); padding:10px 14px; border-radius:8px;">
-    <div class="fw-7" style="font-size:13px;"><span id="bulk-count">0</span> selected</div>
+  <div id="bulk-bar" class="alert alert-primary d-none align-items-center justify-content-between mb-2">
+    <div class="fw-semibold"><span id="bulk-count">0</span> selected</div>
     <div class="d-flex gap-2">
-      <button class="btn btn-sm btn-warning"><i class="bi bi-arrow-up-circle me-1"></i>Escalate</button>
-      <button class="btn btn-sm btn-success"><i class="bi bi-check-lg me-1"></i>Mark resolved</button>
-      <button class="btn btn-sm btn-outline-primary"><i class="bi bi-archive me-1"></i>Close</button>
+      <button class="btn btn-sm btn-warning"><i class="ti ti-arrow-up-circle me-1"></i>Escalate</button>
+      <button class="btn btn-sm btn-success"><i class="ti ti-check me-1"></i>Mark resolved</button>
+      <button class="btn btn-sm btn-outline-primary"><i class="ti ti-archive me-1"></i>Close</button>
     </div>
   </div>
 
-  <table class="brand-table">
-    <thead>
-      <tr>
-        <th style="width:40px;"><input type="checkbox" id="check-all"></th>
-        <th>No.</th>
-        <th>Date</th>
-        <th>Incident Type</th>
-        <th>Location</th>
-        <th>Reported by</th>
-        <th>Status</th>
-        <th>Severity</th>
-        <th class="actions-col">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="all-tbody">
-      @forelse ($occurrences as $occurrence)
-        @php $initials = collect(explode(' ', $occurrence->user->name))->map(fn ($w) => $w[0] ?? '')->take(2)->join(''); @endphp
-        <tr>
-          <td><input type="checkbox" class="row-check"></td>
-          <td class="fw-7">{{ $occurrence->id }}</td>
-          <td>{{ $occurrence->occurred_at->format('d/m/y') }}</td>
-          <td>{{ $occurrence->incidentType->name }}</td>
-          <td>{{ $occurrence->location->name }}</td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="avatar" style="width:24px;height:24px;font-size:10px;">{{ $initials }}</div>
-              <span class="fw-7" style="font-size:12.5px;">{{ $occurrence->user->name }}</span>
-            </div>
-          </td>
-          <td>
-            <span class="pill pill-{{ strtolower($occurrence->status->name) }}">{{ $occurrence->status->name }}</span>
-            @if ($occurrence->isAcknowledged())
-              <span class="pill" style="background:rgba(61,179,110,.14);color:var(--brand-success);">Acknowledged</span>
-            @endif
-          </td>
-          <td><span class="pill" style="background:{{ $occurrence->severity->color }}1f;color:{{ $occurrence->severity->color }};">{{ $occurrence->severity->name }}</span></td>
-          <td>
-            <div class="row-actions">
-              <a class="ra-btn" href="{{ route('incidents.show', $occurrence) }}" data-bs-toggle="tooltip" title="View"><i class="bi bi-eye"></i></a>
-              @unless ($occurrence->isAcknowledged())
-                <form action="{{ route('incidents.acknowledge', $occurrence) }}" method="POST" style="display:inline;"
-                      onsubmit="return confirm('Acknowledge receipt? The reporter will no longer be able to edit or delete it.');">
-                  @csrf
-                  <button type="submit" class="ra-btn" data-bs-toggle="tooltip" title="Acknowledge receipt"><i class="bi bi-check2-circle"></i></button>
-                </form>
-              @endunless
-              @if (! $occurrence->isLocked())
-                <a class="ra-btn" href="{{ route('incidents.edit', $occurrence) }}" data-bs-toggle="tooltip" title="Edit"><i class="bi bi-pencil-square"></i></a>
-                <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident?');">
-                  @csrf @method('DELETE')
-                  <button type="submit" class="ra-btn danger" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></button>
-                </form>
-              @endif
-            </div>
-          </td>
-        </tr>
-      @empty
-        <tr><td colspan="9" class="text-center muted py-4">No incidents yet.</td></tr>
-      @endforelse
-    </tbody>
-  </table>
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-end mb-3">
+        <div class="app-search">
+          <input type="search" class="form-control" placeholder="search...">
+          <i class="ti ti-search app-search-icon"></i>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover table-centered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:40px;"><input type="checkbox" id="check-all"></th>
+              <th>No.</th>
+              <th>Date</th>
+              <th>Incident Type</th>
+              <th>Location</th>
+              <th>Reported by</th>
+              <th>Status</th>
+              <th>Severity</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-tbody">
+            @forelse ($occurrences as $occurrence)
+              @php
+                $initials = collect(explode(' ', $occurrence->user->name))->map(fn ($w) => $w[0] ?? '')->take(2)->join('');
+                $sc = $statusColors[strtolower($occurrence->status->name)] ?? 'secondary';
+              @endphp
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td class="fw-semibold">{{ $occurrence->id }}</td>
+                <td>{{ $occurrence->occurred_at->format('d/m/y') }}</td>
+                <td>{{ $occurrence->incidentType->name }}</td>
+                <td>{{ $occurrence->location->name }}</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="avatar-sm rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center">{{ $initials }}</span>
+                    <span class="fw-semibold">{{ $occurrence->user->name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-{{ $sc }}-subtle text-{{ $sc }}">{{ $occurrence->status->name }}</span>
+                  @if ($occurrence->isAcknowledged())
+                    <span class="badge bg-success-subtle text-success">Acknowledged</span>
+                  @endif
+                </td>
+                <td><span class="badge" style="background:{{ $occurrence->severity->color }}1f;color:{{ $occurrence->severity->color }};">{{ $occurrence->severity->name }}</span></td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-icon btn-soft-secondary" href="{{ route('incidents.show', $occurrence) }}" title="View"><i class="ti ti-eye"></i></a>
+                  @unless ($occurrence->isAcknowledged())
+                    <form action="{{ route('incidents.acknowledge', $occurrence) }}" method="POST" style="display:inline;"
+                          onsubmit="return confirm('Acknowledge receipt? The reporter will no longer be able to edit or delete it.');">
+                      @csrf
+                      <button type="submit" class="btn btn-sm btn-icon btn-soft-secondary" title="Acknowledge receipt"><i class="ti ti-circle-check"></i></button>
+                    </form>
+                  @endunless
+                  @if (! $occurrence->isLocked())
+                    <a class="btn btn-sm btn-icon btn-soft-secondary" href="{{ route('incidents.edit', $occurrence) }}" title="Edit"><i class="ti ti-pencil"></i></a>
+                    <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident?');">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-icon btn-soft-danger" title="Delete"><i class="ti ti-trash"></i></button>
+                    </form>
+                  @endif
+                </td>
+              </tr>
+            @empty
+              <tr><td colspan="9" class="text-center text-muted py-4">No incidents yet.</td></tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <div class="mt-3">{{ $occurrences->links() }}</div>
 @endsection

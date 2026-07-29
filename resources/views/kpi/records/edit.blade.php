@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
 @section('title', 'Edit scorecard · ' . $record->date->format('d M Y') . ' · M Dashboard')
-@section('page', 'kpi-records')
-@section('crumbs', json_encode([
-    ['label' => 'Records'],
-    ['label' => 'KPI Records', 'href' => '/kpi/records'],
-    ['label' => $record->date->format('d M Y'), 'href' => '/kpi/records/' . $record->id],
-    ['label' => 'Edit'],
-]))
+@section('page-title', 'Edit Scorecard')
+@section('crumbs')
+  <li class="breadcrumb-item">Records</li>
+  <li class="breadcrumb-item"><a href="/kpi/records">KPI Records</a></li>
+  <li class="breadcrumb-item"><a href="/kpi/records/{{ $record->id }}">{{ $record->date->format('d M Y') }}</a></li>
+  <li class="breadcrumb-item active">Edit</li>
+@endsection
 
 @section('content')
   @php
@@ -15,22 +15,20 @@
     $beatLines     = $record->lines->whereNotNull('place_id');
   @endphp
 
-  <div class="page-head">
+  <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
-      <h1 class="page-title">Edit scorecard</h1>
-      <p class="page-subtitle">{{ $record->location_name }} · {{ $record->building_name }} · {{ $record->date->format('d M Y') }}</p>
+      <h4 class="mb-0">Edit scorecard</h4>
+      <p class="text-muted mb-0">{{ $record->location_name }} · {{ $record->building_name }} · {{ $record->date->format('d M Y') }}</p>
     </div>
-    <div class="actions">
-      <a class="btn btn-outline-primary" href="{{ route('records.show', $record) }}">
-        <i class="bi bi-arrow-left me-2"></i>Back
-      </a>
-    </div>
+    <a class="btn btn-soft-primary" href="{{ route('records.show', $record) }}">
+      <i class="ti ti-arrow-left me-1"></i>Back
+    </a>
   </div>
 
   @if ($errors->any())
-    <div class="alert alert-danger" role="alert" style="background:rgba(252,51,32,.10);border:1px solid var(--brand-danger);border-radius:10px;padding:12px 18px;">
+    <div class="alert alert-danger" role="alert">
       @foreach ($errors->all() as $message)
-        <div><i class="bi bi-exclamation-triangle me-2"></i>{{ $message }}</div>
+        <div><i class="ti ti-alert-triangle me-2"></i>{{ $message }}</div>
       @endforeach
     </div>
   @endif
@@ -39,75 +37,91 @@
     @csrf
     @method('PUT')
 
-    <div class="shadow-card p-4 mb-3">
-      <dl class="row g-3 mb-0" style="font-size:15px;">
-        <dt class="col-sm-3 muted fw-7">Location</dt>
-        <dd class="col-sm-9">{{ $record->location_name }}</dd>
+    <div class="card">
+      <div class="card-body">
+        <dl class="row g-3 mb-0">
+          <dt class="col-sm-3 text-muted fw-semibold">Location</dt>
+          <dd class="col-sm-9">{{ $record->location_name }}</dd>
 
-        <dt class="col-sm-3 muted fw-7">Building</dt>
-        <dd class="col-sm-9">{{ $record->building_name }}</dd>
+          <dt class="col-sm-3 text-muted fw-semibold">Building</dt>
+          <dd class="col-sm-9">{{ $record->building_name }}</dd>
 
-        <dt class="col-sm-3 muted fw-7">Date</dt>
-        <dd class="col-sm-9">{{ $record->date->format('d M Y') }}</dd>
-      </dl>
-      <p class="muted mb-0 mt-2" style="font-size:12px;">Location, building and date are locked. Edit the scores and comments — merit is recalculated automatically on save.</p>
+          <dt class="col-sm-3 text-muted fw-semibold">Date</dt>
+          <dd class="col-sm-9">{{ $record->date->format('d M Y') }}</dd>
+        </dl>
+        <p class="text-muted mb-0 mt-2 small">Location, building and date are locked. Edit the scores and comments — merit is recalculated automatically on save.</p>
+      </div>
     </div>
 
-    <table class="brand-table">
-      <thead>
-        <tr>
-          <th>KPI group</th>
-          <th>Criteria</th>
-          <th style="width:110px">Target</th>
-          <th style="width:130px">Scored</th>
-          <th style="width:130px">Merit <span class="muted fw-5" style="font-size:11px;">(auto)</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach ($standardLines as $line)
-          <tr>
-            <td>{{ $line->group?->name ?? '—' }}</td>
-            <td class="fw-7">{{ $line->criteria }}</td>
-            <td>{{ $line->target ?? '—' }}</td>
-            <td><input type="number" min="0" name="lines[{{ $line->id }}][scored]" value="{{ old('lines.' . $line->id . '.scored', $line->scored) }}" class="brand-input"></td>
-            <td class="muted">{{ $line->merit !== null ? number_format($line->merit, 1) : '—' }}</td>
-          </tr>
-        @endforeach
-      </tbody>
-    </table>
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover table-centered mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>KPI group</th>
+                <th>Criteria</th>
+                <th style="width:110px">Target</th>
+                <th style="width:130px">Scored</th>
+                <th style="width:130px">Merit <span class="text-muted" style="font-size:11px;">(auto)</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($standardLines as $line)
+                <tr>
+                  <td>{{ $line->group?->name ?? '—' }}</td>
+                  <td class="fw-semibold">{{ $line->criteria }}</td>
+                  <td>{{ $line->target ?? '—' }}</td>
+                  <td><input type="number" min="0" name="lines[{{ $line->id }}][scored]" value="{{ old('lines.' . $line->id . '.scored', $line->scored) }}" class="form-control"></td>
+                  <td class="text-muted">{{ $line->merit !== null ? number_format($line->merit, 1) : '—' }}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     @if ($beatLines->isNotEmpty())
-      <div class="section-divider">Deployment beats</div>
-      <table class="brand-table">
-        <thead>
-          <tr>
-            <th>Place</th>
-            <th style="width:140px">Est. guards</th>
-            <th style="width:130px">Scored</th>
-            <th style="width:130px">Merit <span class="muted fw-5" style="font-size:11px;">(auto)</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach ($beatLines as $line)
-            <tr>
-              <td class="fw-7">{{ $line->criteria }}</td>
-              <td>{{ $line->target ?? '—' }}</td>
-              <td><input type="number" min="0" name="lines[{{ $line->id }}][scored]" value="{{ old('lines.' . $line->id . '.scored', $line->scored) }}" class="brand-input"></td>
-              <td class="muted">{{ $line->merit !== null ? number_format($line->merit, 1) : '—' }}</td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
+      <h4 class="mt-4 mb-2">Deployment beats</h4>
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-centered mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Place</th>
+                  <th style="width:140px">Est. guards</th>
+                  <th style="width:130px">Scored</th>
+                  <th style="width:130px">Merit <span class="text-muted" style="font-size:11px;">(auto)</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach ($beatLines as $line)
+                  <tr>
+                    <td class="fw-semibold">{{ $line->criteria }}</td>
+                    <td>{{ $line->target ?? '—' }}</td>
+                    <td><input type="number" min="0" name="lines[{{ $line->id }}][scored]" value="{{ old('lines.' . $line->id . '.scored', $line->scored) }}" class="form-control"></td>
+                    <td class="text-muted">{{ $line->merit !== null ? number_format($line->merit, 1) : '—' }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     @endif
 
-    <div class="shadow-card p-4 mt-3">
-      <label class="field-label" for="comments">Comments</label>
-      <textarea name="comments" id="comments" rows="3" class="brand-input" style="width:100%;">{{ old('comments', $record->comments) }}</textarea>
+    <div class="card">
+      <div class="card-body">
+        <label class="form-label" for="comments">Comments</label>
+        <textarea name="comments" id="comments" rows="3" class="form-control">{{ old('comments', $record->comments) }}</textarea>
+      </div>
     </div>
 
-    <div class="d-flex gap-2 mt-3">
-      <button type="submit" class="btn btn-success"><i class="bi bi-check-lg me-2"></i>Save changes</button>
-      <a class="btn btn-outline-primary" href="{{ route('records.show', $record) }}">Cancel</a>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-success"><i class="ti ti-check me-1"></i>Save changes</button>
+      <a class="btn btn-light" href="{{ route('records.show', $record) }}">Cancel</a>
     </div>
   </form>
 @endsection

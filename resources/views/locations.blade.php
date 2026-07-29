@@ -1,142 +1,136 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Locations · M Dashboard</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/css/brand.css" rel="stylesheet">
-  <link href="/assets/css/components.css" rel="stylesheet">
-</head>
-<body data-page="locations" data-crumbs='[{"label":"Setups"},{"label":"Locations"}]'>
+@extends('layouts.app')
 
-  <div class="app">
-    <aside class="app-sidebar" data-shell="sidebar"></aside>
+@section('title', 'Locations · M Dashboard')
+@section('page-title', 'Locations & Company Management')
+@section('crumbs')
+  <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Setups</a></li>
+  <li class="breadcrumb-item active">Locations</li>
+@endsection
 
-    <div class="app-main">
-      <header class="app-topbar" data-shell="topbar"></header>
+@section('content')
 
-      <main class="app-content">
+  @if (session('status'))
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+      <i class="ti ti-circle-check me-2 fs-lg"></i>{{ session('status') }}
+    </div>
+  @endif
 
-        <!-- Page header -->
-        <div class="page-head">
-          <div>
-            <h1 class="page-title">Locations &amp; Company Management</h1>
-            <p class="page-subtitle">Manage security company deployments here</p>
-          </div>
-          <div class="actions">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBuilding">
-              <i class="bi bi-plus-square me-2"></i>Add building
-            </button>
-          </div>
-        </div>
+  @if ($errors->any())
+    <div class="alert alert-danger" role="alert">
+      @foreach ($errors->all() as $message)
+        <div><i class="ti ti-alert-triangle me-2"></i>{{ $message }}</div>
+      @endforeach
+    </div>
+  @endif
 
-        @if (session('status'))
-          <div class="alert alert-success" role="alert" style="background:rgba(61,179,110,.12);border:1px solid var(--brand-success);border-radius:10px;padding:12px 18px;">
-            <i class="bi bi-check-circle me-2"></i>{{ session('status') }}
-          </div>
-        @endif
+  <!-- Buildings -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h4 class="mb-0">Buildings</h4>
+      <p class="text-muted mb-0">Posts &amp; sites you manage</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBuilding">
+      <i class="ti ti-plus me-1"></i>Add building
+    </button>
+  </div>
 
-        @if ($errors->any())
-          <div class="alert alert-danger" role="alert" style="background:rgba(252,51,32,.10);border:1px solid var(--brand-danger);border-radius:10px;padding:12px 18px;">
-            @foreach ($errors->all() as $message)
-              <div><i class="bi bi-exclamation-triangle me-2"></i>{{ $message }}</div>
-            @endforeach
-          </div>
-        @endif
-
-        <!-- Tile grid -->
-        <div class="row g-3">
-          @forelse ($buildings as $building)
-            <div class="col-md-6 col-lg-4 col-xl-3">
-              <div class="location-tile">
-                <div class="row-actions" style="position:absolute;top:8px;right:8px;">
-                  <button type="button" class="ra-btn js-edit-building"
-                          data-bs-toggle="tooltip" title="Edit"
-                          data-id="{{ $building->id }}"
-                          data-name="{{ $building->name }}"
-                          data-location-id="{{ $building->location_id }}">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button type="button" class="ra-btn danger js-delete-building"
-                          data-bs-toggle="tooltip" title="Delete"
-                          data-id="{{ $building->id }}"
-                          data-name="{{ $building->name }}">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
-                <div>
-                  <div class="title">{{ $building->name }}</div>
-                  <div class="sub muted mt-2">{{ $building->location->name }}</div>
-                </div>
-                <a href="{{ route('buildings.places.index', $building) }}" class="btn btn-primary">Manage</a>
+  <div class="row">
+    @forelse ($buildings as $building)
+      <div class="col-xl-3 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="avatar-md d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded fs-22">
+                <i class="ti ti-building"></i>
+              </span>
+              <div class="d-flex gap-1">
+                <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-building"
+                        title="Edit"
+                        data-id="{{ $building->id }}"
+                        data-name="{{ $building->name }}"
+                        data-location-id="{{ $building->location_id }}">
+                  <i class="ti ti-pencil"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-building"
+                        title="Delete"
+                        data-id="{{ $building->id }}"
+                        data-name="{{ $building->name }}">
+                  <i class="ti ti-trash"></i>
+                </button>
               </div>
             </div>
-          @empty
-          @endforelse
-
-          <!-- Add new tile -->
-          <div class="col-md-6 col-lg-4 col-xl-3">
-            <button type="button" class="location-tile add-tile" data-bs-toggle="modal" data-bs-target="#addBuilding" style="width:100%;">
-              <i class="bi bi-plus-circle"></i>
-              <div class="fw-7" style="font-size:18px;">Add new building</div>
-              <div class="muted fw-5">Posts &amp; sites</div>
-            </button>
+            <h4 class="mb-1 fw-bold">{{ $building->name }}</h4>
+            <p class="text-muted small mb-3"><i class="ti ti-map-pin me-1"></i>{{ $building->location->name ?? '—' }}</p>
+            <a href="{{ route('buildings.places.index', $building) }}" class="btn btn-sm btn-primary w-100">
+              <i class="ti ti-settings me-1"></i>Manage places
+            </a>
           </div>
         </div>
+      </div>
+    @empty
+    @endforelse
 
-        <!-- Locations -->
-        <div class="page-head mt-5">
-          <div>
-            <h2 class="page-title" style="font-size:22px;">Locations</h2>
-            <p class="page-subtitle">Add the locations buildings can belong to</p>
-          </div>
-          <div class="actions">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLocation">
-              <i class="bi bi-plus-square me-2"></i>Add location
-            </button>
-          </div>
+    <!-- Add new tile -->
+    <div class="col-xl-3 col-md-6">
+      <button type="button" class="card w-100 h-100 border-2 border-dashed bg-transparent js-add-building-tile"
+              data-bs-toggle="modal" data-bs-target="#addBuilding" style="border-style:dashed!important;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center text-primary py-4">
+          <i class="ti ti-circle-plus fs-36 mb-2"></i>
+          <div class="fw-bold">Add new building</div>
+          <div class="text-muted small">Posts &amp; sites</div>
         </div>
+      </button>
+    </div>
+  </div>
 
-        <table class="brand-table">
-          <thead>
+  <!-- Locations -->
+  <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
+    <div>
+      <h4 class="mb-0">Locations</h4>
+      <p class="text-muted mb-0">Add the locations buildings can belong to</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLocation">
+      <i class="ti ti-plus me-1"></i>Add location
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-centered mb-0">
+          <thead class="table-light">
             <tr>
               <th style="width:80px">No.</th>
               <th>Name</th>
-              <th class="actions-col">Actions</th>
+              <th class="text-end">Actions</th>
             </tr>
           </thead>
           <tbody>
             @forelse ($locations as $location)
               <tr>
-                <td class="fw-7">{{ $loop->iteration }}</td>
+                <td class="fw-semibold">{{ $loop->iteration }}</td>
                 <td>{{ $location->name }}</td>
-                <td><div class="row-actions">
-                  <button type="button" class="ra-btn js-edit-location"
-                          data-bs-toggle="tooltip" title="Edit"
+                <td class="text-end">
+                  <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-location"
+                          title="Edit"
                           data-id="{{ $location->id }}"
                           data-name="{{ $location->name }}">
-                    <i class="bi bi-pencil-square"></i>
+                    <i class="ti ti-pencil"></i>
                   </button>
-                  <button type="button" class="ra-btn danger js-delete-location"
-                          data-bs-toggle="tooltip" title="Delete"
+                  <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-location"
+                          title="Delete"
                           data-id="{{ $location->id }}"
                           data-name="{{ $location->name }}">
-                    <i class="bi bi-trash"></i>
+                    <i class="ti ti-trash"></i>
                   </button>
-                </div></td>
+                </td>
               </tr>
             @empty
-              <tr><td colspan="3" class="text-center muted fw-5">No locations yet.</td></tr>
+              <tr><td colspan="3" class="text-center text-muted">No locations yet.</td></tr>
             @endforelse
           </tbody>
         </table>
-
-      </main>
+      </div>
     </div>
   </div>
 
@@ -147,10 +141,9 @@
   @include('partials.locations.add-location')
   @include('partials.locations.edit-location')
   @include('partials.locations.delete-location')
+@endsection
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/js/partials.js"></script>
-  <script src="/assets/js/app.js"></script>
+@push('scripts')
   <script>
     document.addEventListener('click', (e) => {
       const t = e.target.closest('.js-edit-building, .js-delete-building, .js-edit-location, .js-delete-location');
@@ -185,5 +178,4 @@
       }
     });
   </script>
-</body>
-</html>
+@endpush

@@ -1,0 +1,33 @@
+HTTrack3.49-2+htsswf+htsjava launched on Mon, 22 Jun 2026 13:37:22 at https://coderthemes.com/paces/bootstrap/dashboard-crm.html?luxe +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://coderthemes.com/paces/bootstrap/dashboard-crm.html?luxe -O1 "C:\My Web Sites\sec1" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+13:43:36	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/fonts/boxicons.eot (from https://coderthemes.com/paces/bootstrap/assets/css/vendors.min.css)
+13:43:36	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/fonts/boxicons.woff2 (from https://coderthemes.com/paces/bootstrap/assets/css/vendors.min.css)
+13:43:36	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/fonts/boxicons.woff (from https://coderthemes.com/paces/bootstrap/assets/css/vendors.min.css)
+13:43:36	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/fonts/boxicons.ttf (from https://coderthemes.com/paces/bootstrap/assets/css/vendors.min.css)
+13:43:36	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/fonts/boxicons.svg? (from https://coderthemes.com/paces/bootstrap/assets/css/vendors.min.css)
+13:43:36	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/css/fonts/remixicon.eot?t=1769685282643 (from https://coderthemes.com/paces/bootstrap/assets/css/vendors.min.css)
+13:43:36	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/css/fonts/remixicon.svg?t=1769685282643 (from https://coderthemes.com/paces/bootstrap/assets/css/vendors.min.css)
+13:43:37	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/users-profile.html (from https://coderthemes.com/paces/bootstrap/apps-crm-customers.html)
+13:43:37	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/apps-ecommerce-discount-edit.html (from https://coderthemes.com/paces/bootstrap/apps-promo-discounts.html)
+13:43:37	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/file-manager.html (from https://coderthemes.com/paces/bootstrap/apps-file-manager.html)
+13:43:37	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/files/proposal.pdf (from https://coderthemes.com/paces/bootstrap/apps-file-manager.html)
+13:43:37	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/files/dependency.dep (from https://coderthemes.com/paces/bootstrap/apps-file-manager.html)
+13:43:38	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/dashboard-ecommerce.html (from https://coderthemes.com/paces/bootstrap/layouts-horizontal.html)
+13:43:38	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/"assets/images/stock/small-6.jpg" (from https://coderthemes.com/paces/bootstrap/widgets-weather.html)
+13:43:38	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/"assets/images/stock/small-4.jpg" (from https://coderthemes.com/paces/bootstrap/widgets-weather.html)
+13:43:38	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/"assets/images/stock/small-5.jpg" (from https://coderthemes.com/paces/bootstrap/widgets-weather.html)
+13:43:38	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/! (from https://coderthemes.com/paces/bootstrap/form-elements.html)
+13:43:42	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/cropped.png (from https://coderthemes.com/paces/bootstrap/form-cropper.html)
+13:43:43	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/plugins/jstree/32px.png (from https://coderthemes.com/paces/bootstrap/assets/plugins/jstree/style.min.css)
+13:43:43	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/plugins/jstree/40px.png (from https://coderthemes.com/paces/bootstrap/assets/plugins/jstree/style.min.css)
+13:43:43	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/plugins/summernote/font/summernote.eot? (from https://coderthemes.com/paces/bootstrap/assets/plugins/summernote/summernote-bs5.min.css)
+13:43:43	Error: 	"Not Found" (404) at link https://coderthemes.com/paces/bootstrap/assets/plugins/leaflet/images/layers-2x.png (from https://coderthemes.com/paces/bootstrap/assets/plugins/leaflet/leaflet.css)
+
+HTTrack Website Copier/3.49-2 mirror complete in 6 minutes 21 seconds : 721 links scanned, 698 files written (92495645 bytes overall) [23853409 bytes received at 62607 bytes/sec], 77070053 bytes transferred using HTTP compression in 485 files, ratio 10%, 11.8 requests per connection
+(22 errors, 0 warnings, 0 messages)

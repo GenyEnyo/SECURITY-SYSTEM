@@ -1,20 +1,24 @@
 {{-- ===== Delete building ===== --}}
 <div class="modal fade" id="deleteBuilding" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:14px;border:0;">
+    <div class="modal-content">
       <form method="POST">
         @csrf
         @method('DELETE')
-        <div class="modal-body p-4 text-center">
-          <div class="mx-auto mb-3" style="width:60px;height:60px;border-radius:50%;background:rgba(252,51,32,.12);color:var(--brand-danger);display:grid;place-items:center;font-size:28px;">
-            <i class="bi bi-trash"></i>
+        <div class="modal-header">
+          <h4 class="modal-title">Delete building</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div class="avatar-md mx-auto mb-3 d-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle fs-24">
+            <i class="ti ti-trash"></i>
           </div>
-          <h5 class="fw-7 mb-2">Delete this building?</h5>
-          <p class="muted fw-5 mb-4">"<span class="target-name fw-7"></span>" will be removed.</p>
-          <div class="d-flex gap-2 justify-content-center">
-            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-danger">Yes, delete</button>
-          </div>
+          <h4 class="mb-2">Delete this building?</h4>
+          <p class="text-muted mb-0">"<span class="target-name fw-semibold"></span>" will be removed.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete</button>
         </div>
       </form>
     </div>

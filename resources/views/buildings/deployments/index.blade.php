@@ -1,85 +1,87 @@
 @extends('layouts.app')
 
 @section('title', 'Manage ' . $building->name . ' · M Dashboard')
-@section('page', 'deployments')
-@section('crumbs', json_encode([
-    ['label' => 'Setups'],
-    ['label' => 'Deployments', 'href' => '/deployments'],
-    ['label' => $building->name],
-]))
+@section('page-title', 'Manage ' . $building->name)
+@section('crumbs')
+  <li class="breadcrumb-item">Setups</li>
+  <li class="breadcrumb-item"><a href="{{ url('/deployments') }}">Deployments</a></li>
+  <li class="breadcrumb-item active">{{ $building->name }}</li>
+@endsection
 
 @push('head')
   <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 @endpush
 
 @section('content')
-  <div class="page-head">
+  <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h1 class="page-title">Manage {{ $building->name }}</h1>
-      <p class="page-subtitle">{{ $building->location->name }} — Deployments for this building</p>
+      <h4 class="mb-0">Manage {{ $building->name }}</h4>
+      <p class="text-muted mb-0">{{ $building->location->name }} — Deployments for this building</p>
     </div>
-    <div class="actions">
-      <a class="btn btn-primary" href="{{ route('buildings.deployments.create', $building) }}">
-        <i class="bi bi-plus-square me-2"></i>Add Deployment
-      </a>
-    </div>
+    <a class="btn btn-primary" href="{{ route('buildings.deployments.create', $building) }}">
+      <i class="ti ti-plus me-1"></i>Add Deployment
+    </a>
   </div>
 
   @if (session('status'))
-    <div class="alert alert-success" role="alert" style="background:rgba(61,179,110,.12);border:1px solid var(--brand-success);border-radius:10px;padding:12px 18px;">
-      <i class="bi bi-check-circle me-2"></i>{{ session('status') }}
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+      <i class="ti ti-circle-check me-2 fs-lg"></i>{{ session('status') }}
     </div>
   @endif
 
   @if ($errors->any())
-    <div class="alert alert-danger" role="alert" style="background:rgba(252,51,32,.10);border:1px solid var(--brand-danger);border-radius:10px;padding:12px 18px;">
+    <div class="alert alert-danger" role="alert">
       @foreach ($errors->all() as $message)
-        <div><i class="bi bi-exclamation-triangle me-2"></i>{{ $message }}</div>
+        <div><i class="ti ti-alert-triangle me-2"></i>{{ $message }}</div>
       @endforeach
     </div>
   @endif
 
-  <table id="deployments-table" class="brand-table">
-    <thead>
-      <tr>
-        <th>Shift</th>
-        <th>Date</th>
-        <th>Guard No.</th>
-        <th>Start Time</th>
-        <th>End Time</th>
-        <th class="actions-col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach ($deployments as $d)
-        <tr>
-          <td>{{ $d->shift->name }}</td>
-          <td>{{ $d->start_at->format('Y-m-d') }}</td>
-          <td>{{ $d->number_of_guards }}</td>
-          <td>{{ $d->start_at->format('H:i') }}</td>
-          <td>{{ $d->end_at->format('H:i') }}</td>
-          <td>
-            <div class="row-actions">
-              <a href="{{ route('buildings.deployments.show', [$building, $d]) }}"
-                 class="ra-btn" data-bs-toggle="tooltip" title="View">
-                <i class="bi bi-eye"></i>
-              </a>
-              <a href="{{ route('buildings.deployments.edit', [$building, $d]) }}"
-                 class="ra-btn" data-bs-toggle="tooltip" title="Edit">
-                <i class="bi bi-pencil-square"></i>
-              </a>
-              <button type="button" class="ra-btn danger js-delete-deployment"
-                      data-bs-toggle="tooltip" title="Delete"
-                      data-id="{{ $d->id }}"
-                      data-label="{{ $d->shift->name }} on {{ $d->start_at->format('Y-m-d') }}">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      @endforeach
-    </tbody>
-  </table>
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="deployments-table" class="table table-hover table-centered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Shift</th>
+              <th>Date</th>
+              <th>Guard No.</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach ($deployments as $d)
+              <tr>
+                <td>{{ $d->shift->name }}</td>
+                <td>{{ $d->start_at->format('Y-m-d') }}</td>
+                <td>{{ $d->number_of_guards }}</td>
+                <td>{{ $d->start_at->format('H:i') }}</td>
+                <td>{{ $d->end_at->format('H:i') }}</td>
+                <td class="text-end">
+                  <a href="{{ route('buildings.deployments.show', [$building, $d]) }}"
+                     class="btn btn-sm btn-icon btn-soft-secondary" title="View">
+                    <i class="ti ti-eye"></i>
+                  </a>
+                  <a href="{{ route('buildings.deployments.edit', [$building, $d]) }}"
+                     class="btn btn-sm btn-icon btn-soft-secondary" title="Edit">
+                    <i class="ti ti-pencil"></i>
+                  </a>
+                  <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-deployment"
+                          title="Delete"
+                          data-id="{{ $d->id }}"
+                          data-label="{{ $d->shift->name }} on {{ $d->start_at->format('Y-m-d') }}">
+                    <i class="ti ti-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   @include('partials.deployments.delete-deployment')
 @endsection

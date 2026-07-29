@@ -1,77 +1,79 @@
 @extends('layouts.app')
 
 @section('title', 'Manage ' . $building->name . ' · M Dashboard')
-@section('page', 'locations')
-@section('crumbs', json_encode([
-    ['label' => 'Setups'],
-    ['label' => 'Locations', 'href' => '/locations'],
-    ['label' => $building->name],
-]))
+@section('page-title', 'Manage ' . $building->name)
+@section('crumbs')
+  <li class="breadcrumb-item">Setups</li>
+  <li class="breadcrumb-item"><a href="{{ url('/locations') }}">Locations</a></li>
+  <li class="breadcrumb-item active">{{ $building->name }}</li>
+@endsection
 
 @push('head')
   <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 @endpush
 
 @section('content')
-  <div class="page-head">
+  <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h1 class="page-title">Manage {{ $building->name }}</h1>
-      <p class="page-subtitle">{{ $building->location->name }} — Specific locations in this building</p>
+      <h4 class="mb-0">Manage {{ $building->name }}</h4>
+      <p class="text-muted mb-0">{{ $building->location->name }} — Specific locations in this building</p>
     </div>
-    <div class="actions">
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlace">
-        <i class="bi bi-plus-square me-2"></i>Add specific location
-      </button>
-    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlace">
+      <i class="ti ti-plus me-1"></i>Add specific location
+    </button>
   </div>
 
   @if (session('status'))
-    <div class="alert alert-success" role="alert" style="background:rgba(61,179,110,.12);border:1px solid var(--brand-success);border-radius:10px;padding:12px 18px;">
-      <i class="bi bi-check-circle me-2"></i>{{ session('status') }}
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+      <i class="ti ti-circle-check me-2 fs-lg"></i>{{ session('status') }}
     </div>
   @endif
 
   @if ($errors->any())
-    <div class="alert alert-danger" role="alert" style="background:rgba(252,51,32,.10);border:1px solid var(--brand-danger);border-radius:10px;padding:12px 18px;">
+    <div class="alert alert-danger" role="alert">
       @foreach ($errors->all() as $message)
-        <div><i class="bi bi-exclamation-triangle me-2"></i>{{ $message }}</div>
+        <div><i class="ti ti-alert-triangle me-2"></i>{{ $message }}</div>
       @endforeach
     </div>
   @endif
 
-  <table id="places-table" class="brand-table">
-    <thead>
-      <tr>
-        <th style="width:80px">No.</th>
-        <th>Name</th>
-        <th class="actions-col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach ($places as $place)
-        <tr>
-          <td class="fw-7">{{ $loop->iteration }}</td>
-          <td>{{ $place->name }}</td>
-          <td>
-            <div class="row-actions">
-              <button type="button" class="ra-btn js-edit-place"
-                      data-bs-toggle="tooltip" title="Edit"
-                      data-id="{{ $place->id }}"
-                      data-name="{{ $place->name }}">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button type="button" class="ra-btn danger js-delete-place"
-                      data-bs-toggle="tooltip" title="Delete"
-                      data-id="{{ $place->id }}"
-                      data-name="{{ $place->name }}">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      @endforeach
-    </tbody>
-  </table>
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="places-table" class="table table-hover table-centered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:80px">No.</th>
+              <th>Name</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach ($places as $place)
+              <tr>
+                <td class="fw-semibold">{{ $loop->iteration }}</td>
+                <td>{{ $place->name }}</td>
+                <td class="text-end">
+                  <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-place"
+                          title="Edit"
+                          data-id="{{ $place->id }}"
+                          data-name="{{ $place->name }}">
+                    <i class="ti ti-pencil"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-place"
+                          title="Delete"
+                          data-id="{{ $place->id }}"
+                          data-name="{{ $place->name }}">
+                    <i class="ti ti-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   @include('partials.places.add-place')
   @include('partials.places.edit-place')

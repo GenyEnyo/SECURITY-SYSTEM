@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
 @section('title', 'KPI Reports · M Dashboard')
-@section('page', 'kpi-reports')
-@section('crumbs', '[{"label":"Reports"},{"label":"KPI Reports"}]')
+@section('page-title', 'KPI Reports')
+@section('crumbs')
+  <li class="breadcrumb-item">Reports</li>
+  <li class="breadcrumb-item active">KPI Reports</li>
+@endsection
 
 @section('content')
   @php
@@ -11,120 +14,182 @@
     $worst = $agg['worst'];
   @endphp
 
-  <div class="page-head">
+  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
     <div>
-      <h1 class="page-title">KPI Reports</h1>
-      <p class="page-subtitle">Performance trends · {{ $rangeLabel }}</p>
+      <h4 class="mb-0">KPI Reports</h4>
+      <p class="text-muted mb-0">Performance trends · {{ $rangeLabel }}</p>
     </div>
-    <div class="actions">
-      <form method="GET" class="d-flex gap-2 align-items-center flex-wrap">
-        <input type="hidden" name="range" value="{{ $range }}">
-        <select name="location_id" class="brand-select" style="width:170px;">
+    <form method="GET" class="d-flex flex-wrap gap-2 align-items-end">
+      <input type="hidden" name="range" value="{{ $range }}">
+      <div>
+        <label class="form-label">Location</label>
+        <select name="location_id" class="form-select" style="width:170px;">
           <option value="">All locations</option>
           @foreach ($locations as $location)
             <option value="{{ $location->id }}" @selected(($filters['location_id'] ?? '') == $location->id)>{{ $location->name }}</option>
           @endforeach
         </select>
-        <select name="building_id" class="brand-select" style="width:170px;">
+      </div>
+      <div>
+        <label class="form-label">Building</label>
+        <select name="building_id" class="form-select" style="width:170px;">
           <option value="">All buildings</option>
           @foreach ($buildings as $building)
             <option value="{{ $building->id }}" @selected(($filters['building_id'] ?? '') == $building->id)>{{ $building->name }}</option>
           @endforeach
         </select>
-        <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Filter</button>
-        <a href="{{ route('kpi.reports.monthly') }}" class="btn btn-outline-primary"><i class="bi bi-file-earmark-pdf me-1"></i>Monthly report</a>
-      </form>
-    </div>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary"><i class="ti ti-filter me-1"></i>Filter</button>
+        <a href="{{ route('kpi.reports.monthly') }}" class="btn btn-outline-primary"><i class="ti ti-file-text me-1"></i>Monthly report</a>
+      </div>
+    </form>
   </div>
 
   <!-- Range buttons -->
-  <div class="toolbar">
-    <div class="d-flex gap-2 align-items-center" style="font-size:13px;">
-      <span class="muted fw-7">View:</span>
-      @foreach (['week' => 'Weekly', 'month' => 'Monthly', 'quarter' => 'Quarterly', 'ytd' => 'YTD'] as $key => $label)
-        <a href="{{ route('kpi.reports.index') }}?{{ $rangeQuery($key) }}"
-           class="btn btn-sm {{ $range === $key ? 'btn-primary' : 'btn-outline-primary' }}">{{ $label }}</a>
-      @endforeach
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <span class="text-muted fw-semibold">View:</span>
+        @foreach (['week' => 'Weekly', 'month' => 'Monthly', 'quarter' => 'Quarterly', 'ytd' => 'YTD'] as $key => $label)
+          <a href="{{ route('kpi.reports.index') }}?{{ $rangeQuery($key) }}"
+             class="btn btn-sm {{ $range === $key ? 'btn-primary' : 'btn-outline-primary' }}">{{ $label }}</a>
+        @endforeach
+      </div>
     </div>
   </div>
 
   <!-- Summary cards -->
-  <div class="row g-3">
-    <div class="col-md-3"><div class="metric-card">
-      <div class="icon-wrap"><i class="bi bi-graph-up-arrow"></i></div>
-      <div class="label">Overall score</div>
-      <div class="value">{{ $agg['overall_pct'] }}%</div>
-      <div class="delta muted">{{ $rangeLabel }}</div>
-    </div></div>
-    <div class="col-md-3"><div class="metric-card">
-      <div class="icon-wrap" style="background:rgba(61,179,110,.12);color:var(--brand-success);"><i class="bi bi-trophy"></i></div>
-      <div class="label">Best group</div>
-      <div class="value" style="font-size:18px;line-height:1.2;">{{ $best['name'] ?? '—' }}</div>
-      <div class="delta up">{{ $best ? $best['attainment'] . '% avg' : 'No data' }}</div>
-    </div></div>
-    <div class="col-md-3"><div class="metric-card">
-      <div class="icon-wrap" style="background:rgba(252,51,32,.12);color:var(--brand-danger);"><i class="bi bi-exclamation-triangle"></i></div>
-      <div class="label">Needs attention</div>
-      <div class="value" style="font-size:18px;line-height:1.2;">{{ $worst['name'] ?? '—' }}</div>
-      <div class="delta down">{{ $worst ? $worst['attainment'] . '% avg' : 'No data' }}</div>
-    </div></div>
-    <div class="col-md-3"><div class="metric-card">
-      <div class="icon-wrap" style="background:rgba(255,169,31,.18);color:var(--brand-warning);"><i class="bi bi-calendar-check"></i></div>
-      <div class="label">Scorecards filed</div>
-      <div class="value">{{ $agg['count'] }}</div>
-      <div class="delta muted">in {{ $rangeLabel }}</div>
-    </div></div>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-1">{{ $agg['overall_pct'] }}%</h4>
+              <p class="text-muted mb-0">Overall score</p>
+            </div>
+            <div class="avatar-md bg-primary-subtle text-primary rounded d-flex align-items-center justify-content-center fs-22">
+              <i class="ti ti-chart-arrows-vertical"></i>
+            </div>
+          </div>
+          <p class="text-muted mb-0 mt-2"><span class="badge bg-light text-muted">{{ $rangeLabel }}</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-1" style="font-size:18px;line-height:1.2;">{{ $best['name'] ?? '—' }}</h4>
+              <p class="text-muted mb-0">Best group</p>
+            </div>
+            <div class="avatar-md bg-success-subtle text-success rounded d-flex align-items-center justify-content-center fs-22">
+              <i class="ti ti-trophy"></i>
+            </div>
+          </div>
+          <p class="mb-0 mt-2"><span class="badge bg-success-subtle text-success">{{ $best ? $best['attainment'] . '% avg' : 'No data' }}</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-1" style="font-size:18px;line-height:1.2;">{{ $worst['name'] ?? '—' }}</h4>
+              <p class="text-muted mb-0">Needs attention</p>
+            </div>
+            <div class="avatar-md bg-danger-subtle text-danger rounded d-flex align-items-center justify-content-center fs-22">
+              <i class="ti ti-alert-triangle"></i>
+            </div>
+          </div>
+          <p class="mb-0 mt-2"><span class="badge bg-danger-subtle text-danger">{{ $worst ? $worst['attainment'] . '% avg' : 'No data' }}</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-1">{{ $agg['count'] }}</h4>
+              <p class="text-muted mb-0">Scorecards filed</p>
+            </div>
+            <div class="avatar-md bg-warning-subtle text-warning rounded d-flex align-items-center justify-content-center fs-22">
+              <i class="ti ti-calendar-check"></i>
+            </div>
+          </div>
+          <p class="text-muted mb-0 mt-2"><span class="badge bg-light text-muted">in {{ $rangeLabel }}</span></p>
+        </div>
+      </div>
+    </div>
   </div>
 
   @if ($agg['count'] === 0)
-    <div class="shadow-card p-4 mt-3 muted fw-5" style="text-align:center;">
-      No scorecards found for {{ $rangeLabel }}@if(array_filter($filters)) with the selected filters @endif.
+    <div class="card">
+      <div class="card-body text-center text-muted py-4">
+        No scorecards found for {{ $rangeLabel }}@if(array_filter($filters)) with the selected filters @endif.
+      </div>
     </div>
   @else
     <!-- Charts -->
-    <div class="row g-3 mt-1">
+    <div class="row">
       <div class="col-lg-7">
-        <div class="shadow-card p-4">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="fw-7" style="font-size:16px;">Average attainment by KPI group</div>
-            <span class="muted fw-7" style="font-size:12px;">Target line at 80%</span>
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+              <div class="fw-semibold" style="font-size:16px;">Average attainment by KPI group</div>
+              <span class="text-muted fw-semibold" style="font-size:12px;">Target line at 80%</span>
+            </div>
+            <canvas id="groupBar" height="120"></canvas>
           </div>
-          <canvas id="groupBar" height="120"></canvas>
         </div>
       </div>
       <div class="col-lg-5">
-        <div class="shadow-card p-4 h-100">
-          <div class="fw-7 mb-3" style="font-size:16px;">6-period trend</div>
-          <canvas id="trendLine" height="160"></canvas>
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="fw-semibold mb-3" style="font-size:16px;">6-period trend</div>
+            <canvas id="trendLine" height="160"></canvas>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Proposed vs actual deployment by location -->
     @if (count($deployment['labels']))
-      <div class="shadow-card p-4 mt-3">
-        <div class="fw-7 mb-3" style="font-size:16px;">Proposed vs actual deployment by location <span class="muted fw-5" style="font-size:12px;">(guard-days)</span></div>
-        <canvas id="deployBar" height="110"></canvas>
+      <div class="card">
+        <div class="card-body">
+          <div class="fw-semibold mb-3" style="font-size:16px;">Proposed vs actual deployment by location <span class="text-muted" style="font-size:12px;">(guard-days)</span></div>
+          <canvas id="deployBar" height="110"></canvas>
+        </div>
       </div>
     @endif
 
     <!-- Group breakdown table -->
-    <div class="section-divider">Group breakdown</div>
-    <table class="brand-table">
-      <thead>
-        <tr><th>KPI group</th><th>Weight</th><th>Avg attainment</th><th>Weighted points</th></tr>
-      </thead>
-      <tbody>
-        @foreach ($agg['groups'] as $g)
-          <tr>
-            <td class="fw-7">{{ $g['name'] }}</td>
-            <td>{{ $g['weight'] }}%</td>
-            <td>{{ $g['attainment'] }}%</td>
-            <td>{{ round($g['weight'] * $g['attainment'] / 100, 1) }}</td>
-          </tr>
-        @endforeach
-      </tbody>
-    </table>
+    <h4 class="mt-4 mb-2">Group breakdown</h4>
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover table-centered mb-0">
+            <thead class="table-light">
+              <tr><th>KPI group</th><th>Weight</th><th>Avg attainment</th><th>Weighted points</th></tr>
+            </thead>
+            <tbody>
+              @foreach ($agg['groups'] as $g)
+                <tr>
+                  <td class="fw-semibold">{{ $g['name'] }}</td>
+                  <td>{{ $g['weight'] }}%</td>
+                  <td>{{ $g['attainment'] }}%</td>
+                  <td>{{ round($g['weight'] * $g['attainment'] / 100, 1) }}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   @endif
 @endsection
 
