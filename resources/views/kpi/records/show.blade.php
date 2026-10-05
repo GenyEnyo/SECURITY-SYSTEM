@@ -23,15 +23,19 @@
       <a class="btn btn-soft-primary" href="{{ route('records.index') }}">
         <i class="ti ti-arrow-left me-1"></i>Back
       </a>
+      @can('Edit KPI Record')
       <a class="btn btn-warning" href="{{ route('records.edit', $record) }}">
         <i class="ti ti-pencil me-1"></i>Edit
       </a>
+      @endcan
+      @can('Delete KPI Record')
       <form action="{{ route('records.destroy', $record) }}" method="POST"
             onsubmit="return confirm('Delete this scorecard? This cannot be undone.');">
         @csrf
         @method('DELETE')
         <button type="submit" class="btn btn-danger"><i class="ti ti-trash me-1"></i>Delete</button>
       </form>
+      @endcan
     </div>
   </div>
 

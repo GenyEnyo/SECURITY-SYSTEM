@@ -19,15 +19,19 @@
       <a class="btn btn-soft-primary" href="{{ route('buildings.deployments.index', $building) }}">
         <i class="ti ti-arrow-left me-1"></i>Back
       </a>
+      @can('Manage Deployments')
       <a class="btn btn-warning" href="{{ route('buildings.deployments.edit', [$building, $deployment]) }}">
         <i class="ti ti-pencil me-1"></i>Edit
       </a>
+      @endcan
+      @can('Manage Deployments')
       <form action="{{ route('buildings.deployments.destroy', [$building, $deployment]) }}" method="POST"
             onsubmit="return confirm('Delete this deployment?');">
         @csrf
         @method('DELETE')
         <button type="submit" class="btn btn-danger"><i class="ti ti-trash me-1"></i>Delete</button>
       </form>
+      @endcan
     </div>
   </div>
 

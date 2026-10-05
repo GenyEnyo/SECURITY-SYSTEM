@@ -84,7 +84,7 @@
 
               <div class="col-lg-6">
                 <label class="form-label" for="f-officer">Reporting Officer</label>
-                <input id="f-officer" class="form-control" value="{{ auth()->user()->name ?? 'Kwasi Ansah' }}" readonly>
+                <input id="f-officer" class="form-control" value="{{ auth()->user()->name }}" readonly>
               </div>
 
               <div class="col-12">

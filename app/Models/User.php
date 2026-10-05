@@ -3,15 +3,20 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Concerns\Auditable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
+use LdapRecord\Laravel\Auth\LdapAuthenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements LdapAuthenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles, AuthenticatesWithLdap, Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -19,9 +24,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'staff_number',
         'name',
+        'username',
         'email',
         'password',
+        'guid',
+        'domain',
     ];
 
     /**
@@ -45,5 +54,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function incidents(): HasMany
+    {
+        return $this->hasMany(IncidentOccurrence::class);
     }
 }

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Deployment extends Model
 {
+    use Auditable;
+
     public const SUPERVISING_OFFICERS = ['Kwasi Ansah', 'Akua Mensah', 'Yaw Boateng'];
 
     protected $fillable = [

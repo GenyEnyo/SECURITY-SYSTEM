@@ -18,9 +18,11 @@
       <h4 class="mb-0">Manage {{ $building->name }}</h4>
       <p class="text-muted mb-0">{{ $building->location->name }} — Specific locations in this building</p>
     </div>
+    @can('Manage Locations')
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlace">
       <i class="ti ti-plus me-1"></i>Add specific location
     </button>
+    @endcan
   </div>
 
   @if (session('status'))
@@ -54,18 +56,22 @@
                 <td class="fw-semibold">{{ $loop->iteration }}</td>
                 <td>{{ $place->name }}</td>
                 <td class="text-end">
+                  @can('Manage Locations')
                   <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-place"
                           title="Edit"
                           data-id="{{ $place->id }}"
                           data-name="{{ $place->name }}">
                     <i class="ti ti-pencil"></i>
                   </button>
+                  @endcan
+                  @can('Manage Locations')
                   <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-place"
                           title="Delete"
                           data-id="{{ $place->id }}"
                           data-name="{{ $place->name }}">
                     <i class="ti ti-trash"></i>
                   </button>
+                  @endcan
                 </td>
               </tr>
             @endforeach

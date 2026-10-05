@@ -11,13 +11,28 @@ use App\Models\IncidentType;
 use App\Models\Location;
 use App\Models\Place;
 use App\Models\Severity;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Storage;
 
-class IncidentOccurrenceController extends Controller
+class IncidentOccurrenceController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:Report Incident', only: ['create', 'store']),
+            new Middleware('permission:View Incidents', only: ['index', 'show']),
+            new Middleware('permission:View All Incidents', only: ['all']),
+            new Middleware('permission:Edit Incident', only: ['edit', 'update']),
+            new Middleware('permission:Delete Incident', only: ['destroy']),
+            new Middleware('permission:Acknowledge Incident', only: ['acknowledge']),
+        ];
+    }
+
     public function index()
     {
         $occurrences = IncidentOccurrence::with(['incidentType', 'location', 'building', 'place', 'severity', 'status', 'user'])
+            ->unless(auth()->user()->can('View All Incidents'), fn ($query) => $query->where('user_id', auth()->id()))
             ->latest('occurred_at')
             ->get();
 
@@ -42,7 +57,7 @@ class IncidentOccurrenceController extends Controller
     {
         $data = $request->validated();
         $data['incident_status_id'] = IncidentStatus::where('name', 'Reported')->value('id');
-        $data['user_id'] = 1;
+        $data['user_id'] = auth()->id();
 
         if ($request->hasFile('attachment')) {
             $data['attachment_path'] = $request->file('attachment')->store('incidents', 'public');
@@ -55,13 +70,21 @@ class IncidentOccurrenceController extends Controller
 
     public function show(IncidentOccurrence $incident)
     {
+        $this->authorizeAccess($incident);
+
         $incident->load(['incidentType', 'location', 'building', 'place', 'severity', 'status', 'user']);
+
+        activity('incident_occurrence')
+            ->causedBy(auth()->user())
+            ->performedOn($incident)
+            ->log('viewed');
 
         return view('incidents.show', ['incident' => $incident]);
     }
 
     public function edit(IncidentOccurrence $incident)
     {
+        $this->authorizeAccess($incident);
         abort_if($incident->isLocked(), 403, 'This incident can no longer be changed.');
 
         return view('incidents.edit', array_merge(
@@ -72,6 +95,7 @@ class IncidentOccurrenceController extends Controller
 
     public function update(UpdateIncidentOccurrenceRequest $request, IncidentOccurrence $incident)
     {
+        $this->authorizeAccess($incident);
         abort_if($incident->isLocked(), 403, 'This incident can no longer be changed.');
 
         $data = $request->validated();
@@ -90,6 +114,7 @@ class IncidentOccurrenceController extends Controller
 
     public function destroy(IncidentOccurrence $incident)
     {
+        $this->authorizeAccess($incident);
         abort_if($incident->isLocked(), 403, 'This incident can no longer be changed.');
 
         if ($incident->attachment_path) {
@@ -110,6 +135,16 @@ class IncidentOccurrenceController extends Controller
         }
 
         return back()->with('status', 'Incident acknowledged.');
+    }
+
+    // Users without "View All Incidents" may only work with incidents they reported.
+    private function authorizeAccess(IncidentOccurrence $incident): void
+    {
+        abort_unless(
+            $incident->user_id === auth()->id() || auth()->user()->can('View All Incidents'),
+            403,
+            'You can only access incidents you reported.',
+        );
     }
 
     private function lookups(): array

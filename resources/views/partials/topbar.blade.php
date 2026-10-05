@@ -1,7 +1,7 @@
 @php
   $authUser = auth()->user();
-  $authName = $authUser->name ?? 'Officer';
-  $authRole = $authUser->role ?? 'Security Operations';
+  $authName = $authUser->name;
+  $authRole = $authUser->getRoleNames()->first() ?? 'No role assigned';
   $initials = collect(explode(' ', trim($authName)))->filter()->take(2)->map(fn ($p) => strtoupper($p[0]))->implode('');
 @endphp
 <header class="app-topbar">
@@ -60,11 +60,13 @@
             <div class="dropdown-header noti-title">
               <h6 class="text-overflow m-0">Welcome back 👋!</h6>
             </div>
+            @can('View My Submissions')
             <a href="{{ url('/my-submissions') }}" class="dropdown-item">
               <i class="ti ti-folder me-1 fs-lg align-middle"></i>
               <span class="align-middle">My submissions</span>
             </a>
             <div class="dropdown-divider"></div>
+            @endcan
             <a href="#" class="dropdown-item text-danger fw-semibold"
                onclick="event.preventDefault(); document.getElementById('topbar-logout-form').submit();">
               <i class="ti ti-logout me-1 fs-lg align-middle"></i>

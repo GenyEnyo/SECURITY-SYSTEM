@@ -10,9 +10,16 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::firstOrCreate(
+        // Local account used to sign in when LDAP_ENABLED=false.
+        $user = User::firstOrCreate(
             ['email' => 'kwasi@example.com'],
-            ['name' => 'Kwasi Ansah', 'password' => Hash::make('password')],
+            ['name' => 'Kwasi Ansah', 'username' => 'kwasi', 'password' => Hash::make('password')],
         );
+
+        if (! $user->username) {
+            $user->update(['username' => 'kwasi']);
+        }
+
+        $user->assignRole('Super-Admin');
     }
 }

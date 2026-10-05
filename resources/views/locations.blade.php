@@ -29,9 +29,11 @@
       <h4 class="mb-0">Buildings</h4>
       <p class="text-muted mb-0">Posts &amp; sites you manage</p>
     </div>
+    @can('Manage Locations')
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBuilding">
       <i class="ti ti-plus me-1"></i>Add building
     </button>
+    @endcan
   </div>
 
   <div class="row">
@@ -44,6 +46,7 @@
                 <i class="ti ti-building"></i>
               </span>
               <div class="d-flex gap-1">
+                @can('Manage Locations')
                 <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-building"
                         title="Edit"
                         data-id="{{ $building->id }}"
@@ -51,12 +54,15 @@
                         data-location-id="{{ $building->location_id }}">
                   <i class="ti ti-pencil"></i>
                 </button>
+                @endcan
+                @can('Manage Locations')
                 <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-building"
                         title="Delete"
                         data-id="{{ $building->id }}"
                         data-name="{{ $building->name }}">
                   <i class="ti ti-trash"></i>
                 </button>
+                @endcan
               </div>
             </div>
             <h4 class="mb-1 fw-bold">{{ $building->name }}</h4>
@@ -70,6 +76,7 @@
     @empty
     @endforelse
 
+    @can('Manage Locations')
     <!-- Add new tile -->
     <div class="col-xl-3 col-md-6">
       <button type="button" class="card w-100 h-100 border-2 border-dashed bg-transparent js-add-building-tile"
@@ -79,6 +86,7 @@
           <div class="fw-bold">Add new building</div>
           <div class="text-muted small">Posts &amp; sites</div>
         </div>
+    @endcan
       </button>
     </div>
   </div>
@@ -89,9 +97,11 @@
       <h4 class="mb-0">Locations</h4>
       <p class="text-muted mb-0">Add the locations buildings can belong to</p>
     </div>
+    @can('Manage Locations')
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLocation">
       <i class="ti ti-plus me-1"></i>Add location
     </button>
+    @endcan
   </div>
 
   <div class="card">
@@ -111,18 +121,22 @@
                 <td class="fw-semibold">{{ $loop->iteration }}</td>
                 <td>{{ $location->name }}</td>
                 <td class="text-end">
+                  @can('Manage Locations')
                   <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-location"
                           title="Edit"
                           data-id="{{ $location->id }}"
                           data-name="{{ $location->name }}">
                     <i class="ti ti-pencil"></i>
                   </button>
+                  @endcan
+                  @can('Manage Locations')
                   <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-location"
                           title="Delete"
                           data-id="{{ $location->id }}"
                           data-name="{{ $location->name }}">
                     <i class="ti ti-trash"></i>
                   </button>
+                  @endcan
                 </td>
               </tr>
             @empty

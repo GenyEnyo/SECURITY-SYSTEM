@@ -83,11 +83,15 @@
                 <td>{{ number_format($record->lines_sum_merit ?? 0, 1) }}</td>
                 <td class="text-end">
                   <a href="{{ route('records.show', $record) }}" class="btn btn-sm btn-icon btn-soft-secondary" title="View"><i class="ti ti-eye"></i></a>
+                  @can('Edit KPI Record')
                   <a href="{{ route('records.edit', $record) }}" class="btn btn-sm btn-icon btn-soft-secondary" title="Edit"><i class="ti ti-pencil"></i></a>
+                  @endcan
+                  @can('Delete KPI Record')
                   <form action="{{ route('records.destroy', $record) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this scorecard? This cannot be undone.');">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-icon btn-soft-danger" title="Delete"><i class="ti ti-trash"></i></button>
                   </form>
+                  @endcan
                 </td>
               </tr>
             @empty

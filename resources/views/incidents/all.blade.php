@@ -85,6 +85,7 @@
                 <td><span class="badge" style="background:{{ $occurrence->severity->color }}1f;color:{{ $occurrence->severity->color }};">{{ $occurrence->severity->name }}</span></td>
                 <td class="text-end">
                   <a class="btn btn-sm btn-icon btn-soft-secondary" href="{{ route('incidents.show', $occurrence) }}" title="View"><i class="ti ti-eye"></i></a>
+                  @can('Acknowledge Incident')
                   @unless ($occurrence->isAcknowledged())
                     <form action="{{ route('incidents.acknowledge', $occurrence) }}" method="POST" style="display:inline;"
                           onsubmit="return confirm('Acknowledge receipt? The reporter will no longer be able to edit or delete it.');">
@@ -92,12 +93,17 @@
                       <button type="submit" class="btn btn-sm btn-icon btn-soft-secondary" title="Acknowledge receipt"><i class="ti ti-circle-check"></i></button>
                     </form>
                   @endunless
+                  @endcan
                   @if (! $occurrence->isLocked())
+                    @can('Edit Incident')
                     <a class="btn btn-sm btn-icon btn-soft-secondary" href="{{ route('incidents.edit', $occurrence) }}" title="Edit"><i class="ti ti-pencil"></i></a>
+                    @endcan
+                    @can('Delete Incident')
                     <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident?');">
                       @csrf @method('DELETE')
                       <button type="submit" class="btn btn-sm btn-icon btn-soft-danger" title="Delete"><i class="ti ti-trash"></i></button>
                     </form>
+                    @endcan
                   @endif
                 </td>
               </tr>

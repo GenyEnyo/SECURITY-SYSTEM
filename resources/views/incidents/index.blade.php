@@ -63,11 +63,15 @@
                 <td class="text-end">
                   <a href="{{ route('incidents.show', $occurrence) }}" class="btn btn-sm btn-icon btn-soft-secondary" title="View"><i class="ti ti-eye"></i></a>
                   @if (! $occurrence->isLocked())
+                    @can('Edit Incident')
                     <a href="{{ route('incidents.edit', $occurrence) }}" class="btn btn-sm btn-icon btn-soft-secondary" title="Edit"><i class="ti ti-pencil"></i></a>
+                    @endcan
+                    @can('Delete Incident')
                     <form action="{{ route('incidents.destroy', $occurrence) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this incident? This cannot be undone.');">
                       @csrf @method('DELETE')
                       <button type="submit" class="btn btn-sm btn-icon btn-soft-danger" title="Delete"><i class="ti ti-trash"></i></button>
                     </form>
+                    @endcan
                   @else
                     <span class="btn btn-sm btn-icon btn-soft-secondary" style="opacity:.45;cursor:default;"
                           title="Locked — acknowledged or older than 1 day"><i class="ti ti-lock"></i></span>

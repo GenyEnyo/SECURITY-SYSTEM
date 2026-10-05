@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ShiftSeeder::class,
             SeveritySeeder::class,
             KpiGroupSeeder::class,
+            RoleAndPermissionSeeder::class,
             UserSeeder::class,
         ]);
     }

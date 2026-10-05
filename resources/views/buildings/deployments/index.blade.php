@@ -18,9 +18,11 @@
       <h4 class="mb-0">Manage {{ $building->name }}</h4>
       <p class="text-muted mb-0">{{ $building->location->name }} — Deployments for this building</p>
     </div>
+    @can('Manage Deployments')
     <a class="btn btn-primary" href="{{ route('buildings.deployments.create', $building) }}">
       <i class="ti ti-plus me-1"></i>Add Deployment
     </a>
+    @endcan
   </div>
 
   @if (session('status'))
@@ -64,16 +66,20 @@
                      class="btn btn-sm btn-icon btn-soft-secondary" title="View">
                     <i class="ti ti-eye"></i>
                   </a>
+                  @can('Manage Deployments')
                   <a href="{{ route('buildings.deployments.edit', [$building, $d]) }}"
                      class="btn btn-sm btn-icon btn-soft-secondary" title="Edit">
                     <i class="ti ti-pencil"></i>
                   </a>
+                  @endcan
+                  @can('Manage Deployments')
                   <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-deployment"
                           title="Delete"
                           data-id="{{ $d->id }}"
                           data-label="{{ $d->shift->name }} on {{ $d->start_at->format('Y-m-d') }}">
                     <i class="ti ti-trash"></i>
                   </button>
+                  @endcan
                 </td>
               </tr>
             @endforeach

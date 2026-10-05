@@ -25,6 +25,7 @@
     </div>
     <div class="d-flex gap-2">
       <a class="btn btn-soft-primary" href="{{ route('incidents.index') }}"><i class="ti ti-arrow-left me-1"></i>Back</a>
+      @can('Acknowledge Incident')
       @unless ($incident->isAcknowledged())
         <form action="{{ route('incidents.acknowledge', $incident) }}" method="POST"
               onsubmit="return confirm('Acknowledge receipt? The reporter will no longer be able to edit or delete it.');">
@@ -32,12 +33,17 @@
           <button type="submit" class="btn btn-success"><i class="ti ti-circle-check me-1"></i>Acknowledge</button>
         </form>
       @endunless
+      @endcan
       @if (! $incident->isLocked())
+        @can('Edit Incident')
         <a class="btn btn-warning" href="{{ route('incidents.edit', $incident) }}"><i class="ti ti-pencil me-1"></i>Edit</a>
+        @endcan
+        @can('Delete Incident')
         <form action="{{ route('incidents.destroy', $incident) }}" method="POST" onsubmit="return confirm('Delete this incident?');">
           @csrf @method('DELETE')
           <button type="submit" class="btn btn-danger"><i class="ti ti-trash me-1"></i>Delete</button>
         </form>
+        @endcan
       @endif
     </div>
   </div>

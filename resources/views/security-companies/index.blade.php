@@ -14,9 +14,11 @@
       <h4 class="mb-0">Contracted Security Companies</h4>
       <p class="text-muted mb-0">Manage the security companies under contract</p>
     </div>
+    @can('Manage Security Companies')
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompany">
       <i class="ti ti-plus me-1"></i>Add security company
     </button>
+    @endcan
   </div>
 
   @if (session('status'))
@@ -60,6 +62,7 @@
                 <td>{{ $company->contract_detail }}</td>
                 <td><span class="badge {{ $badge }}">{{ ucfirst($company->status) }}</span></td>
                 <td class="text-end">
+                  @can('Manage Security Companies')
                   <button type="button" class="btn btn-sm btn-icon btn-soft-secondary js-edit-company"
                           data-bs-toggle="tooltip" title="Edit"
                           data-id="{{ $company->id }}"
@@ -69,12 +72,15 @@
                           data-status="{{ $company->status }}">
                     <i class="ti ti-pencil"></i>
                   </button>
+                  @endcan
+                  @can('Manage Security Companies')
                   <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-company"
                           data-bs-toggle="tooltip" title="Delete"
                           data-id="{{ $company->id }}"
                           data-name="{{ $company->name }}">
                     <i class="ti ti-trash"></i>
                   </button>
+                  @endcan
                 </td>
               </tr>
             @empty
