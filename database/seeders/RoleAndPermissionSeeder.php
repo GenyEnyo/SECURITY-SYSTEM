@@ -40,6 +40,8 @@ class RoleAndPermissionSeeder extends Seeder
 
             'Manage Incident Types',
             'Manage Severity Levels',
+            'Manage Incident Statuses',
+            'Manage Company Statuses',
 
             'View My Submissions',
         ];

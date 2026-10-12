@@ -28,7 +28,8 @@ class AuditLogTest extends TestCase
 
     public function test_model_changes_are_logged_with_the_acting_user(): void
     {
-        $admin = $this->userWithRole('Admin');
+        // Only a Super-Admin sees every location, so only they can manage a new one.
+        $admin = $this->userWithRole('Super-Admin');
 
         $this->actingAs($admin)->post('/locations', ['name' => 'Annex'])->assertSessionHasNoErrors();
         $location = Location::where('name', 'Annex')->firstOrFail();

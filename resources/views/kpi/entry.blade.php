@@ -3,7 +3,7 @@
 @section('title', 'KPI scorecard · M Dashboard')
 @section('page-title', 'KPI Scorecard — Daily entry')
 @section('crumbs')
-  <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Daily entry</a></li>
+  <li class="breadcrumb-item">Daily entry</li>
   <li class="breadcrumb-item active">KPI scorecard</li>
 @endsection
 
@@ -37,7 +37,7 @@
     </div>
   @endif
 
-  <form method="POST" action="{{ route('entries.store') }}" class="pb-5">
+  <form method="POST" action="{{ route('entries.store') }}" class="pb-5" id="kpi-form">
     @csrf
     <input type="hidden" name="location_id" id="kpi-loc-input">
     <input type="hidden" name="building_id" id="kpi-building-input">
@@ -46,13 +46,20 @@
     <!-- Deployment location selector -->
     <div class="card mb-3">
       <div class="card-body">
+        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+          <i class="ti ti-shield-check fs-22 text-primary me-2"></i>
+          <div>
+            <div class="text-muted small">Security company</div>
+            <div class="fw-semibold" id="kpi-company">Select a location to see its security company.</div>
+          </div>
+        </div>
         <div class="row g-3">
           <div class="col-lg-4">
             <label class="form-label" for="kpi-loc">Location</label>
             <select id="kpi-loc" class="form-select">
-              <option value="" disabled selected>Select a location...</option>
+              <option value="" disabled @selected(! $userLocationId)>Select a location...</option>
               @foreach ($locations as $location)
-                <option value="{{ $location->id }}">{{ $location->name }}</option>
+                <option value="{{ $location->id }}" @selected($location->id == $userLocationId)>{{ $location->name }}</option>
               @endforeach
             </select>
           </div>
@@ -208,6 +215,7 @@
         const meritCell = r.cells[4];
         if (meritCell) {
           const merit = targetSum > 0 ? weight * (got / targetSum) : 0;
+          meritCell.dataset.merit = merit;
           meritCell.textContent = merit.toFixed(1);
           meritCell.classList.toggle('muted', merit === 0);
         }
@@ -222,7 +230,8 @@
       let total = 0, weight = 0;
       document.querySelectorAll('.kpi-group').forEach(s => {
         weight += +s.dataset.weight || 0;
-        s.querySelectorAll('.merit-cell').forEach(c => { total += +c.textContent || 0; });
+        // Sum the unrounded merits so a fully scored group adds up to its weight.
+        s.querySelectorAll('.merit-cell').forEach(c => { total += +c.dataset.merit || 0; });
       });
       el.textContent = total.toFixed(1) + ' / ' + weight;
     }
@@ -236,6 +245,7 @@
     const BUILDINGS = @json($buildings);
     const PLACES = @json($places);
     const DEPLOYMENTS = @json($deployments);
+    const COMPANIES = @json($companies);
 
     const locSel   = document.getElementById('kpi-loc');
     const buildSel = document.getElementById('kpi-building');
@@ -243,6 +253,7 @@
     const dateInp  = document.getElementById('kpi-date');
     const summary  = document.getElementById('kpi-deploy-summary');
     const beatsBody = document.getElementById('kpi-beats-body');
+    const companyEl = document.getElementById('kpi-company');
 
     const locInput   = document.getElementById('kpi-loc-input');
     const buildInput = document.getElementById('kpi-building-input');
@@ -281,21 +292,41 @@
       placeSel.disabled = false;
     }
 
+    // Deployments recorded for the chosen building on the chosen date.
+    function dayDeployments(){
+      const date = dateInp ? dateInp.value : '';
+      return DEPLOYMENTS.filter(d => String(d.building_id) === String(buildSel.value) && d.date === date);
+    }
+
+    // The company on the day's deployment if there is one, otherwise the location's company.
+    function renderCompany(){
+      if (!companyEl) return;
+      if (!locSel.value) {
+        companyEl.textContent = 'Select a location to see its security company.';
+        return;
+      }
+      let names = dayDeployments().map(d => d.company).filter(Boolean);
+      if (!names.length) {
+        names = COMPANIES.filter(c => String(c.location_id) === String(locSel.value)).map(c => c.name);
+      }
+      companyEl.textContent = names.length ? [...new Set(names)].join(', ') : 'No security company set for this location.';
+    }
+
     function renderDeployment(){
       const buildingId = buildSel.value;
       const placeId = placeSel.value;
-      const date = dateInp ? dateInp.value : '';
+      renderCompany();
 
       if (!buildingId) {
         summary.textContent = 'Select a building and date to load the deployment.';
       } else {
-        const matches = DEPLOYMENTS.filter(d => String(d.building_id) === String(buildingId) && d.date === date);
+        const matches = dayDeployments();
         if (!matches.length) {
           summary.textContent = 'No deployment recorded for this building on this date.';
         } else {
           summary.innerHTML = matches.map(d =>
             `<div><i class="ti ti-shield-check me-2"></i><strong>${esc(d.company || '—')}</strong>`
-            + ` · ${esc(d.shift || '—')} shift · ${d.guards} guard${d.guards == 1 ? '' : 's'}`
+            + ` · Full day · ${d.guards} guard${d.guards == 1 ? '' : 's'}`
             + ` · ${esc(d.officer || '—')} <span class="text-muted">(${d.start}–${d.end})</span></div>`
           ).join('');
         }
@@ -325,5 +356,22 @@
     buildSel.addEventListener('change', () => { loadPlaces(); syncHidden(); renderDeployment(); });
     placeSel.addEventListener('change', renderDeployment);
     if (dateInp) dateInp.addEventListener('change', () => { syncHidden(); renderDeployment(); });
+
+    // Location defaults to the user's own.
+    if (locSel.value) { loadBuildings(); syncHidden(); renderDeployment(); }
+
+    // Warn when the guards entered per place do not tally with the day's deployment.
+    document.getElementById('kpi-form').addEventListener('submit', (e) => {
+      const matches = dayDeployments();
+      if (!matches.length || placeSel.value) return;
+
+      const deployed = matches.reduce((sum, d) => sum + (+d.guards || 0), 0);
+      let entered = 0;
+      beatsBody.querySelectorAll('input[name^="beat_scored"]').forEach(i => { entered += +i.value || 0; });
+
+      if (entered !== deployed && !confirm(`You entered ${entered} guard${entered === 1 ? '' : 's'} across the places, but the deployment for this day says ${deployed}. Submit anyway?`)) {
+        e.preventDefault();
+      }
+    });
   </script>
 @endpush

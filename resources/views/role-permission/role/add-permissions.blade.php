@@ -3,6 +3,7 @@
 @section('title', 'Role Permissions · M Dashboard')
 @section('page-title', 'Role Permissions')
 @section('crumbs')
+  <li class="breadcrumb-item">Setups</li>
   <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
   <li class="breadcrumb-item active">Role Permissions</li>
 @endsection

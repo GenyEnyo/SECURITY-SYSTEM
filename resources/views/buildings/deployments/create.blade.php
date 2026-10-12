@@ -4,7 +4,7 @@
 @section('page-title', 'Add Deployment')
 @section('crumbs')
   <li class="breadcrumb-item">Setups</li>
-  <li class="breadcrumb-item"><a href="{{ url('/locations') }}">Locations</a></li>
+  <li class="breadcrumb-item"><a href="{{ url('/deployments') }}">Deployments</a></li>
   <li class="breadcrumb-item"><a href="{{ url('/buildings/' . $building->id . '/deployments') }}">{{ $building->name }}</a></li>
   <li class="breadcrumb-item active">Add Deployment</li>
 @endsection
@@ -25,30 +25,25 @@
           </div>
 
           <div class="card-body">
-            <p class="text-muted">Assign guards and shifts for {{ $building->name }}.</p>
+            <p class="text-muted">Assign guards for {{ $building->name }} for the full day.</p>
 
             <div class="row g-3">
 
               <div class="col-lg-6">
                 <label class="form-label" for="f-company">Security Company</label>
                 <select id="f-company" name="security_company_id" class="form-select @error('security_company_id') is-invalid @enderror" required>
-                  <option value="" disabled @selected(! old('security_company_id'))>Select company...</option>
+                  <option value="" disabled @selected(! old('security_company_id', $defaultCompanyId))>Select company...</option>
                   @foreach ($companies as $company)
-                    <option value="{{ $company->id }}" @selected(old('security_company_id') == $company->id)>{{ $company->name }}</option>
+                    <option value="{{ $company->id }}" @selected(old('security_company_id', $defaultCompanyId) == $company->id)>{{ $company->name }}</option>
                   @endforeach
                 </select>
                 @error('security_company_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
               </div>
 
               <div class="col-lg-6">
-                <label class="form-label" for="f-shift">Shift</label>
-                <select id="f-shift" name="shift_id" class="form-select @error('shift_id') is-invalid @enderror" required>
-                  <option value="" disabled @selected(! old('shift_id'))>Select shift...</option>
-                  @foreach ($shifts as $shift)
-                    <option value="{{ $shift->id }}" @selected(old('shift_id') == $shift->id)>{{ $shift->name }}</option>
-                  @endforeach
-                </select>
-                @error('shift_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <label class="form-label" for="f-expected">Expected Guards (full day)</label>
+                <input id="f-expected" class="form-control" value="{{ $expectedGuards }}" readonly>
+                <div class="form-text">About {{ intdiv($expectedGuards + 1, 2) }} by day and {{ intdiv($expectedGuards, 2) }} by night. Estimates are set under KPI settings.</div>
               </div>
 
               <div class="col-lg-6">
@@ -63,13 +58,12 @@
 
               <div class="col-lg-6">
                 <label class="form-label" for="f-officer">Supervising Officer</label>
-                <select id="f-officer" name="supervising_officer" class="form-select @error('supervising_officer') is-invalid @enderror" required>
-                  <option value="" disabled @selected(! old('supervising_officer'))>Select officer...</option>
+                <select id="f-officer" name="supervisor_id" class="form-select @error('supervisor_id') is-invalid @enderror" required>
                   @foreach ($officers as $officer)
-                    <option value="{{ $officer }}" @selected(old('supervising_officer') === $officer)>{{ $officer }}</option>
+                    <option value="{{ $officer->id }}" @selected(old('supervisor_id', auth()->id()) == $officer->id)>{{ $officer->name }}</option>
                   @endforeach
                 </select>
-                @error('supervising_officer') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                @error('supervisor_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
               </div>
 
               <div class="col-lg-6">

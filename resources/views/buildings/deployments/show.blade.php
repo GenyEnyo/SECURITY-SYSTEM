@@ -4,7 +4,7 @@
 @section('page-title', 'Deployment #' . $deployment->id)
 @section('crumbs')
   <li class="breadcrumb-item">Setups</li>
-  <li class="breadcrumb-item"><a href="{{ url('/locations') }}">Locations</a></li>
+  <li class="breadcrumb-item"><a href="{{ url('/deployments') }}">Deployments</a></li>
   <li class="breadcrumb-item"><a href="{{ url('/buildings/' . $building->id . '/deployments') }}">{{ $building->name }}</a></li>
   <li class="breadcrumb-item active">#{{ $deployment->id }}</li>
 @endsection
@@ -13,7 +13,7 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
       <h4 class="mb-0">Deployment #{{ $deployment->id }}</h4>
-      <p class="text-muted mb-0">{{ $deployment->shift->name }} shift · {{ $deployment->start_at->format('d M Y, H:i') }}</p>
+      <p class="text-muted mb-0">Full day · {{ $deployment->start_at->format('d M Y, H:i') }}</p>
     </div>
     <div class="d-flex gap-2">
       <a class="btn btn-soft-primary" href="{{ route('buildings.deployments.index', $building) }}">
@@ -45,10 +45,10 @@
         <dd class="col-sm-9">{{ $building->location->name }}</dd>
 
         <dt class="col-sm-3 text-muted fw-semibold">Security company</dt>
-        <dd class="col-sm-9">{{ $deployment->securityCompany->name }}</dd>
+        <dd class="col-sm-9">{{ $deployment->securityCompany?->name ?? '—' }}</dd>
 
-        <dt class="col-sm-3 text-muted fw-semibold">Shift</dt>
-        <dd class="col-sm-9">{{ $deployment->shift->name }}</dd>
+        <dt class="col-sm-3 text-muted fw-semibold">Expected guards</dt>
+        <dd class="col-sm-9">{{ $deployment->expected_guards ?? '—' }}</dd>
 
         <dt class="col-sm-3 text-muted fw-semibold">Supervising officer</dt>
         <dd class="col-sm-9">{{ $deployment->supervising_officer }}</dd>

@@ -4,7 +4,7 @@
 @section('page-title', 'Edit Deployment #' . $deployment->id)
 @section('crumbs')
   <li class="breadcrumb-item">Setups</li>
-  <li class="breadcrumb-item"><a href="{{ url('/locations') }}">Locations</a></li>
+  <li class="breadcrumb-item"><a href="{{ url('/deployments') }}">Deployments</a></li>
   <li class="breadcrumb-item"><a href="{{ url('/buildings/' . $building->id . '/deployments') }}">{{ $building->name }}</a></li>
   <li class="breadcrumb-item active">Edit #{{ $deployment->id }}</li>
 @endsection
@@ -42,14 +42,9 @@
               </div>
 
               <div class="col-lg-6">
-                <label class="form-label" for="f-shift">Shift</label>
-                <select id="f-shift" name="shift_id" class="form-select @error('shift_id') is-invalid @enderror" required>
-                  <option value="" disabled>Select shift...</option>
-                  @foreach ($shifts as $shift)
-                    <option value="{{ $shift->id }}" @selected(old('shift_id', $deployment->shift_id) == $shift->id)>{{ $shift->name }}</option>
-                  @endforeach
-                </select>
-                @error('shift_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <label class="form-label" for="f-expected">Expected Guards (full day)</label>
+                <input id="f-expected" class="form-control" value="{{ $expectedGuards }}" readonly>
+                <div class="form-text">About {{ intdiv($expectedGuards + 1, 2) }} by day and {{ intdiv($expectedGuards, 2) }} by night. Estimates are set under KPI settings.</div>
               </div>
 
               <div class="col-lg-6">
@@ -64,13 +59,16 @@
 
               <div class="col-lg-6">
                 <label class="form-label" for="f-officer">Supervising Officer</label>
-                <select id="f-officer" name="supervising_officer" class="form-select @error('supervising_officer') is-invalid @enderror" required>
-                  <option value="" disabled>Select officer...</option>
+                <select id="f-officer" name="supervisor_id" class="form-select @error('supervisor_id') is-invalid @enderror" required>
+                  <option value="" disabled @selected(! old('supervisor_id', $deployment->supervisor_id))>Select officer...</option>
                   @foreach ($officers as $officer)
-                    <option value="{{ $officer }}" @selected(old('supervising_officer', $deployment->supervising_officer) === $officer)>{{ $officer }}</option>
+                    <option value="{{ $officer->id }}" @selected(old('supervisor_id', $deployment->supervisor_id) == $officer->id)>{{ $officer->name }}</option>
                   @endforeach
                 </select>
-                @error('supervising_officer') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                @if (! $deployment->supervisor_id && $deployment->supervising_officer)
+                  <div class="form-text">Previously recorded as {{ $deployment->supervising_officer }}.</div>
+                @endif
+                @error('supervisor_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
               </div>
 
               <div class="col-lg-6">

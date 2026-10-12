@@ -37,6 +37,8 @@
               <th>Full name</th>
               <th>Username</th>
               <th>Email</th>
+              <th>Location</th>
+              <th>Department / Section</th>
               <th>Source</th>
               <th>Roles</th>
               <th class="text-end">Actions</th>
@@ -49,6 +51,8 @@
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->username ?? '—' }}</td>
                 <td>{{ $user->email }}</td>
+                <td>{{ $user->location?->name ?? '—' }}</td>
+                <td>{{ collect([$user->department, $user->section])->filter()->implode(' / ') ?: '—' }}</td>
                 <td>
                   <span class="badge {{ $user->guid ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary' }}">{{ $user->guid ? 'Directory' : 'Local' }}</span>
                 </td>
@@ -62,13 +66,13 @@
                 <td class="text-end">
                   @can('Assign Roles')
                     <a href="{{ route('users.roles.edit', $user) }}" class="btn btn-sm btn-soft-secondary">
-                      <i class="ti ti-user-shield me-1"></i>Add / edit roles
+                      <i class="ti ti-user-shield me-1"></i>Edit details / roles
                     </a>
                   @endcan
                 </td>
               </tr>
             @empty
-              <tr><td colspan="7" class="text-center text-muted py-4">No users yet.</td></tr>
+              <tr><td colspan="9" class="text-center text-muted py-4">No users yet.</td></tr>
             @endforelse
           </tbody>
         </table>

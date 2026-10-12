@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Location;
 use App\Models\SecurityCompany;
+use App\Models\SecurityCompanyStatus;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -12,7 +14,9 @@ class SecurityCompanyController extends Controller
     public function index()
     {
         return view('security-companies.index', [
-            'companies' => SecurityCompany::orderBy('name')->get(),
+            'companies' => SecurityCompany::with('location')->orderBy('name')->get(),
+            'locations' => Location::orderBy('name')->get(),
+            'statuses'  => SecurityCompanyStatus::orderBy('id')->get(),
         ]);
     }
 
@@ -25,6 +29,7 @@ class SecurityCompanyController extends Controller
     {
         $data = $request->validate([
             'name'            => ['required', 'string', 'max:255', 'unique:security_companies,name'],
+            'location_id'     => ['required', Rule::in(Location::pluck('id'))],
             'contact'         => ['required', 'string', 'max:255'],
             'contract_detail' => ['required', 'string', 'max:255'],
         ]);
@@ -50,9 +55,10 @@ class SecurityCompanyController extends Controller
     {
         $data = $request->validate([
             'name'            => ['required', 'string', 'max:255', Rule::unique('security_companies', 'name')->ignore($securityCompany)],
+            'location_id'     => ['required', Rule::in(Location::pluck('id'))],
             'contact'         => ['required', 'string', 'max:255'],
             'contract_detail' => ['required', 'string', 'max:255'],
-            'status'          => ['required', Rule::in(SecurityCompany::STATUSES)],
+            'status'          => ['required', Rule::in(SecurityCompanyStatus::pluck('name'))],
         ]);
 
         $securityCompany->update($data);

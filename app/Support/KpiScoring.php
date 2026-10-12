@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
  * group score    = group.weight × (Σ scored ÷ Σ target)   (= Σ of its line merits)
  * overall score  = Σ all line merits  → points out of Σ active weights (100 here)
  *
+ * Line merit is stored to 4 decimals and only rounded for display, so a fully
+ * scored group adds up to its weight (10.0, not 3 × 3.3 = 9.9).
+ *
  * Target-share weighting means a 6-guard gate counts more than a 1-guard post in
  * Deployment; for the quality groups (all targets equal) it reduces to equal weighting.
  */
@@ -39,7 +42,7 @@ class KpiScoring
                 $targetSum = (float) ($groupTargets[$line->kpi_group_id] ?? 0);
 
                 $merit = $targetSum > 0
-                    ? round($weight * ((float) $line->scored / $targetSum), 1)
+                    ? round($weight * ((float) $line->scored / $targetSum), 4)
                     : 0;
 
                 $line->update(['merit' => $merit]);

@@ -3,8 +3,8 @@
 @section('title', 'Dashboard · M Dashboard')
 @section('page-title', 'Dashboard')
 @section('crumbs')
-  <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-  <li class="breadcrumb-item active">Dashboard</li>
+  <li class="breadcrumb-item">Dashboards</li>
+  <li class="breadcrumb-item active">Officer dashboard</li>
 @endsection
 
 @section('content')

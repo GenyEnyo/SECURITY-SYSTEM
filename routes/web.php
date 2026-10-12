@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\DeploymentController;
 use App\Http\Controllers\IncidentOccurrenceController;
+use App\Http\Controllers\IncidentStatusController;
 use App\Http\Controllers\IncidentTypeController;
 use App\Http\Controllers\KpiEntryController;
 use App\Http\Controllers\KpiComplianceController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SecurityCompanyController;
+use App\Http\Controllers\SecurityCompanyStatusController;
 use App\Http\Controllers\SeverityController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -94,11 +96,13 @@ Route::middleware('auth')->group(function () {
     // is not captured by the show route.
     Route::resource('buildings.deployments', DeploymentController::class)
         ->except(['index', 'show'])
+        ->scoped()
         ->middleware('permission:Manage Deployments');
     Route::middleware('permission:View Deployments')->group(function () {
         Route::get('deployments', [DeploymentController::class, 'picker'])->name('deployments.picker');
         Route::resource('buildings.deployments', DeploymentController::class)
-            ->only(['index', 'show']);
+            ->only(['index', 'show'])
+            ->scoped();
     });
 
     Route::resource('security-companies', SecurityCompanyController::class)
@@ -146,5 +150,13 @@ Route::middleware('auth')->group(function () {
             ->parameters(['severity-levels' => 'severity'])
             ->only(['index', 'store', 'update', 'destroy'])
             ->middleware('permission:Manage Severity Levels');
+        Route::resource('incident-statuses', IncidentStatusController::class)
+            ->parameters(['incident-statuses' => 'incidentStatus'])
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middleware('permission:Manage Incident Statuses');
+        Route::resource('company-statuses', SecurityCompanyStatusController::class)
+            ->parameters(['company-statuses' => 'companyStatus'])
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middleware('permission:Manage Company Statuses');
     });
 });

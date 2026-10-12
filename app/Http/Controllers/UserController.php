@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('roles')->orderBy('name')->get();
+        $users = User::with(['roles', 'location'])->orderBy('name')->get();
 
         return view('role-permission.user.index', compact('users'));
     }
@@ -20,7 +22,14 @@ class UserController extends Controller
         $roles = Role::orderBy('name')->get();
         $userRoles = $user->roles->pluck('name')->all();
 
-        return view('role-permission.user.add-role', compact('user', 'roles', 'userRoles'));
+        // User administration is not limited to the admin's own location.
+        $locations = Location::withoutGlobalScope('user_location')->orderBy('name')->get();
+        $departments = User::whereNotNull('department')->distinct()->orderBy('department')->pluck('department')
+            ->push(config('security.supervisor_department'))->unique()->values();
+        $sections = User::whereNotNull('section')->distinct()->orderBy('section')->pluck('section')
+            ->push(config('security.supervisor_section'))->unique()->values();
+
+        return view('role-permission.user.add-role', compact('user', 'roles', 'userRoles', 'locations', 'departments', 'sections'));
     }
 
     public function giveRoleToUser(Request $request, User $user)
@@ -28,6 +37,9 @@ class UserController extends Controller
         $data = $request->validate([
             'role'   => 'nullable|array',
             'role.*' => 'string|exists:roles,name',
+            'location_id' => 'nullable|exists:locations,id',
+            'department'  => 'nullable|string|max:255',
+            'section'     => 'nullable|string|max:255',
         ]);
 
         $roles = $data['role'] ?? [];
@@ -38,6 +50,7 @@ class UserController extends Controller
 
         $oldRoles = $user->getRoleNames()->all();
         $user->syncRoles($roles);
+        $user->update(Arr::only($data, ['location_id', 'department', 'section']));
 
         activity('access')
             ->causedBy($request->user())
@@ -45,6 +58,6 @@ class UserController extends Controller
             ->withProperties(['old' => ['roles' => $oldRoles], 'attributes' => ['roles' => $roles]])
             ->log('roles changed');
 
-        return redirect()->route('users.index')->with('status', "Roles updated for {$user->name}");
+        return redirect()->route('users.index')->with('status', "Details updated for {$user->name}");
     }
 }

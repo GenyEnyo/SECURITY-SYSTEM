@@ -9,6 +9,7 @@ use App\Models\KpiScorecard;
 use App\Models\KpiSubItem;
 use App\Models\Location;
 use App\Models\Place;
+use App\Models\SecurityCompany;
 use App\Support\KpiScoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,12 +24,13 @@ class KpiEntryController extends Controller
             'locations'   => Location::orderBy('name')->get(),
             'buildings'   => Building::orderBy('name')->get(['id', 'name', 'location_id']),
             'places'      => Place::orderBy('name')->get(['id', 'name', 'building_id', 'estimated_guards']),
-            'deployments' => Deployment::with(['securityCompany:id,name', 'shift:id,name'])->get()
+            'companies'   => SecurityCompany::orderBy('name')->get(['id', 'name', 'location_id']),
+            'userLocationId' => auth()->user()->location_id,
+            'deployments' => Deployment::with('securityCompany:id,name')->get()
                 ->map(fn ($d) => [
                     'building_id' => $d->building_id,
                     'date'        => $d->start_at->toDateString(),
                     'company'     => $d->securityCompany?->name,
-                    'shift'       => $d->shift?->name,
                     'guards'      => $d->number_of_guards,
                     'officer'     => $d->supervising_officer,
                     'start'       => $d->start_at->format('H:i'),
@@ -45,8 +47,8 @@ class KpiEntryController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'location_id'   => ['required', 'exists:locations,id'],
-            'building_id'   => ['required', 'exists:buildings,id'],
+            'location_id'   => ['required', Rule::in(Location::pluck('id'))],
+            'building_id'   => ['required', Rule::in(Building::where('location_id', $request->location_id)->pluck('id'))],
             'date'          => [
                 'required',
                 'date',

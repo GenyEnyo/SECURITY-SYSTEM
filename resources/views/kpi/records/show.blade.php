@@ -4,7 +4,7 @@
 @section('page-title', 'KPI Scorecard')
 @section('crumbs')
   <li class="breadcrumb-item">Records</li>
-  <li class="breadcrumb-item"><a href="/kpi/records">KPI Records</a></li>
+  <li class="breadcrumb-item"><a href="{{ route('records.index') }}">KPI Records</a></li>
   <li class="breadcrumb-item active">{{ $record->date->format('d M Y') }}</li>
 @endsection
 

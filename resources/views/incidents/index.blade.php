@@ -3,6 +3,7 @@
 @section('title', 'Incidents · M Dashboard')
 @section('page-title', 'Incidents')
 @section('crumbs')
+  <li class="breadcrumb-item">Records</li>
   <li class="breadcrumb-item active">Incidents</li>
 @endsection
 

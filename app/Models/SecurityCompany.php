@@ -3,13 +3,19 @@
 namespace App\Models;
 
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\ScopedToUserLocation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SecurityCompany extends Model
 {
     use Auditable;
+    use ScopedToUserLocation;
 
-    public const STATUSES = ['active', 'renewing', 'inactive'];
+    protected $fillable = ['name', 'location_id', 'contact', 'contract_detail', 'status'];
 
-    protected $fillable = ['name', 'contact', 'contract_detail', 'status'];
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
 }

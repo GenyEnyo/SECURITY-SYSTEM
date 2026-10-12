@@ -26,7 +26,10 @@ class RbacTest extends TestCase
 
     private function userWithRole(string $role): User
     {
-        return User::factory()->create()->assignRole($role);
+        // Data is location-scoped, so give the user the location of the seeded building the tests use.
+        $locationId = Building::withoutGlobalScopes()->orderBy('id')->value('location_id');
+
+        return User::factory()->create(['location_id' => $locationId])->assignRole($role);
     }
 
     private function incidentFor(User $reporter): IncidentOccurrence
@@ -117,7 +120,7 @@ class RbacTest extends TestCase
     {
         $admin = User::where('email', 'kwasi@example.com')->firstOrFail();
 
-        foreach (['/dashboard', '/users', '/roles', '/permissions', '/incidents/all', '/kpi/settings', '/kpi/reports', '/kpi/records', '/locations', '/deployments', '/security-companies', '/settings/incident-types', '/settings/severity-levels'] as $url) {
+        foreach (['/dashboard', '/users', '/roles', '/permissions', '/incidents/all', '/kpi/settings', '/kpi/reports', '/kpi/records', '/locations', '/deployments', '/security-companies', '/settings/incident-types', '/settings/severity-levels', '/settings/incident-statuses', '/settings/company-statuses'] as $url) {
             $this->actingAs($admin)->get($url)->assertOk();
         }
     }

@@ -9,7 +9,7 @@ class ShiftSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (['Day', 'Night'] as $name) {
+        foreach (['Day', 'Night', 'Full Day'] as $name) {
             Shift::firstOrCreate(['name' => $name]);
         }
     }

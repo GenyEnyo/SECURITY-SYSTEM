@@ -5,7 +5,9 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Concerns\Auditable;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,6 +27,9 @@ class User extends Authenticatable implements LdapAuthenticatable
      */
     protected $fillable = [
         'staff_number',
+        'location_id',
+        'department',
+        'section',
         'name',
         'username',
         'email',
@@ -59,5 +64,23 @@ class User extends Authenticatable implements LdapAuthenticatable
     public function incidents(): HasMany
     {
         return $this->hasMany(IncidentOccurrence::class);
+    }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class)->withoutGlobalScope('user_location');
+    }
+
+    public function seesAllLocations(): bool
+    {
+        return $this->hasRole('Super-Admin');
+    }
+
+    /** Users who may supervise a deployment at the given location. */
+    public function scopeSupervisingOfficers(Builder $query, ?int $locationId): void
+    {
+        $query->where('location_id', $locationId)
+            ->whereRaw('LOWER(department) = ?', [strtolower(config('security.supervisor_department'))])
+            ->whereRaw('LOWER(section) = ?', [strtolower(config('security.supervisor_section'))]);
     }
 }

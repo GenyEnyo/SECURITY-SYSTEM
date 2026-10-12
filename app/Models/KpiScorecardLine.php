@@ -22,7 +22,7 @@ class KpiScorecardLine extends Model
     ];
 
     protected $casts = [
-        'merit' => 'decimal:1',
+        'merit' => 'decimal:4',
     ];
 
     public function scorecard(): BelongsTo

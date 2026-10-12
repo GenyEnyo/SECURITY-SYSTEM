@@ -45,8 +45,9 @@
         <table id="deployments-table" class="table table-hover table-centered mb-0">
           <thead class="table-light">
             <tr>
-              <th>Shift</th>
               <th>Date</th>
+              <th>Security Company</th>
+              <th>Expected Guards</th>
               <th>Guard No.</th>
               <th>Start Time</th>
               <th>End Time</th>
@@ -56,8 +57,9 @@
           <tbody>
             @foreach ($deployments as $d)
               <tr>
-                <td>{{ $d->shift->name }}</td>
                 <td>{{ $d->start_at->format('Y-m-d') }}</td>
+                <td>{{ $d->securityCompany?->name ?? '—' }}</td>
+                <td>{{ $d->expected_guards ?? $expectedGuards }}</td>
                 <td>{{ $d->number_of_guards }}</td>
                 <td>{{ $d->start_at->format('H:i') }}</td>
                 <td>{{ $d->end_at->format('H:i') }}</td>
@@ -76,7 +78,7 @@
                   <button type="button" class="btn btn-sm btn-icon btn-soft-danger js-delete-deployment"
                           title="Delete"
                           data-id="{{ $d->id }}"
-                          data-label="{{ $d->shift->name }} on {{ $d->start_at->format('Y-m-d') }}">
+                          data-label="the deployment on {{ $d->start_at->format('Y-m-d') }}">
                     <i class="ti ti-trash"></i>
                   </button>
                   @endcan

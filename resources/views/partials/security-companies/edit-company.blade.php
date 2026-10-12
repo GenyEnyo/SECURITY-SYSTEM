@@ -15,6 +15,15 @@
             <input name="name" class="form-control" required>
           </div>
           <div class="mb-3">
+            <label class="form-label">Location</label>
+            <select name="location_id" class="form-select" required>
+              <option value="" disabled selected>Select a location...</option>
+              @foreach ($locations as $location)
+                <option value="{{ $location->id }}">{{ $location->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-3">
             <label class="form-label">Contact</label>
             <input name="contact" class="form-control" required>
           </div>
@@ -25,9 +34,9 @@
           <div class="mb-3">
             <label class="form-label">Status</label>
             <select name="status" class="form-select" required>
-              <option value="active">Active</option>
-              <option value="renewing">Renewing</option>
-              <option value="inactive">Inactive</option>
+              @foreach ($statuses as $status)
+                <option value="{{ $status->name }}">{{ ucfirst($status->name) }}</option>
+              @endforeach
             </select>
           </div>
         </div>

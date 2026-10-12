@@ -3,7 +3,7 @@
 @section('title', 'Security companies · M Dashboard')
 @section('page-title', 'Security companies')
 @section('crumbs')
-  <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Setups</a></li>
+  <li class="breadcrumb-item">Setups</li>
   <li class="breadcrumb-item active">Security companies</li>
 @endsection
 
@@ -43,6 +43,7 @@
             <tr>
               <th style="width:80px">No.</th>
               <th>Company</th>
+              <th>Location</th>
               <th>Contact</th>
               <th>Contract days/mo</th>
               <th>Status</th>
@@ -53,11 +54,12 @@
             @forelse ($companies as $company)
               @php
                 $badge = $company->status === 'renewing' ? 'bg-info-subtle text-info'
-                       : ($company->status === 'inactive' ? 'bg-success-subtle text-success' : 'bg-success-subtle text-success');
+                       : ($company->status === 'active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary');
               @endphp
               <tr>
                 <td class="fw-semibold">{{ $loop->iteration }}</td>
                 <td>{{ $company->name }}</td>
+                <td>{{ $company->location?->name ?? '—' }}</td>
                 <td>{{ $company->contact }}</td>
                 <td>{{ $company->contract_detail }}</td>
                 <td><span class="badge {{ $badge }}">{{ ucfirst($company->status) }}</span></td>
@@ -67,6 +69,7 @@
                           data-bs-toggle="tooltip" title="Edit"
                           data-id="{{ $company->id }}"
                           data-name="{{ $company->name }}"
+                          data-location="{{ $company->location_id }}"
                           data-contact="{{ $company->contact }}"
                           data-contract="{{ $company->contract_detail }}"
                           data-status="{{ $company->status }}">
@@ -84,7 +87,7 @@
                 </td>
               </tr>
             @empty
-              <tr><td colspan="6" class="text-center text-muted fw-medium">No security companies yet.</td></tr>
+              <tr><td colspan="7" class="text-center text-muted fw-medium">No security companies yet.</td></tr>
             @endforelse
           </tbody>
         </table>
@@ -113,6 +116,7 @@
         open('editCompany', (el) => {
           el.querySelector('form').action = `/security-companies/${d.id}`;
           el.querySelector('[name="name"]').value = d.name;
+          el.querySelector('[name="location_id"]').value = d.location;
           el.querySelector('[name="contact"]').value = d.contact;
           el.querySelector('[name="contract_detail"]').value = d.contract;
           el.querySelector('[name="status"]').value = d.status;

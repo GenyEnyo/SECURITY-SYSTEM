@@ -3,7 +3,7 @@
 @section('title', 'KPI settings · M Dashboard')
 @section('page-title', 'KPI settings')
 @section('crumbs')
-  <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Setups</a></li>
+  <li class="breadcrumb-item">Setups</li>
   <li class="breadcrumb-item active">KPI settings</li>
 @endsection
 
@@ -12,6 +12,13 @@
     <div>
       <h4 class="mb-0">KPI Settings</h4>
       <p class="text-muted mb-0">Configure KPI groups and sub-items used for daily scorecards</p>
+      @php $totalWeight = $groups->sum('weight'); @endphp
+      <p class="mb-0 mt-1">
+        <span class="badge {{ $totalWeight === 100 ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }}">Total weight {{ $totalWeight }} / 100</span>
+        @if ($totalWeight < 100)
+          <span class="text-muted small ms-1">{{ 100 - $totalWeight }} left to assign</span>
+        @endif
+      </p>
     </div>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGroup">
       <i class="ti ti-plus me-1"></i>Add KPI group

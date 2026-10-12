@@ -368,10 +368,15 @@ class SecurityAnalyticsService
 
         $shifts = $this->guardShiftRows()->groupBy(fn ($r) => strtolower($r['shift']))->map->sum('guard_shifts');
 
+        // A Full Day deployment's guards are split evenly between day and night.
+        $fullDay     = (int) ($shifts['full day'] ?? 0);
+        $dayShifts   = (int) ($shifts['day'] ?? 0) + intdiv($fullDay, 2);
+        $nightShifts = (int) ($shifts['night'] ?? 0) + $fullDay - intdiv($fullDay, 2);
+
         return [
             'day_hours' => sprintf('%02d:00-%02d:00', $start, $end),
-            'day'   => ['incidents' => $day,   'guard_shifts' => (int) ($shifts['day'] ?? 0),   'per_100' => $this->rate($day, (int) ($shifts['day'] ?? 0))],
-            'night' => ['incidents' => $night, 'guard_shifts' => (int) ($shifts['night'] ?? 0), 'per_100' => $this->rate($night, (int) ($shifts['night'] ?? 0))],
+            'day'   => ['incidents' => $day,   'guard_shifts' => $dayShifts,   'per_100' => $this->rate($day, $dayShifts)],
+            'night' => ['incidents' => $night, 'guard_shifts' => $nightShifts, 'per_100' => $this->rate($night, $nightShifts)],
         ];
     }
 

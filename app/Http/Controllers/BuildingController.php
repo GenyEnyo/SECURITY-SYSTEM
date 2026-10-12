@@ -26,7 +26,7 @@ class BuildingController extends Controller
     {
         $data = $request->validate([
             'name'        => ['required', 'string', 'max:255'],
-            'location_id' => ['required', 'exists:locations,id'],
+            'location_id' => ['required', Rule::in(Location::pluck('id'))],
         ]);
 
         Building::create($data);
@@ -48,7 +48,7 @@ class BuildingController extends Controller
     {
         $data = $request->validate([
             'name'        => ['required', 'string', 'max:255'],
-            'location_id' => ['required', 'exists:locations,id'],
+            'location_id' => ['required', Rule::in(Location::pluck('id'))],
         ]);
 
         $building->update($data);

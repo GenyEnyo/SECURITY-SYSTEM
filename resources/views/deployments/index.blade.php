@@ -3,7 +3,7 @@
 @section('title', 'Deployments · M Dashboard')
 @section('page-title', 'Deployments')
 @section('crumbs')
-  <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Setups</a></li>
+  <li class="breadcrumb-item">Setups</li>
   <li class="breadcrumb-item active">Deployments</li>
 @endsection
 
