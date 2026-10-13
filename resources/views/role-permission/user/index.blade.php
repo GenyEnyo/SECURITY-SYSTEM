@@ -66,7 +66,7 @@
                 <td class="text-end">
                   @can('Assign Roles')
                     <a href="{{ route('users.roles.edit', $user) }}" class="btn btn-sm btn-soft-secondary">
-                      <i class="ti ti-user-shield me-1"></i>Edit details / roles
+                      <i class="ti ti-user-shield me-1"></i>Assign roles
                     </a>
                   @endcan
                 </td>

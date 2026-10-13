@@ -99,10 +99,10 @@ class LocationScopeTest extends TestCase
         ])->assertSessionHasErrors(['location_id', 'building_id', 'place_id']);
     }
 
-    public function test_admin_can_set_a_users_location_department_and_section(): void
+    public function test_assigning_roles_does_not_change_a_users_location_department_or_section(): void
     {
         $admin = User::factory()->create(['location_id' => $this->accra->id])->assignRole('Admin');
-        $target = User::factory()->create();
+        $target = User::factory()->create(['location_id' => $this->accra->id]);
 
         $this->actingAs($admin)->put("/users/{$target->id}/roles", [
             'role'        => ['Supervisor'],
@@ -112,7 +112,9 @@ class LocationScopeTest extends TestCase
         ])->assertRedirect(route('users.index'));
 
         $target->refresh();
-        $this->assertSame($this->tema->id, $target->location_id);
-        $this->assertSame('Security', $target->section);
+        $this->assertTrue($target->hasRole('Supervisor'));
+        $this->assertSame($this->accra->id, $target->location_id);
+        $this->assertNull($target->department);
+        $this->assertNull($target->section);
     }
 }

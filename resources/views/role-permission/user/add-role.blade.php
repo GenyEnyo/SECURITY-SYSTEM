@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Edit User · M Dashboard')
-@section('page-title', 'Edit User')
+@section('title', 'Assign Roles · M Dashboard')
+@section('page-title', 'Assign Roles')
 @section('crumbs')
   <li class="breadcrumb-item">Setups</li>
   <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
@@ -26,7 +26,7 @@
   <div class="card">
     <div class="card-header">
       <h4 class="card-title mb-0">{{ $user->name }}</h4>
-      <p class="text-muted mb-0">Set where this user works and tick the roles they should hold.</p>
+      <p class="text-muted mb-0">Tick the roles this user should hold.</p>
     </div>
     <div class="card-body">
       <form method="POST" action="{{ route('users.roles.update', $user) }}">
@@ -34,32 +34,16 @@
         @method('PUT')
         <div class="row g-3 mb-4">
           <div class="col-md-4">
-            <label class="form-label" for="u-location">Location</label>
-            <select id="u-location" name="location_id" class="form-select">
-              <option value="">No location</option>
-              @foreach ($locations as $location)
-                <option value="{{ $location->id }}" @selected(old('location_id', $user->location_id) == $location->id)>{{ $location->name }}</option>
-              @endforeach
-            </select>
-            <div class="form-text">The user only sees data for this location.</div>
+            <div class="form-label">Location</div>
+            <div>{{ $user->location?->name ?? '—' }}</div>
           </div>
           <div class="col-md-4">
-            <label class="form-label" for="u-department">Department</label>
-            <input id="u-department" name="department" class="form-control" list="u-departments" value="{{ old('department', $user->department) }}">
-            <datalist id="u-departments">
-              @foreach ($departments as $department)
-                <option value="{{ $department }}"></option>
-              @endforeach
-            </datalist>
+            <div class="form-label">Department</div>
+            <div>{{ $user->department ?? '—' }}</div>
           </div>
           <div class="col-md-4">
-            <label class="form-label" for="u-section">Section</label>
-            <input id="u-section" name="section" class="form-control" list="u-sections" value="{{ old('section', $user->section) }}">
-            <datalist id="u-sections">
-              @foreach ($sections as $section)
-                <option value="{{ $section }}"></option>
-              @endforeach
-            </datalist>
+            <div class="form-label">Section</div>
+            <div>{{ $user->section ?? '—' }}</div>
           </div>
         </div>
 

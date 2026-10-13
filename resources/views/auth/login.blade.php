@@ -41,6 +41,12 @@
           <h5 class="mb-1">Welcome back</h5>
           <p class="text-muted">Sign in to continue to the dashboard.</p>
 
+          @if (session('expired'))
+            <div class="alert alert-warning" role="alert">
+              <i class="ti ti-clock-exclamation me-2"></i>{{ session('expired') }}
+            </div>
+          @endif
+
           @if ($errors->any())
             <div class="alert alert-danger" role="alert">
               @foreach ($errors->all() as $message)
@@ -52,7 +58,7 @@
           <div class="mb-3">
             <label class="form-label" for="username">Username</label>
             <input id="username" name="username" type="text" class="form-control"
-                   placeholder="{{ $ldapEnabled ? 'Network username' : 'Username or email' }}"
+                   placeholder="{{ $ldapEnabled ? 'jane.doe' : 'Username or email' }}"
                    value="{{ old('username') }}" autocomplete="username" required autofocus>
           </div>
 

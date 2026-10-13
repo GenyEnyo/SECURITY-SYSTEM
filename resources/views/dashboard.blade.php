@@ -96,7 +96,7 @@
       <div class="card">
         <div class="card-header d-flex align-items-center justify-content-between">
           <h4 class="card-title mb-0">Recent incidents</h4>
-          <a href="/incidents" class="fw-semibold fs-14">View all <i class="ti ti-arrow-right"></i></a>
+          <a href="{{ url('/incidents') }}" class="fw-semibold fs-14">View all <i class="ti ti-arrow-right"></i></a>
         </div>
         <div class="card-body">
           <div class="table-responsive">
@@ -185,7 +185,7 @@
   <h4 class="mt-4 mb-2">Quick actions</h4>
   <div class="row">
     <div class="col-sm-6 col-lg-3">
-      <a href="/incidents/create" class="card text-decoration-none text-body">
+      <a href="{{ url('/incidents/create') }}" class="card text-decoration-none text-body">
         <div class="card-body d-flex align-items-center gap-3">
           <div class="avatar-md bg-danger-subtle text-danger rounded d-flex align-items-center justify-content-center fs-22">
             <i class="ti ti-shield-plus"></i>

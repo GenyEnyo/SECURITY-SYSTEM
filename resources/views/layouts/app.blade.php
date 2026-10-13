@@ -46,6 +46,12 @@
           </div>
         </div>
 
+        @if (session('expired'))
+          <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="ti ti-clock-exclamation me-2 fs-lg"></i>{{ session('expired') }}
+          </div>
+        @endif
+
         @yield('content')
       </div>
 

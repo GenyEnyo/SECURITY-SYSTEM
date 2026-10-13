@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Location;
+use App\Models\Staff;
 use App\Models\User;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,6 +54,31 @@ class LdapLoginTest extends TestCase
         $this->assertSame('10432', $user->staff_number);
         $this->assertNotNull($user->guid);
         $this->assertAuthenticatedAs($user, 'web');
+    }
+
+    public function test_directory_user_is_filled_from_their_staff_record_on_login(): void
+    {
+        $akosombo = Location::firstOrCreate(['name' => 'Akosombo']);
+        Staff::create(['staff_number' => '10432', 'department' => 'VRA - REAL ESTATE & SECURITY SERVICES', 'section' => 'VRA - RED - SECURITY', 'location_name' => 'Akosombo']);
+
+        $fake = DirectoryEmulator::setup('default');
+
+        $ldapUser = LdapUser::create([
+            'cn'             => 'Ama Owusu',
+            'samaccountname' => 'aowusu',
+            'mail'           => 'ama.owusu@example.com',
+            'employeeid'     => '10432',
+            'objectguid'     => (string) Str::uuid(),
+        ]);
+
+        $fake->actingAs($ldapUser);
+
+        $this->post('/login', ['username' => 'aowusu', 'password' => 'secret']);
+
+        $user = User::where('username', 'aowusu')->firstOrFail();
+        $this->assertSame('VRA - REAL ESTATE & SECURITY SERVICES', $user->department);
+        $this->assertSame('VRA - RED - SECURITY', $user->section);
+        $this->assertSame($akosombo->id, $user->location_id);
     }
 
     public function test_local_accounts_cannot_sign_in_while_ldap_is_enabled(): void

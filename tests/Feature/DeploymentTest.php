@@ -38,8 +38,8 @@ class DeploymentTest extends TestCase
 
         $this->supervisor = User::factory()->create([
             'location_id' => $accra->id,
-            'department'  => 'Real Estate and Security',
-            'section'     => 'Security',
+            'department'  => config('security.supervisor_department'),
+            'section'     => config('security.supervisor_section'),
         ])->assignRole('Supervisor');
     }
 

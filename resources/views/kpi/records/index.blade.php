@@ -97,7 +97,7 @@
             @empty
               <tr>
                 <td colspan="6" class="text-center text-muted py-4">
-                  No scorecards saved yet — <a href="/kpi/entries">add one</a>.
+                  No scorecards saved yet — <a href="{{ url('/kpi/entries') }}">add one</a>.
                 </td>
               </tr>
             @endforelse

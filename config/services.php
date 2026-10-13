@@ -28,6 +28,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'staff_api' => [
+        'url' => env('STAFF_API_URL', 'https://vraussd.vra.com/apis/api/getallstaff'),
+        'verify' => env('STAFF_API_VERIFY_SSL', true),
+        'timeout' => env('STAFF_API_TIMEOUT', 120),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

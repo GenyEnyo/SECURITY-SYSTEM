@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\User;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -91,5 +93,16 @@ class AuthTest extends TestCase
 
         $this->assertGuest();
         $this->get('/dashboard')->assertRedirect(route('login'));
+    }
+
+    public function test_expired_form_goes_back_with_a_message_instead_of_a_419_page(): void
+    {
+        Route::post('/_expired', fn () => throw new TokenMismatchException)->middleware('web');
+
+        $this->from('/login')->post('/_expired', ['username' => 'kofi', 'password' => 'secret'])
+            ->assertRedirect('/login')
+            ->assertSessionHas('expired')
+            ->assertSessionHasInput('username', 'kofi')
+            ->assertSessionMissing('_old_input.password');
     }
 }
