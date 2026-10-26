@@ -156,13 +156,13 @@
   <script>
     window.editType = (id, name) => {
       const el = document.getElementById('editType');
-      el.querySelector('form').action = `/settings/company-statuses/${id}`;
+      el.querySelector('form').action = `{{ url('') }}/settings/company-statuses/${id}`;
       el.querySelector('[name="name"]').value = name;
       new bootstrap.Modal(el).show();
     };
     window.deleteType = (id, name) => {
       const el = document.getElementById('deleteType');
-      el.querySelector('form').action = `/settings/company-statuses/${id}`;
+      el.querySelector('form').action = `{{ url('') }}/settings/company-statuses/${id}`;
       el.querySelector('.target-name').textContent = name;
       new bootstrap.Modal(el).show();
     };

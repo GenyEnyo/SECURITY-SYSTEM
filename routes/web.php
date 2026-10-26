@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuildingController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeploymentController;
 use App\Http\Controllers\IncidentOccurrenceController;
 use App\Http\Controllers\IncidentStatusController;
@@ -34,7 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/access-pending', [AuthController::class, 'accessPending'])->name('access.pending');
 
-    Route::view('/dashboard', 'dashboard')->name('dashboard')->middleware('permission:View Dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard')->middleware('permission:View Dashboard');
 
     Route::prefix('kpi')->name('kpi.')->group(function () {
         Route::middleware('permission:Manage KPI Settings')->group(function () {

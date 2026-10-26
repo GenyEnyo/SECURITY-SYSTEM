@@ -150,7 +150,7 @@
   <script>
     window.openAddSubItem = (groupId, groupName, criteriaLabel, targetLabel) => {
       const el = document.getElementById('addSubItem');
-      el.querySelector('form').action = `/kpi/groups/${groupId}/sub-items`;
+      el.querySelector('form').action = `{{ url('') }}/kpi/groups/${groupId}/sub-items`;
       el.querySelector('.target-name').textContent = groupName;
       el.querySelector('.criteria-label').textContent = criteriaLabel || 'Criteria';
       el.querySelector('.target-label').textContent = targetLabel || 'Target';
@@ -175,18 +175,18 @@
 
       if (t.classList.contains('js-edit-group')) {
         open('editGroup', (el) => {
-          el.querySelector('form').action = `/kpi/groups/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/kpi/groups/${d.id}`;
           el.querySelector('[name="name"]').value = d.name;
           el.querySelector('[name="weight"]').value = d.weight;
         });
       } else if (t.classList.contains('js-delete-group')) {
         open('deleteGroup', (el) => {
-          el.querySelector('form').action = `/kpi/groups/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/kpi/groups/${d.id}`;
           el.querySelector('.target-name').textContent = d.name;
         });
       } else if (t.classList.contains('js-edit-sub-item')) {
         open('editSubItem', (el) => {
-          el.querySelector('form').action = `/kpi/sub-items/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/kpi/sub-items/${d.id}`;
           el.querySelector('.criteria-label').textContent = d.criteriaLabel || 'Criteria';
           el.querySelector('.target-label').textContent = d.targetLabel || 'Target';
           el.querySelector('[name="criteria"]').value = d.criteria;
@@ -194,7 +194,7 @@
         });
       } else if (t.classList.contains('js-delete-sub-item')) {
         open('deleteSubItem', (el) => {
-          el.querySelector('form').action = `/kpi/sub-items/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/kpi/sub-items/${d.id}`;
           el.querySelector('.target-name').textContent = d.criteria;
         });
       }

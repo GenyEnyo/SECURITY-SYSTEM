@@ -158,14 +158,14 @@
   <script>
     window.editSeverity = (id, name, color) => {
       const el = document.getElementById('editSeverity');
-      el.querySelector('form').action = `/settings/severity-levels/${id}`;
+      el.querySelector('form').action = `{{ url('') }}/settings/severity-levels/${id}`;
       el.querySelector('[name="name"]').value = name;
       el.querySelector('[name="color"]').value = color;
       new bootstrap.Modal(el).show();
     };
     window.deleteSeverity = (id, name) => {
       const el = document.getElementById('deleteSeverity');
-      el.querySelector('form').action = `/settings/severity-levels/${id}`;
+      el.querySelector('form').action = `{{ url('') }}/settings/severity-levels/${id}`;
       el.querySelector('.target-name').textContent = name;
       new bootstrap.Modal(el).show();
     };

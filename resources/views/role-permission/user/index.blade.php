@@ -30,7 +30,8 @@
   <div class="card">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-hover table-centered mb-0">
+        <table class="table table-hover table-centered mb-0" data-datatable data-no-sort-last
+               data-search-placeholder="Search name, username, location, role..." data-empty="No users yet.">
           <thead class="table-light">
             <tr>
               <th style="width:80px">No.</th>
@@ -45,7 +46,7 @@
             </tr>
           </thead>
           <tbody>
-            @forelse ($users as $user)
+            @foreach ($users as $user)
               <tr>
                 <td class="fw-semibold">{{ $loop->iteration }}</td>
                 <td>{{ $user->name }}</td>
@@ -71,12 +72,12 @@
                   @endcan
                 </td>
               </tr>
-            @empty
-              <tr><td colspan="9" class="text-center text-muted py-4">No users yet.</td></tr>
-            @endforelse
+            @endforeach
           </tbody>
         </table>
       </div>
     </div>
   </div>
+
+  @include('partials.datatables')
 @endsection

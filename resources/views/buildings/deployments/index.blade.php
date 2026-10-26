@@ -111,7 +111,7 @@
       if (!t) return;
       const buildingId = {{ $building->id }};
       const el = document.getElementById('deleteDeployment');
-      el.querySelector('form').action = `/buildings/${buildingId}/deployments/${t.dataset.id}`;
+      el.querySelector('form').action = `{{ url('') }}/buildings/${buildingId}/deployments/${t.dataset.id}`;
       el.querySelector('.target-name').textContent = t.dataset.label;
       new bootstrap.Modal(el).show();
     });

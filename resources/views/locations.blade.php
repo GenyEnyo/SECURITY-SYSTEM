@@ -170,23 +170,23 @@
       };
       if (t.classList.contains('js-edit-building')) {
         open('editBuilding', (el) => {
-          el.querySelector('form').action = `/buildings/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/buildings/${d.id}`;
           el.querySelector('[name="name"]').value = d.name;
           el.querySelector('[name="location_id"]').value = d.locationId;
         });
       } else if (t.classList.contains('js-delete-building')) {
         open('deleteBuilding', (el) => {
-          el.querySelector('form').action = `/buildings/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/buildings/${d.id}`;
           el.querySelector('.target-name').textContent = d.name;
         });
       } else if (t.classList.contains('js-edit-location')) {
         open('editLocation', (el) => {
-          el.querySelector('form').action = `/locations/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/locations/${d.id}`;
           el.querySelector('[name="name"]').value = d.name;
         });
       } else {
         open('deleteLocation', (el) => {
-          el.querySelector('form').action = `/locations/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/locations/${d.id}`;
           el.querySelector('.target-name').textContent = d.name;
         });
       }

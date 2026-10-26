@@ -106,12 +106,12 @@
       const d = t.dataset;
       if (t.classList.contains('js-edit-place')) {
         const el = document.getElementById('editPlace');
-        el.querySelector('form').action = `/buildings/${buildingId}/places/${d.id}`;
+        el.querySelector('form').action = `{{ url('') }}/buildings/${buildingId}/places/${d.id}`;
         el.querySelector('[name="name"]').value = d.name;
         new bootstrap.Modal(el).show();
       } else {
         const el = document.getElementById('deletePlace');
-        el.querySelector('form').action = `/buildings/${buildingId}/places/${d.id}`;
+        el.querySelector('form').action = `{{ url('') }}/buildings/${buildingId}/places/${d.id}`;
         el.querySelector('.target-name').textContent = d.name;
         new bootstrap.Modal(el).show();
       }

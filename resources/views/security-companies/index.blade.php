@@ -38,7 +38,8 @@
   <div class="card">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-hover table-centered mb-0">
+        <table class="table table-hover table-centered mb-0" data-datatable data-no-sort-last
+               data-search-placeholder="Search companies..." data-empty="No security companies yet.">
           <thead class="table-light">
             <tr>
               <th style="width:80px">No.</th>
@@ -51,7 +52,7 @@
             </tr>
           </thead>
           <tbody>
-            @forelse ($companies as $company)
+            @foreach ($companies as $company)
               @php
                 $badge = $company->status === 'renewing' ? 'bg-info-subtle text-info'
                        : ($company->status === 'active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary');
@@ -86,9 +87,7 @@
                   @endcan
                 </td>
               </tr>
-            @empty
-              <tr><td colspan="7" class="text-center text-muted fw-medium">No security companies yet.</td></tr>
-            @endforelse
+            @endforeach
           </tbody>
         </table>
       </div>
@@ -98,6 +97,7 @@
   @include('partials.security-companies.add-company')
   @include('partials.security-companies.edit-company')
   @include('partials.security-companies.delete-company')
+  @include('partials.datatables')
 
 @endsection
 
@@ -114,7 +114,7 @@
       };
       if (t.classList.contains('js-edit-company')) {
         open('editCompany', (el) => {
-          el.querySelector('form').action = `/security-companies/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/security-companies/${d.id}`;
           el.querySelector('[name="name"]').value = d.name;
           el.querySelector('[name="location_id"]').value = d.location;
           el.querySelector('[name="contact"]').value = d.contact;
@@ -123,7 +123,7 @@
         });
       } else {
         open('deleteCompany', (el) => {
-          el.querySelector('form').action = `/security-companies/${d.id}`;
+          el.querySelector('form').action = `{{ url('') }}/security-companies/${d.id}`;
           el.querySelector('.target-name').textContent = d.name;
         });
       }

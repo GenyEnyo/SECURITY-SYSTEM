@@ -37,7 +37,8 @@
   <div class="card">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-hover table-centered mb-0">
+        <table class="table table-hover table-centered mb-0" data-datatable data-no-sort-last
+               data-search-placeholder="Search permissions..." data-empty="No permissions yet.">
           <thead class="table-light">
             <tr>
               <th style="width:80px">No.</th>
@@ -65,6 +66,8 @@
       </div>
     </div>
   </div>
+
+  @include('partials.datatables')
 
   <!-- Add modal -->
   <div class="modal fade" id="addItem" tabindex="-1" aria-hidden="true">
