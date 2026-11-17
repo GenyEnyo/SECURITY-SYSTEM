@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Support\KpiScoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class KpiRecordController extends Controller
 {
@@ -51,6 +52,20 @@ class KpiRecordController extends Controller
             'lines'          => ['array'],
             'lines.*.scored' => ['nullable', 'integer', 'min:0'],
         ]);
+
+        // A KPI score can't go above its target. Deployment beats (place_id set) are not capped.
+        $overTarget = [];
+        $lines = $record->lines()->whereNull('place_id')->whereNotNull('target')->get()->keyBy('id');
+        foreach ($data['lines'] ?? [] as $lineId => $values) {
+            $line = $lines->get($lineId);
+            $scored = $values['scored'] ?? null;
+            if ($line && $scored !== null && $scored > $line->target) {
+                $overTarget["lines.$lineId.scored"] = "Score for \"{$line->criteria}\" cannot be more than its target ({$line->target}).";
+            }
+        }
+        if ($overTarget) {
+            throw ValidationException::withMessages($overTarget);
+        }
 
         DB::transaction(function () use ($record, $data) {
             $record->update(['comments' => $data['comments'] ?? null]);

@@ -42,6 +42,7 @@ class RoleAndPermissionSeeder extends Seeder
             'Manage Severity Levels',
             'Manage Incident Statuses',
             'Manage Company Statuses',
+            'Manage Staff Locations',
 
             'View My Submissions',
         ];
@@ -56,6 +57,7 @@ class RoleAndPermissionSeeder extends Seeder
             'Create Permission',
             'Edit Permission',
             'View Audit Logs',
+            'View All Locations',
         ];
 
         $all = array_merge($operational, $admin);
@@ -64,34 +66,51 @@ class RoleAndPermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
+        // Only Super-Admin may manage permissions themselves.
+        $allButPermissions = array_values(array_diff($all, [
+            'View Permission',
+            'Create Permission',
+            'Edit Permission',
+        ]));
+
         $roles = [
-            'Super-Admin'      => $all,
-            'Admin'            => $all,
-            'Head of Security' => $operational,
-            'Supervisor'       => [
+            'Super-Admin'         => $all,
+            'Admin'               => $allButPermissions,
+            // Head of Security and all admin staff.
+            'Head of Security'    => $allButPermissions,
+            // Views reports for their own unit (location).
+            'Location Supervisor' => [
+                'View Dashboard',
+                'View Incidents',
+                'View All Incidents',
+                'View KPI Records',
+                'View KPI Reports',
+                'View Deployment Compliance',
+                'View Locations',
+                'View Deployments',
+                'View Security Companies',
+            ],
+            // All security staff and guards.
+            'Security Officer'    => [
                 'View Dashboard',
                 'Report Incident',
                 'View Incidents',
-                'View All Incidents',
                 'Edit Incident',
-                'Acknowledge Incident',
                 'Submit KPI Scorecard',
-                'View KPI Records',
-                'Edit KPI Record',
-                'View KPI Reports',
-                'View Deployment Compliance',
                 'View Locations',
                 'View Deployments',
                 'Manage Deployments',
                 'View Security Companies',
                 'View My Submissions',
             ],
-            'Senior Officer'   => [
+            // Minimal: create-only data entry.
+            'Data Entry Officer'  => [
                 'View Dashboard',
                 'Report Incident',
                 'View Incidents',
-                'Edit Incident',
                 'Submit KPI Scorecard',
+                'View Deployments',
+                'Manage Deployments',
                 'View My Submissions',
             ],
         ];

@@ -47,7 +47,7 @@ class DashboardTest extends TestCase
 
     private function userAt(Location $location, string $role): User
     {
-        return User::factory()->create(['location_id' => $location->id])->assignRole($role);
+        return User::factory()->atLocation($location)->create()->assignRole($role);
     }
 
     private function incidentAt(Location $location, User $reporter, string $occurredAt = '2026-10-13 09:00:00', string $severity = 'Low'): IncidentOccurrence
@@ -92,7 +92,7 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_shows_no_template_figures(): void
     {
-        $this->actingAs($this->userAt($this->accra, 'Supervisor'))->get('/dashboard')
+        $this->actingAs($this->userAt($this->accra, 'Location Supervisor'))->get('/dashboard')
             ->assertOk()
             ->assertSee('No incidents recorded.')
             ->assertDontSee('Item Loss')
@@ -102,8 +102,8 @@ class DashboardTest extends TestCase
 
     public function test_incidents_are_limited_to_the_users_location(): void
     {
-        $supervisor = $this->userAt($this->accra, 'Supervisor');
-        $other = $this->userAt($this->accra, 'Senior Officer');
+        $supervisor = $this->userAt($this->accra, 'Location Supervisor');
+        $other = $this->userAt($this->accra, 'Security Officer');
 
         $this->incidentAt($this->accra, $other);
         $this->incidentAt($this->accra, $other, '2026-10-12 08:00:00', 'Urgent');
@@ -122,8 +122,8 @@ class DashboardTest extends TestCase
 
     public function test_officer_without_view_all_incidents_sees_only_their_own(): void
     {
-        $officer = $this->userAt($this->accra, 'Senior Officer');
-        $colleague = $this->userAt($this->accra, 'Senior Officer');
+        $officer = $this->userAt($this->accra, 'Security Officer');
+        $colleague = $this->userAt($this->accra, 'Security Officer');
 
         $mine = $this->incidentAt($this->accra, $officer);
         $this->incidentAt($this->accra, $colleague);
@@ -136,7 +136,7 @@ class DashboardTest extends TestCase
 
     public function test_deployment_cards_come_from_todays_scorecards(): void
     {
-        $supervisor = $this->userAt($this->accra, 'Supervisor');
+        $supervisor = $this->userAt($this->accra, 'Location Supervisor');
 
         $this->scorecardFor(Building::where('location_id', $this->accra->id)->firstOrFail(), 10, 8);
         $this->scorecardFor(Building::where('location_id', $this->tema->id)->firstOrFail(), 20, 20);
@@ -149,14 +149,14 @@ class DashboardTest extends TestCase
 
     public function test_deployment_cards_are_blank_without_a_scorecard(): void
     {
-        $this->actingAs($this->userAt($this->accra, 'Supervisor'))->get('/dashboard')
+        $this->actingAs($this->userAt($this->accra, 'Location Supervisor'))->get('/dashboard')
             ->assertOk()
             ->assertSee('No scorecard yet today');
     }
 
     public function test_scorecard_banner_disappears_once_every_building_has_one(): void
     {
-        $officer = $this->userAt($this->accra, 'Senior Officer');
+        $officer = $this->userAt($this->accra, 'Security Officer');
         $buildings = Building::where('location_id', $this->accra->id)->get();
 
         $this->actingAs($officer)->get('/dashboard')

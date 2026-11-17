@@ -62,7 +62,7 @@ class StatusSettingsTest extends TestCase
 
     public function test_settings_pages_need_their_permission(): void
     {
-        $officer = User::factory()->create()->assignRole('Senior Officer');
+        $officer = User::factory()->create()->assignRole('Security Officer');
 
         $this->actingAs($officer)->get('/settings/incident-statuses')->assertForbidden();
         $this->actingAs($officer)->get('/settings/company-statuses')->assertForbidden();

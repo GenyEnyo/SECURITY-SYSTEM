@@ -36,11 +36,10 @@ class DeploymentTest extends TestCase
         $this->company = SecurityCompany::where('name', 'G4S Ghana')->firstOrFail();
         $this->company->update(['location_id' => $accra->id]);
 
-        $this->supervisor = User::factory()->create([
-            'location_id' => $accra->id,
-            'department'  => config('security.supervisor_department'),
-            'section'     => config('security.supervisor_section'),
-        ])->assignRole('Supervisor');
+        $this->supervisor = User::factory()->atLocation($accra, [
+            'department' => config('security.supervisor_department'),
+            'section'    => config('security.supervisor_section'),
+        ])->create()->assignRole('Security Officer');
     }
 
     private function payload(array $overrides = []): array
@@ -86,7 +85,7 @@ class DeploymentTest extends TestCase
 
     public function test_supervisor_must_be_a_security_officer_at_the_location(): void
     {
-        $outsider = User::factory()->create(['location_id' => $this->supervisor->location_id, 'department' => 'Finance']);
+        $outsider = User::factory()->atLocation($this->supervisor->location(), ['department' => 'Finance'])->create();
 
         $this->actingAs($this->supervisor)
             ->post("/buildings/{$this->building->id}/deployments", $this->payload(['supervisor_id' => $outsider->id]))

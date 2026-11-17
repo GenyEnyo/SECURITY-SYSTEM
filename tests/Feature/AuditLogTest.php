@@ -61,7 +61,7 @@ class AuditLogTest extends TestCase
 
     public function test_sign_in_events_are_logged(): void
     {
-        $user = User::factory()->create(['username' => 'kofi'])->assignRole('Senior Officer');
+        $user = User::factory()->create(['username' => 'kofi'])->assignRole('Security Officer');
 
         $this->post('/login', ['username' => 'kofi', 'password' => 'wrong']);
         $this->post('/login', ['username' => 'kofi', 'password' => 'password']);
@@ -81,16 +81,16 @@ class AuditLogTest extends TestCase
     public function test_role_changes_are_logged(): void
     {
         $admin = $this->userWithRole('Admin');
-        $target = $this->userWithRole('Senior Officer');
+        $target = $this->userWithRole('Security Officer');
 
-        $this->actingAs($admin)->put("/users/{$target->id}/roles", ['role' => ['Supervisor']]);
+        $this->actingAs($admin)->put("/users/{$target->id}/roles", ['role' => ['Location Supervisor']]);
 
         $entry = Activity::where('log_name', 'access')->where('description', 'roles changed')->firstOrFail();
 
         $this->assertSame($admin->id, $entry->causer_id);
         $this->assertSame($target->id, $entry->subject_id);
-        $this->assertSame(['Senior Officer'], $entry->properties['old']['roles']);
-        $this->assertSame(['Supervisor'], $entry->properties['attributes']['roles']);
+        $this->assertSame(['Security Officer'], $entry->properties['old']['roles']);
+        $this->assertSame(['Location Supervisor'], $entry->properties['attributes']['roles']);
     }
 
     public function test_audit_page_is_restricted(): void
@@ -103,7 +103,7 @@ class AuditLogTest extends TestCase
         $this->actingAs($admin)->get('/audit-logs')->assertOk()->assertSee('Annex')->assertSee('Created');
         $this->actingAs($admin)->get('/audit-logs?log=auth')->assertOk()->assertDontSee('Annex');
         $this->actingAs($this->userWithRole('Super-Admin'))->get('/audit-logs')->assertOk();
-        $this->actingAs($this->userWithRole('Supervisor'))->get('/audit-logs')->assertForbidden();
-        $this->actingAs($this->userWithRole('Senior Officer'))->get('/dashboard')->assertDontSee('Audit logs');
+        $this->actingAs($this->userWithRole('Location Supervisor'))->get('/audit-logs')->assertForbidden();
+        $this->actingAs($this->userWithRole('Security Officer'))->get('/dashboard')->assertDontSee('Audit logs');
     }
 }

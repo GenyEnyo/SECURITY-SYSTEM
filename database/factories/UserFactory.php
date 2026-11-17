@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Location;
+use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -32,6 +34,24 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Give the user a staff record at the given location. Department, section and
+     * location always come from the staff table, never from users.
+     */
+    public function atLocation(?Location $location, array $staff = []): static
+    {
+        return $this->state(function () use ($location, $staff) {
+            $staffNumber = (string) fake()->unique()->numberBetween(100000, 999999);
+
+            Staff::create($staff + [
+                'staff_number'  => $staffNumber,
+                'location_name' => $location?->name,
+            ]);
+
+            return ['staff_number' => $staffNumber];
+        });
     }
 
     /**

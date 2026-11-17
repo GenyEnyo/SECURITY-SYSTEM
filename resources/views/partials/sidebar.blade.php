@@ -193,7 +193,7 @@
         </li>
         @endcan
 
-        @canany(['Manage Incident Types', 'Manage Severity Levels', 'Manage Incident Statuses', 'Manage Company Statuses'])
+        @canany(['Manage Incident Types', 'Manage Severity Levels', 'Manage Incident Statuses', 'Manage Company Statuses', 'Manage Staff Locations'])
         <li class="side-nav-title">Settings</li>
         @php $settingsOpen = request()->is('settings/*'); @endphp
         <li class="side-nav-item">
@@ -229,6 +229,13 @@
               <li class="side-nav-item">
                 <a href="{{ url('/settings/company-statuses') }}" class="side-nav-link {{ $navActive('settings/company-statuses*') }}">
                   <span class="menu-text">Company Statuses</span>
+                </a>
+              </li>
+              @endcan
+              @can('Manage Staff Locations')
+              <li class="side-nav-item">
+                <a href="{{ url('/settings/staff-locations') }}" class="side-nav-link {{ $navActive('settings/staff-locations*') }}">
+                  <span class="menu-text">Staff Locations</span>
                 </a>
               </li>
               @endcan

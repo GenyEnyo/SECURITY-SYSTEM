@@ -2,15 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Location;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 /**
- * Local copy of the HR staff list, and the link between a staff record
- * and an app user (department and location).
+ * Local copy of the HR staff list. Users are linked to it by staff_number.
  */
 class StaffDirectory
 {
@@ -66,8 +64,38 @@ class StaffDirectory
 
         Staff::whereNotIn('staff_number', $rows->keys()->all())->delete();
 
+        $this->clearOverridesHrHasUpdated();
+
         return $rows->count();
     }
+
+    /**
+     * An admin's location correction lasts until HR changes that person's
+     * location. Once HR's value differs from what it was when the correction
+     * was made, HR has acted, so the correction is dropped and HR is used.
+     *
+     * @return int number of corrections cleared
+     */
+    public function clearOverridesHrHasUpdated(): int
+    {
+        $normalise = fn (?string $name) => strtolower(trim((string) $name));
+        $cleared = 0;
+
+        Staff::whereNotNull('location_id')->each(function (Staff $staff) use ($normalise, &$cleared) {
+            if ($normalise($staff->location_name) !== $normalise($staff->location_hr_name_at_override)) {
+                // Saved one by one so each clear is written to the audit log.
+                $staff->update(['location_id' => null, 'location_hr_name_at_override' => null]);
+                $cleared++;
+            }
+        });
+
+        $this->lastClearedOverrides = $cleared;
+
+        return $cleared;
+    }
+
+    /** Corrections cleared by the last sync. */
+    public int $lastClearedOverrides = 0;
 
     public function find(User $user): ?Staff
     {
@@ -83,45 +111,20 @@ class StaffDirectory
     }
 
     /**
-     * Fill the user's blank staff number, department, section and location from
-     * their staff record. Values that are already set are never overwritten.
+     * Link a user with no staff number (AD account without an employeeid) to
+     * their staff record by email. Nothing else is copied onto the user:
+     * department, section and location are always read from the staff table.
      */
     public function fill(User $user): bool
     {
-        if (filled($user->staff_number) && filled($user->department) && filled($user->section) && $user->location_id !== null) {
+        if (filled($user->staff_number) || ! $staff = $this->find($user)) {
             return false;
         }
 
-        if (! $staff = $this->find($user)) {
-            return false;
-        }
+        $updated = $user->update(['staff_number' => $staff->staff_number]);
+        $user->refreshStaff();
 
-        $changes = [];
-
-        if (blank($user->staff_number)) {
-            $changes['staff_number'] = $staff->staff_number;
-        }
-
-        if (blank($user->department) && filled($staff->department)) {
-            $changes['department'] = $staff->department;
-        }
-
-        if (blank($user->section) && filled($staff->section)) {
-            $changes['section'] = $staff->section;
-        }
-
-        // A staff location the app does not know is left for an admin to set.
-        if ($user->location_id === null && filled($staff->location_name)) {
-            $locationId = Location::withoutGlobalScope('user_location')
-                ->whereRaw('LOWER(name) = ?', [strtolower($staff->location_name)])
-                ->value('id');
-
-            if ($locationId) {
-                $changes['location_id'] = $locationId;
-            }
-        }
-
-        return $changes !== [] && $user->update($changes);
+        return $updated;
     }
 
     private function toRow(array $record): array

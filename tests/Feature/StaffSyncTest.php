@@ -78,7 +78,7 @@ class StaffSyncTest extends TestCase
         $this->assertSame(1, Staff::count());
     }
 
-    public function test_sync_fills_blank_user_details_from_the_staff_list(): void
+    public function test_user_details_are_read_from_the_staff_list(): void
     {
         $user = User::factory()->create(['staff_number' => '10432']);
         $byEmail = User::factory()->create(['email' => 'kofi@example.com']);
@@ -88,47 +88,45 @@ class StaffSyncTest extends TestCase
         $this->artisan('staff:sync')->assertSuccessful();
 
         $user->refresh();
-        $this->assertSame('VRA - REAL ESTATE & SECURITY SERVICES', $user->department);
-        $this->assertSame('VRA - RED - SECURITY', $user->section);
-        $this->assertSame(Location::where('name', 'Akosombo')->value('id'), $user->location_id);
+        $this->assertSame('VRA - REAL ESTATE & SECURITY SERVICES', $user->staff->department);
+        $this->assertSame('VRA - RED - SECURITY', $user->staff->section);
+        $this->assertSame(Location::where('name', 'Akosombo')->value('id'), $user->locationId());
 
+        // A user with no staff number is linked by email; location matching ignores case.
         $byEmail->refresh();
         $this->assertSame('20001', $byEmail->staff_number);
-        $this->assertSame(Location::where('name', 'Accra')->value('id'), $byEmail->location_id);
+        $this->assertSame(Location::where('name', 'Accra')->value('id'), $byEmail->locationId());
     }
 
-    public function test_fill_never_overwrites_details_that_are_already_set(): void
+    public function test_hr_changes_apply_without_touching_the_user(): void
     {
-        Staff::create(['staff_number' => '10432', 'department' => 'VRA - FINANCE & INVESTMENT', 'section' => 'VRA - FIV - TREASURY', 'location_name' => 'Akosombo']);
+        Staff::create(['staff_number' => '10432', 'department' => 'VRA - FINANCE & INVESTMENT', 'location_name' => 'Akosombo']);
+        $user = User::factory()->create(['staff_number' => '10432']);
 
-        $tema = Location::where('name', 'Tema')->firstOrFail();
-        $user = User::factory()->create(['staff_number' => '10432', 'department' => 'Security', 'section' => 'Patrol', 'location_id' => $tema->id]);
+        $this->assertSame(Location::where('name', 'Akosombo')->value('id'), $user->locationId());
 
-        app(StaffDirectory::class)->fill($user);
+        Staff::where('staff_number', '10432')->update(['location_name' => 'Tema', 'department' => 'VRA - RED']);
 
-        $user->refresh();
-        $this->assertSame('Security', $user->department);
-        $this->assertSame('Patrol', $user->section);
-        $this->assertSame($tema->id, $user->location_id);
+        $user = $user->fresh();
+        $this->assertSame(Location::where('name', 'Tema')->value('id'), $user->locationId());
+        $this->assertSame('VRA - RED', $user->staff->department);
     }
 
-    public function test_unknown_staff_location_is_left_unset(): void
+    public function test_unknown_staff_location_gives_no_location(): void
     {
         Staff::create(['staff_number' => '10432', 'department' => 'NED - COMMERCIAL', 'location_name' => 'Tamale']);
 
         $user = User::factory()->create(['staff_number' => '10432']);
 
-        app(StaffDirectory::class)->fill($user);
-
-        $user->refresh();
-        $this->assertSame('NED - COMMERCIAL', $user->department);
-        $this->assertNull($user->location_id);
+        $this->assertSame('NED - COMMERCIAL', $user->staff->department);
+        $this->assertNull($user->locationId());
     }
 
     public function test_assign_roles_page_shows_user_details_as_text_only(): void
     {
         $admin = User::factory()->create()->assignRole('Super-Admin');
-        $user = User::factory()->create(['department' => 'NED - COMMERCIAL', 'section' => 'NED - NCD - CUSTOMER SERVICES']);
+        Staff::create(['staff_number' => '30001', 'department' => 'NED - COMMERCIAL', 'section' => 'NED - NCD - CUSTOMER SERVICES']);
+        $user = User::factory()->create(['staff_number' => '30001']);
 
         $this->actingAs($admin)->get(route('users.roles.edit', $user))
             ->assertOk()

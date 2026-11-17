@@ -35,15 +35,20 @@
         <div class="row g-3 mb-4">
           <div class="col-md-4">
             <div class="form-label">Location</div>
-            <div>{{ $user->location?->name ?? '—' }}</div>
+            <div>
+              {{ $user->staff?->location_name ?? '—' }}
+              @if ($user->staff?->location_name && ! $user->location())
+                <div class="text-danger fs-12">Not a location in this app, so this user sees no location data.</div>
+              @endif
+            </div>
           </div>
           <div class="col-md-4">
             <div class="form-label">Department</div>
-            <div>{{ $user->department ?? '—' }}</div>
+            <div>{{ $user->staff?->department ?? '—' }}</div>
           </div>
           <div class="col-md-4">
             <div class="form-label">Section</div>
-            <div>{{ $user->section ?? '—' }}</div>
+            <div>{{ $user->staff?->section ?? '—' }}</div>
           </div>
         </div>
 

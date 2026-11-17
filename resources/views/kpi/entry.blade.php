@@ -137,7 +137,7 @@
                         <tr data-sub-item-id="{{ $item->id }}">
                           <td>{{ $item->criteria }}</td>
                           <td><input type="number" class="form-control form-control-sm" style="max-width:110px" value="{{ $item->target }}" readonly></td>
-                          <td><input type="number" class="form-control form-control-sm" style="max-width:110px" name="scored[{{ $item->id }}]"></td>
+                          <td><input type="number" class="form-control form-control-sm" style="max-width:110px" name="scored[{{ $item->id }}]" min="0" @if ($item->target !== null) max="{{ $item->target }}" @endif></td>
                           <td class="per-cell">—</td>
                           <td class="merit-cell muted">—</td>
                         </tr>
@@ -240,6 +240,14 @@
       tr.querySelectorAll('input[type=number],input').forEach(i => i.addEventListener('input', () => recalc(tr)));
     }
     document.querySelectorAll('.kpi-table tbody tr').forEach(bindRow);
+
+    // A KPI score can't go above its target. Runs in the capture phase so the
+    // row preview recalculates with the capped value. Deployment beats are not capped.
+    document.getElementById('kpi-form').addEventListener('input', (e) => {
+      const i = e.target;
+      if (!i.matches('input[name^="scored["][max]') || i.value === '') return;
+      if (+i.value > +i.max) i.value = i.max;
+    }, true);
 
     // ---- Deployment selector: Location -> Building -> (optional) Place ----
     const BUILDINGS = @json($buildings);

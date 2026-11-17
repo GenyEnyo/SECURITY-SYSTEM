@@ -35,7 +35,7 @@ class AuthTest extends TestCase
 
     public function test_local_login_with_username(): void
     {
-        $user = User::factory()->create(['username' => 'kofi'])->assignRole('Senior Officer');
+        $user = User::factory()->create(['username' => 'kofi'])->assignRole('Security Officer');
 
         $this->post('/login', ['username' => 'kofi', 'password' => 'password'])
             ->assertRedirect(route('dashboard'));
@@ -45,7 +45,7 @@ class AuthTest extends TestCase
 
     public function test_local_login_with_email(): void
     {
-        $user = User::factory()->create()->assignRole('Senior Officer');
+        $user = User::factory()->create()->assignRole('Security Officer');
 
         $this->post('/login', ['username' => $user->email, 'password' => 'password'])
             ->assertRedirect(route('dashboard'));
@@ -87,7 +87,7 @@ class AuthTest extends TestCase
 
     public function test_logout_ends_the_session(): void
     {
-        $user = User::factory()->create()->assignRole('Senior Officer');
+        $user = User::factory()->create()->assignRole('Security Officer');
 
         $this->actingAs($user)->post('/logout')->assertRedirect(route('login'));
 

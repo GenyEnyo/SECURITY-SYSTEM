@@ -80,6 +80,11 @@ return [
             'database' => [
                 'model' => User::class,
                 'sync_passwords' => true,
+                // Link an existing user row that has no AD guid yet (e.g. added
+                // before AD login) by logon name, instead of inserting a duplicate.
+                'sync_existing' => [
+                    'username' => 'samaccountname',
+                ],
                 'sync_attributes' => [
                     'name' => 'cn',
                     'username' => 'samaccountname',

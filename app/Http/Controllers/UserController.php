@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with(['roles', 'location'])->orderBy('name')->get();
+        $users = User::with(['roles', 'staff'])->orderBy('name')->get();
 
         return view('role-permission.user.index', compact('users'));
     }

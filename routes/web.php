@@ -21,6 +21,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SecurityCompanyController;
 use App\Http\Controllers\SecurityCompanyStatusController;
 use App\Http\Controllers\SeverityController;
+use App\Http\Controllers\StaffLocationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -159,5 +160,10 @@ Route::middleware('auth')->group(function () {
             ->parameters(['company-statuses' => 'companyStatus'])
             ->only(['index', 'store', 'update', 'destroy'])
             ->middleware('permission:Manage Company Statuses');
+
+        Route::middleware('permission:Manage Staff Locations')->group(function () {
+            Route::get('staff-locations', [StaffLocationController::class, 'index'])->name('staff-locations.index');
+            Route::put('staff-locations/{staff}', [StaffLocationController::class, 'update'])->name('staff-locations.update');
+        });
     });
 });

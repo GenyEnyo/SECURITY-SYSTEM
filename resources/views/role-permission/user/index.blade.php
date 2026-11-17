@@ -51,9 +51,9 @@
                 <td class="fw-semibold">{{ $loop->iteration }}</td>
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->username ?? '—' }}</td>
-                <td>{{ $user->email }}</td>
-                <td>{{ $user->location?->name ?? '—' }}</td>
-                <td>{{ collect([$user->department, $user->section])->filter()->implode(' / ') ?: '—' }}</td>
+                <td>{{ $user->email ?: '—' }}</td>
+                <td>{{ $user->staff?->location_name ?? '—' }}</td>
+                <td>{{ collect([$user->staff?->department, $user->staff?->section])->filter()->implode(' / ') ?: '—' }}</td>
                 <td>
                   <span class="badge {{ $user->guid ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary' }}">{{ $user->guid ? 'Directory' : 'Local' }}</span>
                 </td>

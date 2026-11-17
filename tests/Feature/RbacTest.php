@@ -27,9 +27,10 @@ class RbacTest extends TestCase
     private function userWithRole(string $role): User
     {
         // Data is location-scoped, so give the user the location of the seeded building the tests use.
-        $locationId = Building::withoutGlobalScopes()->orderBy('id')->value('location_id');
+        $location = \App\Models\Location::withoutGlobalScopes()
+            ->find(Building::withoutGlobalScopes()->orderBy('id')->value('location_id'));
 
-        return User::factory()->create(['location_id' => $locationId])->assignRole($role);
+        return User::factory()->atLocation($location)->create()->assignRole($role);
     }
 
     private function incidentFor(User $reporter): IncidentOccurrence
@@ -50,33 +51,33 @@ class RbacTest extends TestCase
         return IncidentOccurrence::latest('id')->firstOrFail();
     }
 
-    public function test_senior_officer_sees_own_pages_but_not_admin_pages(): void
+    public function test_security_officer_sees_own_pages_but_not_admin_pages(): void
     {
-        $officer = $this->userWithRole('Senior Officer');
+        $officer = $this->userWithRole('Security Officer');
 
-        $this->actingAs($officer)->get('/dashboard')->assertOk();
-        $this->actingAs($officer)->get('/incidents')->assertOk();
-        $this->actingAs($officer)->get('/incidents/create')->assertOk();
+        foreach (['/dashboard', '/incidents', '/incidents/create', '/kpi/entries', '/deployments', "/buildings/{$this->buildingId()}/deployments/create"] as $url) {
+            $this->actingAs($officer)->get($url)->assertOk();
+        }
 
-        foreach (['/users', '/roles', '/permissions', '/incidents/all', '/kpi/settings', '/kpi/reports', '/locations', '/settings/incident-types'] as $url) {
+        foreach (['/users', '/roles', '/permissions', '/incidents/all', '/kpi/settings', '/kpi/reports', '/kpi/records', '/kpi/compliance', '/settings/incident-types'] as $url) {
             $this->actingAs($officer)->get($url)->assertForbidden();
         }
     }
 
     public function test_sidebar_only_shows_permitted_links(): void
     {
-        $officer = $this->userWithRole('Senior Officer');
+        $officer = $this->userWithRole('Security Officer');
 
         $this->actingAs($officer)->get('/dashboard')
             ->assertSee('Report incident')
-            ->assertDontSee('Security companies')
             ->assertDontSee('KPI settings')
-            ->assertSee('Senior Officer');
+            ->assertDontSee('Audit logs')
+            ->assertSee('Security Officer');
     }
 
     public function test_reported_incident_belongs_to_the_logged_in_user(): void
     {
-        $officer = $this->userWithRole('Senior Officer');
+        $officer = $this->userWithRole('Security Officer');
 
         $incident = $this->incidentFor($officer);
 
@@ -85,22 +86,24 @@ class RbacTest extends TestCase
 
     public function test_only_permitted_roles_can_acknowledge(): void
     {
-        $officer = $this->userWithRole('Senior Officer');
-        $supervisor = $this->userWithRole('Supervisor');
+        $officer = $this->userWithRole('Security Officer');
+        $supervisor = $this->userWithRole('Location Supervisor');
+        $head = $this->userWithRole('Head of Security');
         $incident = $this->incidentFor($officer);
 
         $this->actingAs($officer)->post("/incidents/{$incident->id}/acknowledge")->assertForbidden();
+        $this->actingAs($supervisor)->post("/incidents/{$incident->id}/acknowledge")->assertForbidden();
         $this->assertNull($incident->fresh()->acknowledged_at);
 
-        $this->actingAs($supervisor)->post("/incidents/{$incident->id}/acknowledge")->assertRedirect();
+        $this->actingAs($head)->post("/incidents/{$incident->id}/acknowledge")->assertRedirect();
         $this->assertNotNull($incident->fresh()->acknowledged_at);
     }
 
     public function test_officers_cannot_open_incidents_reported_by_others(): void
     {
-        $reporter = $this->userWithRole('Senior Officer');
-        $other = $this->userWithRole('Senior Officer');
-        $supervisor = $this->userWithRole('Supervisor');
+        $reporter = $this->userWithRole('Security Officer');
+        $other = $this->userWithRole('Security Officer');
+        $supervisor = $this->userWithRole('Location Supervisor');
         $incident = $this->incidentFor($reporter);
 
         $this->actingAs($other)->get("/incidents/{$incident->id}")->assertForbidden();
@@ -110,10 +113,72 @@ class RbacTest extends TestCase
 
     public function test_supervisor_can_view_but_not_manage_locations(): void
     {
-        $supervisor = $this->userWithRole('Supervisor');
+        $supervisor = $this->userWithRole('Location Supervisor');
 
         $this->actingAs($supervisor)->get('/locations')->assertOk()->assertDontSee('Add location');
         $this->actingAs($supervisor)->post('/locations', ['name' => 'Annex'])->assertForbidden();
+    }
+
+    public function test_data_entry_officer_can_only_enter_data(): void
+    {
+        $clerk = $this->userWithRole('Data Entry Officer');
+
+        foreach (['/dashboard', '/incidents/create', '/kpi/entries', '/deployments', "/buildings/{$this->buildingId()}/deployments/create", '/my-submissions'] as $url) {
+            $this->actingAs($clerk)->get($url)->assertOk();
+        }
+
+        foreach (['/kpi/reports', '/kpi/records', '/kpi/compliance', '/incidents/all', '/locations', '/security-companies', '/users'] as $url) {
+            $this->actingAs($clerk)->get($url)->assertForbidden();
+        }
+
+        // Create-only: cannot edit even their own incident.
+        $incident = $this->incidentFor($clerk);
+        $this->actingAs($clerk)->get("/incidents/{$incident->id}/edit")->assertForbidden();
+    }
+
+    public function test_location_supervisor_views_reports_but_cannot_enter_data(): void
+    {
+        $supervisor = $this->userWithRole('Location Supervisor');
+
+        foreach (['/dashboard', '/kpi/reports', '/kpi/reports/monthly', '/kpi/records', '/kpi/compliance', '/incidents/all', '/deployments'] as $url) {
+            $this->actingAs($supervisor)->get($url)->assertOk();
+        }
+
+        foreach (['/kpi/entries', '/incidents/create', "/buildings/{$this->buildingId()}/deployments/create", '/kpi/settings', '/users'] as $url) {
+            $this->actingAs($supervisor)->get($url)->assertForbidden();
+        }
+
+        $this->assertFalse($supervisor->seesAllLocations());
+    }
+
+    public function test_head_of_security_sees_every_location(): void
+    {
+        $head = $this->userWithRole('Head of Security');
+        $otherLocation = \App\Models\Location::withoutGlobalScopes()->where('id', '!=', $head->locationId())->firstOrFail();
+
+        $this->assertTrue($head->seesAllLocations());
+        $this->actingAs($head);
+        $this->assertTrue(\App\Models\Location::whereKey($otherLocation->id)->exists());
+
+        $this->actingAs($head)->get('/permissions')->assertForbidden();
+        $this->actingAs($head)->get('/audit-logs')->assertOk();
+    }
+
+    public function test_admin_sees_everything_except_permissions(): void
+    {
+        $admin = $this->userWithRole('Admin');
+
+        foreach (['/users', '/roles', '/audit-logs', '/kpi/settings', '/kpi/reports', '/incidents/all'] as $url) {
+            $this->actingAs($admin)->get($url)->assertOk();
+        }
+
+        $this->actingAs($admin)->get('/permissions')->assertForbidden();
+        $this->assertTrue($admin->seesAllLocations());
+    }
+
+    private function buildingId(): int
+    {
+        return Building::withoutGlobalScopes()->orderBy('id')->value('id');
     }
 
     public function test_super_admin_passes_everything(): void
@@ -131,9 +196,9 @@ class RbacTest extends TestCase
         $target = User::factory()->create();
 
         $this->actingAs($admin)->get("/users/{$target->id}/roles")->assertOk();
-        $this->actingAs($admin)->put("/users/{$target->id}/roles", ['role' => ['Supervisor']])
+        $this->actingAs($admin)->put("/users/{$target->id}/roles", ['role' => ['Location Supervisor']])
             ->assertRedirect(route('users.index'));
-        $this->assertTrue($target->fresh()->hasRole('Supervisor'));
+        $this->assertTrue($target->fresh()->hasRole('Location Supervisor'));
 
         // Only a Super-Admin may hand out Super-Admin.
         $this->actingAs($admin)->put("/users/{$target->id}/roles", ['role' => ['Super-Admin']])->assertForbidden();
@@ -143,7 +208,7 @@ class RbacTest extends TestCase
     public function test_permissions_can_be_synced_to_a_role(): void
     {
         $admin = $this->userWithRole('Admin');
-        $role = Role::findByName('Senior Officer');
+        $role = Role::findByName('Security Officer');
 
         $this->actingAs($admin)->get("/roles/{$role->id}/permissions")->assertOk();
         $this->actingAs($admin)->put("/roles/{$role->id}/permissions", ['permission' => ['View Dashboard', 'View KPI Reports']])

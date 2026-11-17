@@ -27,9 +27,6 @@ class User extends Authenticatable implements LdapAuthenticatable
      */
     protected $fillable = [
         'staff_number',
-        'location_id',
-        'department',
-        'section',
         'name',
         'username',
         'email',
@@ -66,21 +63,62 @@ class User extends Authenticatable implements LdapAuthenticatable
         return $this->hasMany(IncidentOccurrence::class);
     }
 
-    public function location(): BelongsTo
+    /**
+     * The user's HR record. Users only hold what AD gives at login; department,
+     * section and location always come from here.
+     */
+    public function staff(): BelongsTo
     {
-        return $this->belongsTo(Location::class)->withoutGlobalScope('user_location');
+        return $this->belongsTo(Staff::class, 'staff_number', 'staff_number');
+    }
+
+    /** Location resolved once per request (the location scope asks on every query). */
+    private Location|false|null $resolvedLocation = null;
+
+    /**
+     * The user's location from their staff record: the admin's correction if
+     * set, otherwise the HR location matched by name.
+     */
+    public function location(): ?Location
+    {
+        if ($this->resolvedLocation === null) {
+            $this->resolvedLocation = $this->staff?->effectiveLocation() ?? false;
+        }
+
+        return $this->resolvedLocation ?: null;
+    }
+
+    public function locationId(): ?int
+    {
+        return $this->location()?->id;
+    }
+
+    /** Forget the cached staff record and location, e.g. after a staff sync. */
+    public function refreshStaff(): static
+    {
+        $this->resolvedLocation = null;
+        $this->unsetRelation('staff');
+
+        return $this;
     }
 
     public function seesAllLocations(): bool
     {
-        return $this->hasRole('Super-Admin');
+        return $this->hasRole('Super-Admin') || $this->checkPermissionTo('View All Locations');
     }
 
-    /** Users who may supervise a deployment at the given location. */
+    /** Users whose staff record puts them in the security section at the given location. */
     public function scopeSupervisingOfficers(Builder $query, ?int $locationId): void
     {
-        $query->where('location_id', $locationId)
+        $locationName = Location::withoutGlobalScope('user_location')->whereKey($locationId)->value('name');
+
+        $query->whereHas('staff', fn (Builder $staff) => $staff
+            ->where(fn (Builder $at) => $at
+                ->where('location_id', $locationId)
+                ->orWhere(fn (Builder $hr) => $hr
+                    ->whereNull('location_id')
+                    ->whereRaw('LOWER(location_name) = ?', [strtolower((string) $locationName)])))
             ->whereRaw('LOWER(department) = ?', [strtolower(config('security.supervisor_department'))])
-            ->whereRaw('LOWER(section) = ?', [strtolower(config('security.supervisor_section'))]);
+            ->whereRaw('LOWER(section) = ?', [strtolower(config('security.supervisor_section'))]));
     }
 }

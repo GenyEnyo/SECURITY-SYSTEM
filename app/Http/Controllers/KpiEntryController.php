@@ -14,6 +14,7 @@ use App\Support\KpiScoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class KpiEntryController extends Controller
 {
@@ -25,7 +26,7 @@ class KpiEntryController extends Controller
             'buildings'   => Building::orderBy('name')->get(['id', 'name', 'location_id']),
             'places'      => Place::orderBy('name')->get(['id', 'name', 'building_id', 'estimated_guards']),
             'companies'   => SecurityCompany::orderBy('name')->get(['id', 'name', 'location_id']),
-            'userLocationId' => auth()->user()->location_id,
+            'userLocationId' => auth()->user()->locationId(),
             'deployments' => Deployment::with('securityCompany:id,name')->get()
                 ->map(fn ($d) => [
                     'building_id' => $d->building_id,
@@ -64,6 +65,19 @@ class KpiEntryController extends Controller
         ], [
             'date.unique' => 'A scorecard already exists for this location and building on this date.',
         ]);
+
+        // A KPI score can't go above its target. Deployment beats are not capped.
+        $overTarget = [];
+        $subItems = KpiSubItem::whereIn('id', array_keys($data['scored'] ?? []))->get()->keyBy('id');
+        foreach ($data['scored'] ?? [] as $subItemId => $scored) {
+            $subItem = $subItems->get($subItemId);
+            if ($subItem && $subItem->target !== null && $scored !== null && $scored > $subItem->target) {
+                $overTarget["scored.$subItemId"] = "Score for \"{$subItem->criteria}\" cannot be more than its target ({$subItem->target}).";
+            }
+        }
+        if ($overTarget) {
+            throw ValidationException::withMessages($overTarget);
+        }
 
         DB::transaction(function () use ($request, $data) {
             $scorecard = KpiScorecard::create([

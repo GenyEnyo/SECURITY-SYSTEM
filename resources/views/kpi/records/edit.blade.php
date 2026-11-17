@@ -72,7 +72,7 @@
                   <td>{{ $line->group?->name ?? '—' }}</td>
                   <td class="fw-semibold">{{ $line->criteria }}</td>
                   <td>{{ $line->target ?? '—' }}</td>
-                  <td><input type="number" min="0" name="lines[{{ $line->id }}][scored]" value="{{ old('lines.' . $line->id . '.scored', $line->scored) }}" class="form-control"></td>
+                  <td><input type="number" min="0" @if ($line->target !== null) max="{{ $line->target }}" data-cap @endif name="lines[{{ $line->id }}][scored]" value="{{ old('lines.' . $line->id . '.scored', $line->scored) }}" class="form-control"></td>
                   <td class="text-muted">{{ $line->merit !== null ? number_format($line->merit, 1) : '—' }}</td>
                 </tr>
               @endforeach
@@ -125,3 +125,14 @@
     </div>
   </form>
 @endsection
+
+@push('scripts')
+  <script>
+    // A KPI score can't go above its target (Deployment beats are not capped).
+    document.addEventListener('input', (e) => {
+      const i = e.target;
+      if (!i.matches('input[data-cap]') || i.value === '') return;
+      if (+i.value > +i.max) i.value = i.max;
+    });
+  </script>
+@endpush

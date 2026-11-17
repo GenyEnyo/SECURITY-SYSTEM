@@ -33,7 +33,7 @@ class LocationScopeTest extends TestCase
 
     private function supervisorAt(?Location $location): User
     {
-        return User::factory()->create(['location_id' => $location?->id])->assignRole('Supervisor');
+        return User::factory()->atLocation($location)->create()->assignRole('Location Supervisor');
     }
 
     public function test_user_only_sees_buildings_in_their_location(): void
@@ -87,7 +87,7 @@ class LocationScopeTest extends TestCase
     {
         $temaBuilding = Building::where('location_id', $this->tema->id)->firstOrFail();
         $place = Place::create(['building_id' => $temaBuilding->id, 'name' => 'Main gate']);
-        $officer = User::factory()->create(['location_id' => $this->accra->id])->assignRole('Senior Officer');
+        $officer = User::factory()->atLocation($this->accra)->create()->assignRole('Security Officer');
 
         $this->actingAs($officer)->post('/incidents', [
             'incident_type_id' => IncidentType::value('id'),
@@ -99,22 +99,43 @@ class LocationScopeTest extends TestCase
         ])->assertSessionHasErrors(['location_id', 'building_id', 'place_id']);
     }
 
-    public function test_assigning_roles_does_not_change_a_users_location_department_or_section(): void
+    public function test_assigning_roles_does_not_change_a_users_staff_details(): void
     {
-        $admin = User::factory()->create(['location_id' => $this->accra->id])->assignRole('Admin');
-        $target = User::factory()->create(['location_id' => $this->accra->id]);
+        $admin = User::factory()->atLocation($this->accra)->create()->assignRole('Admin');
+        $target = User::factory()->atLocation($this->accra)->create();
 
         $this->actingAs($admin)->put("/users/{$target->id}/roles", [
-            'role'        => ['Supervisor'],
-            'location_id' => $this->tema->id,
-            'department'  => 'Real Estate and Security',
-            'section'     => 'Security',
+            'role'          => ['Location Supervisor'],
+            'staff_number'  => '999',
+            'location_name' => 'Tema',
         ])->assertRedirect(route('users.index'));
 
-        $target->refresh();
-        $this->assertTrue($target->hasRole('Supervisor'));
-        $this->assertSame($this->accra->id, $target->location_id);
-        $this->assertNull($target->department);
-        $this->assertNull($target->section);
+        $target = $target->fresh();
+        $this->assertTrue($target->hasRole('Location Supervisor'));
+        $this->assertSame($this->accra->id, $target->locationId());
+        $this->assertNotSame('999', $target->staff_number);
+    }
+
+    public function test_moving_a_staff_record_moves_what_the_user_sees(): void
+    {
+        $user = $this->supervisorAt($this->accra);
+
+        $this->actingAs($user)->get('/deployments')->assertSee('Head Office')->assertDontSee('KTS');
+
+        // HR moves them to Tema: no change to the users table needed.
+        $user->staff->update(['location_name' => 'Tema']);
+        $user = $user->fresh();
+
+        $this->actingAs($user)->get('/deployments')->assertSee('KTS')->assertDontSee('Head Office');
+    }
+
+    public function test_user_with_no_staff_record_sees_nothing(): void
+    {
+        $user = User::factory()->create(['staff_number' => '404404'])->assignRole('Location Supervisor');
+
+        $this->actingAs($user)->get('/deployments')
+            ->assertOk()
+            ->assertDontSee('Head Office')
+            ->assertDontSee('KTS');
     }
 }

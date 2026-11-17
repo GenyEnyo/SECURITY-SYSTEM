@@ -244,7 +244,7 @@
 
     {{-- Signature lines --}}
     <div class="sig-row">
-      <div><div class="sig-line">Prepared by — Senior Officer</div></div>
+      <div><div class="sig-line">Prepared by — Location Supervisor</div></div>
       <div><div class="sig-line">Approved by — Head of Security</div></div>
     </div>
 
